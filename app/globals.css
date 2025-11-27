@@ -1,76 +1,157 @@
+/* ============================================
+   KATHLEEN HEALS - HEALING & WELLNESS WEBSITE
+   Modern Design System with Calming Aesthetics
+   ============================================ */
+
+/* ===== IMPORTS ===== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
+/* ===== CSS VARIABLES ===== */
+:root {
+  /* Color Palette - Healing & Wellness Theme */
+  --primary-purple: hsl(270, 60%, 65%);
+  --primary-purple-light: hsl(270, 60%, 75%);
+  --primary-purple-dark: hsl(270, 60%, 45%);
 
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
+  --secondary-teal: hsl(180, 55%, 55%);
+  --secondary-teal-light: hsl(180, 55%, 65%);
+  --secondary-teal-dark: hsl(180, 55%, 35%);
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
+  --accent-gold: hsl(45, 85%, 65%);
+  --accent-rose: hsl(340, 70%, 70%);
 
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
+  /* Neutrals */
+  --bg-dark: hsl(250, 30%, 8%);
+  --bg-dark-secondary: hsl(250, 25%, 12%);
+  --bg-card: hsla(250, 30%, 15%, 0.6);
+  --text-primary: hsl(0, 0%, 98%);
+  --text-secondary: hsl(0, 0%, 75%);
+  --text-muted: hsl(0, 0%, 60%);
 
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
+  /* Gradients */
+  --gradient-hero: linear-gradient(135deg,
+      hsl(270, 60%, 25%) 0%,
+      hsl(250, 50%, 15%) 50%,
+      hsl(180, 40%, 20%) 100%);
 
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
+  --gradient-card: linear-gradient(135deg,
+      hsla(270, 60%, 65%, 0.1) 0%,
+      hsla(180, 55%, 55%, 0.1) 100%);
 
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
+  --gradient-accent: linear-gradient(90deg,
+      var(--primary-purple) 0%,
+      var(--secondary-teal) 100%);
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 2rem;
+  --spacing-lg: 4rem;
+  --spacing-xl: 6rem;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 71.4% 4.1%;
+  /* Typography */
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Playfair Display', Georgia, serif;
 
-    --radius: 0.5rem;
-  }
+  /* Effects */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
 
-  .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
-
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 216 12.2% 83.9%;
-  }
+  --blur-glass: blur(12px);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 @layer base {
   * {
-    @apply border-border;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+  }
+
+  h2 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    color: var(--text-primary);
+  }
+
+  h3 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    color: var(--primary-purple-light);
+  }
+
+  p {
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+  }
+}
+
+@layer components {
+  .text-gradient {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glass-card {
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-glass);
+    border: 1px solid hsla(270, 60%, 65%, 0.2);
+    border-radius: 20px;
+    transition: var(--transition-smooth);
+  }
+
+  .glass-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-purple);
+  }
+}
+
+@layer utilities {
+  .container-custom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+  }
+
+  .section-padding {
+    padding: var(--spacing-xl) 0;
   }
 }
