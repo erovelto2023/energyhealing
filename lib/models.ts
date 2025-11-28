@@ -329,6 +329,47 @@ const FavoriteAffirmationSchema = new Schema({
     }
 })
 
+// Booking Request Schema
+const BookingRequestSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+        maxlength: 100
+    },
+    email: {
+        type: String,
+        required: true,
+        maxlength: 100
+    },
+    phone: {
+        type: String,
+        maxlength: 20
+    },
+    service: {
+        type: String,
+        maxlength: 100
+    },
+    message: {
+        type: String,
+        required: true,
+        maxlength: 2000
+    },
+    status: {
+        type: String,
+        enum: ['new', 'contacted', 'completed', 'archived'],
+        default: 'new'
+    },
+    notes: {
+        type: String,
+        maxlength: 2000,
+        required: false
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+})
+
 // Export models
 export const CardPull = models.CardPull || model('CardPull', CardPullSchema)
 export const EnergyLog = models.EnergyLog || model('EnergyLog', EnergyLogSchema)
@@ -339,3 +380,44 @@ export const JournalEntry = models.JournalEntry || model('JournalEntry', Journal
 export const MoodLog = models.MoodLog || model('MoodLog', MoodLogSchema)
 export const JournalPrompt = models.JournalPrompt || model('JournalPrompt', JournalPromptSchema)
 export const FavoriteAffirmation = models.FavoriteAffirmation || model('FavoriteAffirmation', FavoriteAffirmationSchema)
+
+export const BookingRequest = models.BookingRequest || model('BookingRequest', BookingRequestSchema)
+
+const BlogPostSchema = new Schema({
+    title: {
+        type: String,
+        required: [true, 'Please provide a title'],
+        maxlength: [100, 'Title cannot be more than 100 characters']
+    },
+    slug: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    content: {
+        type: String,
+        required: [true, 'Please provide content']
+    },
+    excerpt: {
+        type: String,
+        maxlength: [300, 'Excerpt cannot be more than 300 characters']
+    },
+    coverImage: {
+        type: String
+    },
+    tags: {
+        type: [String],
+        default: []
+    },
+    isPublished: {
+        type: Boolean,
+        default: false
+    },
+    publishedAt: {
+        type: Date
+    }
+}, {
+    timestamps: true
+})
+
+export const BlogPost = models.BlogPost || model('BlogPost', BlogPostSchema)

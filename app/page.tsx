@@ -1,14 +1,17 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
+import { SignedIn, SignedOut, SignOutButton } from '@clerk/nextjs'
+import HeroSlideshow from '@/components/HeroSlideshow'
 
 export default function Home() {
   const [formSubmitted, setFormSubmitted] = useState(false)
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    const formData = new FormData(e.currentTarget)
+    const form = e.currentTarget
+    const formData = new FormData(form)
     const data = {
       name: formData.get('name'),
       email: formData.get('email'),
@@ -17,31 +20,63 @@ export default function Home() {
       message: formData.get('message')
     }
 
-    console.log('Form submitted:', data)
-    setFormSubmitted(true)
-    e.currentTarget.reset()
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
 
-    setTimeout(() => setFormSubmitted(false), 5000)
+      if (response.ok) {
+        setFormSubmitted(true)
+        form.reset()
+        setTimeout(() => setFormSubmitted(false), 5000)
+      } else {
+        console.error('Form submission failed')
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error)
+    }
   }
 
   return (
     <>
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: 'var(--gradient-hero)' }}>
-        {/* Animated Background Elements */}
-        <div className="absolute top-[-50%] right-[-20%] w-[800px] h-[800px] rounded-full opacity-100 animate-float"
-          style={{
-            background: 'radial-gradient(circle, hsla(270, 60%, 65%, 0.15) 0%, transparent 70%)'
-          }}
-        />
-        <div className="absolute bottom-[-30%] left-[-10%] w-[600px] h-[600px] rounded-full opacity-100 animate-float-reverse"
-          style={{
-            background: 'radial-gradient(circle, hsla(180, 55%, 55%, 0.15) 0%, transparent 70%)',
-            animationDelay: '0s'
-          }}
-        />
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-900">
+        <HeroSlideshow />
 
         <div className="container-custom text-center z-10 animate-fade-in-up px-4">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight drop-shadow-lg">
+            Kathleen Heals
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-100 max-w-2xl mx-auto mb-10 font-light drop-shadow-md">
+            Find relief from pain naturally through the power of energy healing.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a href="#contact" className="btn-primary min-w-[200px]">
+              Start Your Journey
+            </a>
+
+            <SignedOut>
+              <a href="/sign-up" className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full font-semibold hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 min-w-[200px]">
+                Create Account
+              </a>
+            </SignedOut>
+
+            <SignedIn>
+              <SignOutButton>
+                <button className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full font-semibold hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 min-w-[200px]">
+                  Log Out
+                </button>
+              </SignOutButton>
+            </SignedIn>
+          </div>
+        </div>
+      </section>
+
+      {/* Healing Services Section */}
+      <section className="section-padding" id="services">
+        <div className="container-custom">
           <h2 className="text-center mb-4">Healing Services</h2>
           <p className="text-center text-muted text-lg max-w-2xl mx-auto mb-16">
             Personalized healing modalities designed to address your unique needs and support your journey to wellness

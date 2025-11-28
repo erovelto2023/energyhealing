@@ -1,4 +1,6 @@
 // Ollama utility functions for server-side API calls
+import { spawn } from 'child_process'
+import { Readable } from 'stream'
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_API_URL || 'http://31.97.146.3:11434'
 
@@ -43,7 +45,10 @@ export async function generateWithOllama(
 ): Promise<OllamaGenerateResponse> {
     const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Connection': 'close'
+        },
         body: JSON.stringify({
             model,
             prompt,
@@ -120,4 +125,55 @@ Return ONLY the 3 affirmations, one per line, numbered 1-3. No other text.`
 export async function generateText(prompt: string, model?: string): Promise<string> {
     const result = await generateWithOllama(prompt, model)
     return result.response
+}
+
+/**
+ * Generate text with Ollama (Streaming)
+ */
+export async function generateWithOllamaStream(
+    prompt: string,
+    model: string = 'deepseek-r1:latest',
+    options?: OllamaGenerateRequest['options']
+): Promise<ReadableStream<Uint8Array>> {
+    console.log('Spawning curl.exe for Ollama...');
+
+    const child = spawn('curl.exe', [
+        '-v', // verbose required for some reason on Windows to flush stdout?
+        '-N', // no buffer
+        '-X', 'POST',
+        `${OLLAMA_BASE_URL}/api/generate`,
+        '-H', 'Content-Type: application/json',
+        '-d', JSON.stringify({
+            model,
+            prompt,
+            stream: true,
+            options: options || {}
+        })
+    ], {});
+
+    child.stderr.on('data', (data) => {
+        console.log('curl stderr:', data.toString());
+    });
+
+    child.on('error', (err) => {
+        console.error('Failed to start curl:', err);
+    });
+
+    // @ts-ignore
+    return new ReadableStream({
+        start(controller) {
+            child.stdout.on('data', (chunk) => {
+                controller.enqueue(chunk);
+            });
+            child.stdout.on('end', () => {
+                controller.close();
+            });
+            child.stdout.on('error', (err) => {
+                controller.error(err);
+            });
+        },
+        cancel() {
+            child.kill();
+        }
+    });
 }
