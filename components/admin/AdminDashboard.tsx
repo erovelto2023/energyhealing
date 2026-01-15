@@ -782,6 +782,7 @@ export default function AdminDashboard({ reviews, products, glossaryTerms, niche
                                             <GlossaryForm
                                                 initialData={editingWritingTerm}
                                                 onComplete={() => { setWritingView('list'); router.refresh(); }}
+                                                products={products}
                                             />
                                         </div>
                                     )}

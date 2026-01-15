@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createGlossaryTerm, updateGlossaryTerm } from "@/lib/actions"; // Assuming these actions exist
-import { Save, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { createGlossaryTerm, updateGlossaryTerm } from "@/lib/actions";
+import { Save, AlertCircle, CheckCircle, Loader2, Link as LinkIcon } from "lucide-react";
 import { IGlossaryTerm } from "@/lib/models/GlossaryTerm";
+import { IProduct } from "@/lib/models/Product";
 
 interface GlossaryFormProps {
     initialData?: IGlossaryTerm;
     onComplete: () => void;
+    products: IProduct[];
 }
 
-export default function GlossaryForm({ initialData, onComplete }: GlossaryFormProps) {
+export default function GlossaryForm({ initialData, onComplete, products = [] }: GlossaryFormProps) {
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
 
@@ -51,6 +53,9 @@ export default function GlossaryForm({ initialData, onComplete }: GlossaryFormPr
             // SEO
             metaTitle: "",
             keywords: [],
+
+            // Relationships
+            recommendedTools: []
         }
     );
 
@@ -229,6 +234,48 @@ export default function GlossaryForm({ initialData, onComplete }: GlossaryFormPr
                             className="w-full p-2.5 rounded-lg border border-blue-200 text-sm"
                             placeholder="During emotional overwhelm..."
                         />
+                    </div>
+                </div>
+            </div>
+
+            {/* Related Tools / Resources - NEW SECTION */}
+            <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-100 space-y-6">
+                <h3 className="font-bold text-indigo-900 border-b border-indigo-200 pb-2 flex items-center gap-2">
+                    <LinkIcon size={18} />
+                    Related Resources / Tools
+                </h3>
+                <div className="space-y-4">
+                    <p className="text-sm text-indigo-800">Select tools or resources from the database to recommend with this term:</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto p-4 bg-white rounded-lg border border-indigo-100">
+                        {products.map(product => {
+                            const isSelected = formData.recommendedTools?.some(t => t.productId === product.id);
+                            return (
+                                <label key={product.id} className={`flex items-start gap-3 p-3 rounded border cursor-pointer transition-all ${isSelected ? 'bg-indigo-50 border-indigo-200' : 'bg-white border-transparent hover:bg-slate-50'}`}>
+                                    <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={(e) => {
+                                            const current = formData.recommendedTools || [];
+                                            if (e.target.checked) {
+                                                handleChange("recommendedTools", [...current, { productId: product.id, context: "Recommended Resource" }]);
+                                            } else {
+                                                handleChange("recommendedTools", current.filter(t => t.productId !== product.id));
+                                            }
+                                        }}
+                                        className="mt-1 w-4 h-4 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500"
+                                    />
+                                    <div>
+                                        <span className="font-bold text-slate-800 block text-sm">{product.name}</span>
+                                        <span className="text-xs text-slate-500 block">{product.category} • {product.niche}</span>
+                                    </div>
+                                </label>
+                            );
+                        })}
+                        {products.length === 0 && (
+                            <div className="col-span-full text-center text-slate-500 text-sm py-4">
+                                No products found in database.
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
