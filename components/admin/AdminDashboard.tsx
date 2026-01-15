@@ -6,6 +6,7 @@ import { MessageSquare, Wrench, BookOpen, Compass, Edit, Trash2, Plus, ArrowLeft
 import AdminReviewList from '@/components/features/AdminReviewList';
 import ProductForm from './ProductForm';
 import GlossaryImporter from './GlossaryImporter';
+import GlossaryForm from './GlossaryForm';
 
 import {
     createProduct, updateProduct, deleteProduct,
@@ -778,11 +779,10 @@ export default function AdminDashboard({ reviews, products, glossaryTerms, niche
                                             >
                                                 <ArrowLeft size={16} className="mr-1" /> Back to Phrases
                                             </button>
-                                            {/* <HealingTermForm
+                                            <GlossaryForm
                                                 initialData={editingWritingTerm}
                                                 onComplete={() => { setWritingView('list'); router.refresh(); }}
-                                            /> */}
-                                            <p className="text-slate-600">Healing term form is not available in this version.</p>
+                                            />
                                         </div>
                                     )}
                                 </div>

@@ -1,167 +1,403 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createGlossaryTerm, updateGlossaryTerm } from "@/lib/actions";
+import { createGlossaryTerm, updateGlossaryTerm } from "@/lib/actions"; // Assuming these actions exist
+import { Save, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import { IGlossaryTerm } from "@/lib/models/GlossaryTerm";
 
-export default function GlossaryForm({ initialData }: { initialData?: IGlossaryTerm }) {
+interface GlossaryFormProps {
+    initialData?: IGlossaryTerm;
+    onComplete: () => void;
+}
+
+export default function GlossaryForm({ initialData, onComplete }: GlossaryFormProps) {
     const [isPending, startTransition] = useTransition();
-    const [message, setMessage] = useState("");
+    const [error, setError] = useState<string | null>(null);
 
-    async function handleSubmit(formData: FormData) {
-        setMessage("");
+    // Initial state based on your requirements
+    const [formData, setFormData] = useState<Partial<IGlossaryTerm>>(
+        initialData || {
+            term: "",
+            category: "Energy Healing",
+            subCategory: "",
+            shortDefinition: "",
+            definition: "",
 
-        const split = (key: string) => (formData.get(key) as string)?.split(",").map((s) => s.trim()).filter(Boolean) || [];
+            // Meaning & Context
+            origin: "",
+            traditionalMeaning: "",
+            expandedExplanation: "",
 
-        const recommendedToolIds = split("recommendedToolIds").map(id => Number(id)).filter(n => !isNaN(n));
-        const recommendedTools = recommendedToolIds.map(id => ({ productId: id, context: "Recommended for this term" }));
+            // Practical Application
+            howItWorks: "",
+            benefits: "",
+            commonPractices: "",
+            useCases: "",
 
-        const data: any = {
-            // Core
-            term: formData.get("term"),
-            slug: formData.get("slug") || undefined,
-            shortDefinition: formData.get("shortDefinition"),
-            definition: formData.get("definition"), // Full Explanation
-            niche: formData.get("niche"),
+            // Energy & Consciousness
+            energyType: "Subtle",
+            consciousnessLevel: "",
+            chakraAssociation: "",
+            elementalAssociation: "",
+            frequencyLevel: "",
 
-            // Bridge
-            recommendedTools: recommendedTools,
+            // Learning & Guidance
+            beginnerExplanation: "",
+            guidedPractice: "", // Guided Practice Script
+            affirmations: "", // Daily Affirmations
+            warningsOrNotes: "",
+            misconceptions: "",
 
             // SEO
-            synonyms: split("synonyms"),
-            antonyms: split("antonyms"),
-            relatedTermIds: split("relatedTermIds"),
-
-            // Visuals
-            imageUrl: formData.get("imageUrl"),
-            sponsoredBy: formData.get("sponsoredBy"),
-        };
-
-        if (initialData) {
-            data.id = initialData.id;
+            metaTitle: "",
+            keywords: [],
         }
+    );
+
+    const handleChange = (field: keyof IGlossaryTerm, value: any) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
 
         startTransition(async () => {
-            const result = initialData ? await updateGlossaryTerm(data) : await createGlossaryTerm(data);
-            if (result.error) {
-                setMessage("Error: " + result.error);
+            let result;
+            if (initialData && initialData.id) {
+                result = await updateGlossaryTerm({ ...formData, id: initialData.id });
             } else {
-                setMessage(initialData ? "Term updated successfully!" : "Term created successfully!");
+                result = await createGlossaryTerm(formData);
+            }
+
+            if (result.error) {
+                setError(result.error);
+            } else {
+                onComplete();
             }
         });
-    }
-
-    // Helper to join recommended tool IDs
-    const defaultRecommendedTools = initialData?.recommendedTools?.map(t => t.productId).join(", ");
+    };
 
     return (
-        <form action={handleSubmit} className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-            <h2 className="text-xl font-bold text-slate-800 border-b pb-4 mb-6">
-                {initialData ? `Edit Term: ${initialData.term}` : "Add Glossary Item"}
-            </h2>
+        <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-8 max-w-4xl mx-auto">
+            <div className="border-b border-slate-100 pb-6">
+                <h2 className="text-2xl font-black text-slate-800 tracking-tight">
+                    {initialData ? "Edit Glossary Term" : "Create New Term"}
+                </h2>
+                <p className="text-slate-500">Fill in the details below to add a comprehensive healing term.</p>
+            </div>
 
-            {/* Core Definition */}
-            <section className="mb-8">
-                <h3 className="text-md font-semibold text-slate-900 mb-4 uppercase tracking-wide text-xs">The Core Definition</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Core Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="col-span-full">
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Term Name *</label>
+                    <input
+                        required
+                        type="text"
+                        value={formData.term}
+                        onChange={e => handleChange("term", e.target.value)}
+                        className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-lg"
+                        placeholder="e.g. Absolute Awareness"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Category</label>
+                    <select
+                        value={formData.category}
+                        onChange={e => handleChange("category", e.target.value)}
+                        className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                    >
+                        <option value="Energy Healing">Energy Healing</option>
+                        <option value="Meditation">Meditation</option>
+                        <option value="Modalities">Modalities</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Sub-Category</label>
+                    <input
+                        type="text"
+                        value={formData.subCategory || ""}
+                        onChange={e => handleChange("subCategory", e.target.value)}
+                        className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="e.g. Non-duality"
+                    />
+                </div>
+
+                <div className="col-span-full">
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Short Definition (One Sentence)</label>
+                    <textarea
+                        rows={2}
+                        value={formData.shortDefinition}
+                        onChange={e => handleChange("shortDefinition", e.target.value)}
+                        className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="Foundational state of consciousness..."
+                    />
+                </div>
+
+                <div className="col-span-full">
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Full Definition / Concept</label>
+                    <textarea
+                        rows={6}
+                        value={formData.definition}
+                        onChange={e => handleChange("definition", e.target.value)}
+                        className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm"
+                        placeholder="## Concept..."
+                    />
+                </div>
+            </div>
+
+            {/* Meaning & Context */}
+            <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 space-y-6">
+                <h3 className="font-bold text-slate-900 border-b border-slate-200 pb-2">History & Meaning</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700">Term Name *</label>
-                        <input name="term" defaultValue={initialData?.term} required className="input-field" placeholder="e.g. Autoresponder" />
+                        <label className="block text-xs font-bold text-slate-600 uppercase mb-1">Origin & Etymology</label>
+                        <input
+                            type="text"
+                            value={formData.origin || ""}
+                            onChange={e => handleChange("origin", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-slate-200 text-sm"
+                            placeholder="Sanskrit 'Cit'..."
+                        />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700">Slug (URL)</label>
-                        <input name="slug" defaultValue={initialData?.slug} className="input-field" placeholder="e.g. /glossary/autoresponder" />
+                        <label className="block text-xs font-bold text-slate-600 uppercase mb-1">Traditional Meaning</label>
+                        <input
+                            type="text"
+                            value={formData.traditionalMeaning || ""}
+                            onChange={e => handleChange("traditionalMeaning", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-slate-200 text-sm"
+                            placeholder="In Eastern philosophy..."
+                        />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Primary Niche *</label>
-                        <input name="niche" defaultValue={initialData?.niche} required className="input-field" placeholder="e.g. Email Marketing" />
-                    </div>
-                    <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-slate-700">Short Definition (Card View) *</label>
-                        <input name="shortDefinition" defaultValue={initialData?.shortDefinition} required className="input-field" placeholder="1-2 sentence summary..." />
-                    </div>
-                    <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-slate-700">Detailed Explanation (Content) *</label>
-                        <textarea name="definition" defaultValue={initialData?.definition} required rows={6} className="input-field" placeholder="Full explanation (300+ words recommended). Markdown supported." />
+                    <div className="col-span-full">
+                        <label className="block text-xs font-bold text-slate-600 uppercase mb-1">Expanded History / Explanation</label>
+                        <textarea
+                            rows={3}
+                            value={formData.expandedExplanation || ""}
+                            onChange={e => handleChange("expandedExplanation", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-slate-200 text-sm"
+                            placeholder="Rooted in Advaita Vedanta..."
+                        />
                     </div>
                 </div>
-            </section>
+            </div>
 
-            {/* The Bridge */}
-            <section className="mb-8 border-t pt-6 border-slate-100">
-                <h3 className="text-md font-semibold text-slate-900 mb-4 uppercase tracking-wide text-xs text-blue-700">The Bridge (Conversion)</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Practical Application */}
+            <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 space-y-6">
+                <h3 className="font-bold text-blue-900 border-b border-blue-200 pb-2">Practical Application</h3>
+
+                <div className="grid grid-cols-1 gap-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700">Recommended Tool IDs (comma separated)</label>
-                        <input name="recommendedToolIds" defaultValue={defaultRecommendedTools} className="input-field" placeholder="e.g. 101, 102" />
-                        <p className="text-xs text-slate-500 mt-1">IDs of tools from the directory to recommend.</p>
+                        <label className="block text-xs font-bold text-blue-800 uppercase mb-1">How It Works (Mechanism)</label>
+                        <textarea
+                            rows={2}
+                            value={formData.howItWorks || ""}
+                            onChange={e => handleChange("howItWorks", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-blue-200 text-sm focus:ring-blue-500"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-blue-800 uppercase mb-1">Key Benefits</label>
+                        <textarea
+                            rows={2}
+                            value={formData.benefits || ""}
+                            onChange={e => handleChange("benefits", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-blue-200 text-sm focus:ring-blue-500"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-blue-800 uppercase mb-1">Common Practices</label>
+                        <input
+                            type="text"
+                            value={formData.commonPractices || ""}
+                            onChange={e => handleChange("commonPractices", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-blue-200 text-sm"
+                            placeholder="Self-inquiry, meditation..."
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-blue-800 uppercase mb-1">Real-world Use Case</label>
+                        <input
+                            type="text"
+                            value={formData.useCases || ""}
+                            onChange={e => handleChange("useCases", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-blue-200 text-sm"
+                            placeholder="During emotional overwhelm..."
+                        />
                     </div>
                 </div>
-            </section>
+            </div>
 
-            {/* SEO & Class */}
-            <section className="mb-8 border-t pt-6 border-slate-100">
-                <h3 className="text-md font-semibold text-slate-900 mb-4 uppercase tracking-wide text-xs">SEO & Navigation</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Energy & Consciousness */}
+            <div className="bg-purple-50 p-6 rounded-xl border border-purple-100 space-y-6">
+                <h3 className="font-bold text-purple-900 border-b border-purple-200 pb-2">Energy & Consciousness</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700">Synonyms / AKA (comma separated)</label>
-                        <input name="synonyms" defaultValue={initialData?.synonyms?.join(", ")} className="input-field" placeholder="e.g. Automated Email, Drip Campaign" />
+                        <label className="block text-xs font-bold text-purple-800 uppercase mb-1">Energy Type</label>
+                        <select
+                            value={formData.energyType || "Subtle"}
+                            onChange={e => handleChange("energyType", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-purple-200 text-sm"
+                        >
+                            <option value="Subtle">Subtle</option>
+                            <option value="Biofield">Biofield</option>
+                            <option value="Physical">Physical</option>
+                            <option value="Cosmic">Cosmic</option>
+                        </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700">Antonyms (comma separated)</label>
-                        <input name="antonyms" defaultValue={initialData?.antonyms?.join(", ")} className="input-field" placeholder="e.g. Broadcast Email" />
+                        <label className="block text-xs font-bold text-purple-800 uppercase mb-1">Consciousness Level</label>
+                        <input
+                            type="text"
+                            value={formData.consciousnessLevel || ""}
+                            onChange={e => handleChange("consciousnessLevel", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-purple-200 text-sm"
+                            placeholder="e.g. Turiya"
+                        />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700">Related Term IDs (comma separated)</label>
-                        <input name="relatedTermIds" defaultValue={initialData?.relatedTermIds?.join(", ")} className="input-field" placeholder="e.g. g1, g5" />
+                        <label className="block text-xs font-bold text-purple-800 uppercase mb-1">Frequency</label>
+                        <input
+                            type="text"
+                            value={formData.frequencyLevel || ""}
+                            onChange={e => handleChange("frequencyLevel", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-purple-200 text-sm"
+                            placeholder="e.g. Beyond measurable"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-purple-800 uppercase mb-1">Chakra</label>
+                        <input
+                            type="text"
+                            value={formData.chakraAssociation || ""}
+                            onChange={e => handleChange("chakraAssociation", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-purple-200 text-sm"
+                            placeholder="e.g. Crown"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-purple-800 uppercase mb-1">Element</label>
+                        <input
+                            type="text"
+                            value={formData.elementalAssociation || ""}
+                            onChange={e => handleChange("elementalAssociation", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-purple-200 text-sm"
+                            placeholder="e.g. Ether"
+                        />
                     </div>
                 </div>
-            </section>
+            </div>
 
-            {/* Visuals */}
-            <section className="mb-8 border-t pt-6 border-slate-100">
-                <h3 className="text-md font-semibold text-slate-900 mb-4 uppercase tracking-wide text-xs">Visuals & Monetization</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Beginner & Guidance */}
+            <div className="bg-amber-50 p-6 rounded-xl border border-amber-100 space-y-6">
+                <h3 className="font-bold text-amber-900 border-b border-amber-200 pb-2">Guidance & Experience</h3>
+
+                <div>
+                    <label className="block text-xs font-bold text-amber-800 uppercase mb-1">Beginner's Intro</label>
+                    <textarea
+                        rows={2}
+                        value={formData.beginnerExplanation || ""}
+                        onChange={e => handleChange("beginnerExplanation", e.target.value)}
+                        className="w-full p-2.5 rounded-lg border border-amber-200 text-sm"
+                        placeholder="Imagine the sky..."
+                    />
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-amber-800 uppercase mb-1">Guided Practice Script</label>
+                    <textarea
+                        rows={3}
+                        value={formData.guidedPractice || ""}
+                        onChange={e => handleChange("guidedPractice", e.target.value)}
+                        className="w-full p-2.5 rounded-lg border border-amber-200 text-sm"
+                        placeholder="Close your eyes..."
+                    />
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-amber-800 uppercase mb-1">Daily Affirmations</label>
+                    <textarea
+                        rows={2}
+                        value={formData.affirmations || ""}
+                        onChange={e => handleChange("affirmations", e.target.value)}
+                        className="w-full p-2.5 rounded-lg border border-amber-200 text-sm"
+                        placeholder="I am pure awareness..."
+                    />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700">Diagram / Image URL</label>
-                        <input name="imageUrl" defaultValue={initialData?.imageUrl} className="input-field" placeholder="https://..." />
+                        <label className="block text-xs font-bold text-amber-800 uppercase mb-1">Warnings / Notes</label>
+                        <input
+                            type="text"
+                            value={formData.warningsOrNotes || ""}
+                            onChange={e => handleChange("warningsOrNotes", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-amber-200 text-sm"
+                        />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700">Sponsored By (Optional)</label>
-                        <input name="sponsoredBy" defaultValue={initialData?.sponsoredBy} className="input-field" placeholder="Vendor Name" />
+                        <label className="block text-xs font-bold text-amber-800 uppercase mb-1">Common Misconceptions</label>
+                        <input
+                            type="text"
+                            value={formData.misconceptions || ""}
+                            onChange={e => handleChange("misconceptions", e.target.value)}
+                            className="w-full p-2.5 rounded-lg border border-amber-200 text-sm"
+                        />
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <div className="pt-6 border-t border-slate-200">
+            {/* Metadata */}
+            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 space-y-6">
+                <h3 className="font-bold text-gray-900 border-b border-gray-200 pb-2">SEO Metadata</h3>
+                <div>
+                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Meta Title</label>
+                    <input
+                        type="text"
+                        value={formData.metaTitle || ""}
+                        onChange={e => handleChange("metaTitle", e.target.value)}
+                        className="w-full p-2.5 rounded-lg border border-gray-200 text-sm"
+                    />
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Keywords (comma separated)</label>
+                    <input
+                        type="text"
+                        value={formData.keywords?.join(", ") || ""}
+                        onChange={e => handleChange("keywords", e.target.value.split(",").map(s => s.trim()))}
+                        className="w-full p-2.5 rounded-lg border border-gray-200 text-sm"
+                    />
+                </div>
+            </div>
+
+            {error && (
+                <div className="p-4 bg-red-50 text-red-700 rounded-xl flex items-center gap-2">
+                    <AlertCircle size={20} />
+                    {error}
+                </div>
+            )}
+
+            <div className="flex gap-4 pt-4">
                 <button
                     type="submit"
                     disabled={isPending}
-                    className="w-full inline-flex justify-center py-3 px-6 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-green-200 transition-all flex items-center justify-center gap-2"
                 >
-                    {isPending ? (initialData ? 'Updating...' : 'Saving...') : (initialData ? 'Update Term' : 'Save Glossary Term')}
+                    {isPending ? <Loader2 className="animate-spin" /> : <Save size={20} />}
+                    Save Term
+                </button>
+                <button
+                    type="button"
+                    onClick={() => onComplete()}
+                    className="px-6 py-3 border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50"
+                >
+                    Cancel
                 </button>
             </div>
-
-            <style jsx>{`
-                .input-field {
-                    margin-top: 0.25rem;
-                    display: block;
-                    width: 100%;
-                    border-radius: 0.375rem;
-                    border: 1px solid #cbd5e1;
-                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-                    padding: 0.5rem;
-                }
-                .input-field:focus {
-                    border-color: #3b82f6;
-                    outline: none;
-                    ring: 2px;
-                    ring-color: #3b82f6;
-                }
-            `}</style>
-
-            {message && <p className={`text-sm mt-4 p-3 rounded ${message.startsWith('Error') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>{message}</p>}
         </form>
     );
 }

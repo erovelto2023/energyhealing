@@ -102,12 +102,35 @@ export default function GlossaryImporter() {
 
     const template = `[
   {
-    "term": "SEO",
-    "niche": "SEO",
-    "shortDefinition": "Search Engine Optimization",
-    "definition": "The process of optimizing your website to rank higher in search engines.",
-    "synonyms": ["Search Engine Marketing", "Organic Search"],
-    "recommendedToolIds": [1, 2]
+    "term": "Absolute Awareness",
+    "category": "Energy Healing",
+    "subCategory": "Non-duality",
+    "shortDefinition": "The foundational state of consciousness that exists prior to thought.",
+    "definition": "## Concept\\nAbsolute Awareness is the foundational state...",
+    
+    "origin": "Sanskrit 'Cit'",
+    "traditionalMeaning": "Pure Consciousness",
+    "expandedExplanation": "Rooted in Advaita Vedanta...",
+    
+    "howItWorks": "When attention disidentifies from thoughts...",
+    "benefits": "Reduces anxiety, fosters peace",
+    "commonPractices": "Self-inquiry",
+    "useCases": "Emotional overwhelm",
+    
+    "energyType": "Subtle",
+    "consciousnessLevel": "Turiya",
+    "chakraAssociation": "Crown",
+    "elementalAssociation": "Ether",
+    "frequencyLevel": "Beyond measurable",
+    
+    "beginnerExplanation": "Imagine the sky...",
+    "guidedPractice": "Close your eyes...",
+    "affirmations": "I am pure awareness",
+    "warningsOrNotes": "May trigger discomfort",
+    "misconceptions": "It is not a trance",
+    
+    "metaTitle": "Absolute Awareness",
+    "keywords": ["awareness", "non-duality"]
   }
 ]`;
 
