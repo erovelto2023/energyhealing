@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { MessageSquare, Wrench, BookOpen, Compass, Edit, Trash2, Plus, ArrowLeft, Lightbulb, Users, FileText, Copy, Check, PenTool, ShoppingBag, LayoutGrid, Eye, ArrowUpDown, Tag, Sparkles, Search, Download } from 'lucide-react';
 import AdminReviewList from '@/components/features/AdminReviewList';
 import ProductForm from './ProductForm';
+import GlossaryImporter from './GlossaryImporter';
 
 import {
     createProduct, updateProduct, deleteProduct,
@@ -517,8 +518,7 @@ export default function AdminDashboard({ reviews, products, glossaryTerms, niche
                                     >
                                         <ArrowLeft size={16} className="mr-1" /> Back to List
                                     </button>
-                                    {/* <HealingTermsImporter /> */}
-                                    <p className="text-slate-600">Healing terms importer is not available in this version.</p>
+                                    <GlossaryImporter />
                                 </div>
                             ) : (
                                 <div className="space-y-6">
