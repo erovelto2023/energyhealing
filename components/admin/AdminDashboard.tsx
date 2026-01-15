@@ -6,15 +6,10 @@ import { MessageSquare, Wrench, BookOpen, Compass, Edit, Trash2, Plus, ArrowLeft
 import AdminReviewList from '@/components/features/AdminReviewList';
 import ProductForm from './ProductForm';
 
-import NicheForm from './NicheForm';
-import HealingTermsImporter from './HealingTermsImporter';
-import HealingTermForm from './HealingTermForm';
-import SalesPageForm from './SalesPageForm';
 import {
     createProduct, updateProduct, deleteProduct,
     createGlossaryTerm, updateGlossaryTerm, deleteGlossaryTerm, deleteGlossaryTerms,
-    createNiche, updateNiche, deleteNiche, findDuplicateGlossaryTerms,
-    importHealingTerms, deleteSalesPage
+    findDuplicateGlossaryTerms
 } from "@/lib/actions";
 import { IProduct } from '@/lib/models/Product';
 import { IGlossaryTerm } from '@/lib/models/GlossaryTerm';
@@ -87,18 +82,18 @@ export default function AdminDashboard({ reviews, products, glossaryTerms, niche
         });
     };
 
-    const handleDeleteSalesPage = (id: string) => {
-        if (!confirm("Are you sure you want to delete this sales page?")) return;
-        startDeleteTransition(async () => {
-            const result = await deleteSalesPage(id);
-            if (result.success) {
-                alert('✅ Sales page deleted!');
-                window.location.reload();
-            } else if (result.error) {
-                alert('❌ Error: ' + result.error);
-            }
-        });
-    };
+    // const handleDeleteSalesPage = (id: string) => {
+    //     if (!confirm("Are you sure you want to delete this sales page?")) return;
+    //     startDeleteTransition(async () => {
+    //         const result = await deleteSalesPage(id);
+    //         if (result.success) {
+    //             alert('✅ Sales page deleted!');
+    //             window.location.reload();
+    //         } else if (result.error) {
+    //             alert('❌ Error: ' + result.error);
+    //         }
+    //     });
+    // };
 
     const handleDeleteTerm = (id: string) => {
         if (!confirm("Are you sure you want to delete this term?")) return;
@@ -113,18 +108,18 @@ export default function AdminDashboard({ reviews, products, glossaryTerms, niche
         });
     };
 
-    const handleDeleteNiche = (id: string) => {
-        if (!confirm("Are you sure you want to delete this niche?")) return;
-        startDeleteTransition(async () => {
-            const result = await deleteNiche(id);
-            if (result.success) {
-                alert('✅ Niche deleted successfully!');
-                window.location.reload();
-            } else if (result.error) {
-                alert('❌ Error: ' + result.error);
-            }
-        });
-    };
+    // const handleDeleteNiche = (id: string) => {
+    //     if (!confirm("Are you sure you want to delete this niche?")) return;
+    //     startDeleteTransition(async () => {
+    //         const result = await deleteNiche(id);
+    //         if (result.success) {
+    //             alert('✅ Niche deleted successfully!');
+    //             window.location.reload();
+    //         } else if (result.error) {
+    //             alert('❌ Error: ' + result.error);
+    //         }
+    //     });
+    // };
 
     const handleBulkDeleteTerms = () => {
         if (selectedTerms.size === 0) return;
@@ -415,13 +410,13 @@ export default function AdminDashboard({ reviews, products, glossaryTerms, niche
                                                             >
                                                                 <Edit size={16} />
                                                             </button>
-                                                            <button
+                                                            {/* <button
                                                                 onClick={() => handleDeleteNiche(niche.id)}
                                                                 disabled={isDeleting}
                                                                 className="text-red-600 hover:text-red-900 disabled:opacity-50"
                                                             >
                                                                 <Trash2 size={16} />
-                                                            </button>
+                                                            </button> */}
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -483,7 +478,8 @@ export default function AdminDashboard({ reviews, products, glossaryTerms, niche
                                     >
                                         <ArrowLeft size={16} className="mr-1" /> Back to List
                                     </button>
-                                    <NicheForm initialData={editingNiche} />
+                                    {/* <NicheForm initialData={editingNiche} /> */}
+                                    <p className="text-slate-600">Niche management is not available in this version.</p>
                                 </div>
                             )}
                         </div>
@@ -521,7 +517,8 @@ export default function AdminDashboard({ reviews, products, glossaryTerms, niche
                                     >
                                         <ArrowLeft size={16} className="mr-1" /> Back to List
                                     </button>
-                                    <HealingTermsImporter />
+                                    {/* <HealingTermsImporter /> */}
+                                    <p className="text-slate-600">Healing terms importer is not available in this version.</p>
                                 </div>
                             ) : (
                                 <div className="space-y-6">
@@ -781,10 +778,11 @@ export default function AdminDashboard({ reviews, products, glossaryTerms, niche
                                             >
                                                 <ArrowLeft size={16} className="mr-1" /> Back to Phrases
                                             </button>
-                                            <HealingTermForm
+                                            {/* <HealingTermForm
                                                 initialData={editingWritingTerm}
                                                 onComplete={() => { setWritingView('list'); router.refresh(); }}
-                                            />
+                                            /> */}
+                                            <p className="text-slate-600">Healing term form is not available in this version.</p>
                                         </div>
                                     )}
                                 </div>
@@ -1029,13 +1027,13 @@ export default function AdminDashboard({ reviews, products, glossaryTerms, niche
                                                             >
                                                                 <Edit size={16} />
                                                             </button>
-                                                            <button
+                                                            {/* <button
                                                                 onClick={() => handleDeleteSalesPage(page._id)}
                                                                 disabled={isDeleting}
                                                                 className="text-red-600 hover:text-red-900 disabled:opacity-50 inline-block"
                                                             >
                                                                 <Trash2 size={16} />
-                                                            </button>
+                                                            </button> */}
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -1103,13 +1101,14 @@ export default function AdminDashboard({ reviews, products, glossaryTerms, niche
                                         </h2>
                                         <div className="w-24"></div> {/* Spacer */}
                                     </div>
-                                    <SalesPageForm
+                                    {/* <SalesPageForm
                                         initialData={editingSalesPage}
                                         onComplete={() => {
                                             setSalesPageView('list');
                                             window.location.reload();
                                         }}
-                                    />
+                                    /> */}
+                                    <p className="text-slate-600">Sales page management is not available in this version.</p>
                                 </div>
                             )}
                         </div>

@@ -4,14 +4,10 @@ import connectToDatabase from "./db";
 import PendingReview from "./models/PendingReview";
 import Product from "./models/Product";
 import GlossaryTerm from "./models/GlossaryTerm";
-import StrategyQuestion from "./models/StrategyQuestion";
-import SearchLog from "./models/SearchLog";
-import LearningPath from "./models/LearningPath";
 import Niche from "./models/Niche";
 import { revalidatePath } from "next/cache";
 import mongoose from "mongoose";
 import Subscriber from "./models/Subscriber";
-import SalesPage from "./models/SalesPage";
 
 export async function subscribeUser(formData: FormData) {
     const email = formData.get('email') as string;
@@ -181,42 +177,6 @@ export async function createGlossaryTerm(data: any) {
     }
 }
 
-export async function createStrategyQuestion(data: any) {
-    try {
-        await connectToDatabase();
-        const count = await StrategyQuestion.countDocuments();
-        const nextId = `q${count + 1}-${Date.now()}`;
-
-        // Ensure data.options parses filters correctly if passed as string
-        const formattedOptions = data.options.map((opt: any) => ({
-            ...opt,
-            filters: typeof opt.filters === 'string' ? JSON.parse(opt.filters) : opt.filters
-        }));
-
-        const newQuestion = await StrategyQuestion.create({
-            ...data,
-            id: nextId,
-            options: formattedOptions
-        });
-
-        revalidatePath('/admin');
-        return { success: true, question: JSON.parse(JSON.stringify(newQuestion)) };
-    } catch (error: any) {
-        console.error("Error creating strategy question:", error);
-        return { error: error.message || "Failed to create question" };
-    }
-}
-
-export async function getStrategyQuestions() {
-    try {
-        await connectToDatabase();
-        const questions = await StrategyQuestion.find({}).sort({ step: 1 }).lean();
-        return JSON.parse(JSON.stringify(questions));
-    } catch (error) {
-        console.error("Error fetching strategy questions:", error);
-        return [];
-    }
-}
 
 export async function trackProductClick(productId: number) {
     try {
@@ -227,35 +187,6 @@ export async function trackProductClick(productId: number) {
         console.error("Tracking click failed", e);
     }
     // No return needed, fire and forget
-}
-
-export async function logSearchQuery(query: string, resultsCount: number) {
-    if (!query || query.trim().length === 0) return;
-    try {
-        await connectToDatabase();
-        // Upsert the log
-        await SearchLog.findOneAndUpdate(
-            { query: query.toLowerCase().trim() },
-            {
-                $inc: { count: 1 },
-                $set: { lastSearched: new Date(), resultsCount }
-            },
-            { upsert: true }
-        );
-    } catch (e) {
-        console.error("Logging search failed", e);
-    }
-}
-
-export async function getLearningPaths() {
-    try {
-        await connectToDatabase();
-        const paths = await LearningPath.find({}).lean();
-        return JSON.parse(JSON.stringify(paths));
-    } catch (e) {
-        console.error("Failed to fetch learning paths", e);
-        return [];
-    }
 }
 
 export async function updateProduct(data: any) {
@@ -638,95 +569,3 @@ Intention # The conscious focusing of mental energy toward a specific outcome. #
     return await importHealingTerms(data);
 }
 
-// --- SALES PAGE ACTIONS ---
-
-export async function getSalesPages() {
-    try {
-        await connectToDatabase();
-        const pages = await SalesPage.find().sort({ createdAt: -1 }).lean();
-        return JSON.parse(JSON.stringify(pages));
-    } catch (error: any) {
-        console.error("Error fetching sales pages:", error);
-        return [];
-    }
-}
-
-export async function getSalesPageBySlug(slug: string) {
-    try {
-        await connectToDatabase();
-        const page = await SalesPage.findOne({ slug }).lean();
-        return page ? JSON.parse(JSON.stringify(page)) : null;
-    } catch (error: any) {
-        console.error("Error fetching sales page by slug:", error);
-        return null;
-    }
-}
-
-export async function createOrUpdateSalesPage(id: string | null, data: any) {
-    try {
-        await connectToDatabase();
-
-        if (id) {
-            const updated = await SalesPage.findByIdAndUpdate(id, data, { new: true });
-            revalidatePath('/admin');
-            revalidatePath(`/offers/${data.slug}`);
-            revalidatePath('/marketplace');
-            revalidatePath('/');
-            return { success: true, page: JSON.parse(JSON.stringify(updated)) };
-        } else {
-            const created = await SalesPage.create(data);
-            revalidatePath('/admin');
-            revalidatePath('/marketplace');
-            revalidatePath('/');
-            return { success: true, page: JSON.parse(JSON.stringify(created)) };
-        }
-    } catch (error: any) {
-        console.error("Error saving sales page:", error);
-        return { error: error.message || "Failed to save sales page" };
-    }
-}
-
-export async function deleteSalesPage(id: string) {
-    try {
-        await connectToDatabase();
-        await SalesPage.findByIdAndDelete(id);
-        revalidatePath('/admin');
-        revalidatePath('/marketplace');
-        revalidatePath('/');
-        return { success: true };
-    } catch (error: any) {
-        console.error("Error deleting sales page:", error);
-        return { error: error.message || "Failed to delete sales page" };
-    }
-}
-// --- ANALYTICS ACTIONS ---
-
-export async function trackSalesPageVisit(slug: string, version: 'A' | 'B' | null) {
-    try {
-        await connectToDatabase();
-        const update: any = { $inc: { views: 1 } };
-        if (version === 'A') update.$inc.viewsA = 1;
-        if (version === 'B') update.$inc.viewsB = 1;
-
-        await SalesPage.findOneAndUpdate({ slug }, update);
-        return { success: true };
-    } catch (error) {
-        console.error("Visit tracking failed:", error);
-        return { success: false };
-    }
-}
-
-export async function trackSalesPageBuyClick(slug: string, version: 'A' | 'B' | null) {
-    try {
-        await connectToDatabase();
-        const update: any = { $inc: { clicks: 1 } };
-        if (version === 'A') update.$inc.clicksA = 1;
-        if (version === 'B') update.$inc.clicksB = 1;
-
-        await SalesPage.findOneAndUpdate({ slug }, update);
-        return { success: true };
-    } catch (error) {
-        console.error("Click tracking failed:", error);
-        return { success: false };
-    }
-}
