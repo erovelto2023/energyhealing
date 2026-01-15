@@ -80,10 +80,8 @@ export default async function AdminPage() {
 
     const reviews = await getPendingReviews();
     const { products } = await getProducts({});
-    // Fetch standard terms and energy healing terms separately
-    const { terms: standardTerms } = await getGlossaryTerms({});
-    const { terms: healingTerms } = await getGlossaryTerms({ niche: "Energy Healing" });
-    const glossaryTerms = [...standardTerms, ...healingTerms];
+    // Fetch all terms with a high limit to ensure admin dashboard sees everything
+    const { terms: glossaryTerms } = await getGlossaryTerms({ limit: 10000 });
     const niches = await getNiches();
     const subscribers = await getSubscribers();
     const salesPages: any[] = []; // Sales pages feature removed

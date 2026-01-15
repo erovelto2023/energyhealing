@@ -4,7 +4,7 @@ import GlossaryList from '@/components/features/GlossaryList';
 export default async function GlossaryPage({ searchParams }: { searchParams: Promise<{ q?: string; niche?: string; page?: string; letter?: string }> }) {
     const resolvedSearchParams = await searchParams;
     const { q, niche, page, letter } = resolvedSearchParams;
-    const { terms, totalPages, currentPage } = await getGlossaryTerms({ search: q, niche, page, letter });
+    const { terms, totalPages, currentPage } = await getGlossaryTerms({ search: q, niche, page, letter, limit: 15 });
 
     const isHealing = niche === "Energy Healing";
 
