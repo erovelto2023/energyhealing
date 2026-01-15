@@ -1,4 +1,4 @@
-import { getSalesPages } from '@/lib/actions';
+// import { getSalesPages } from '@/lib/actions'; // Removed - feature not used
 import { getProducts } from '@/lib/initialData';
 import MarketplaceDirectory from '@/components/marketplace/MarketplaceDirectory';
 import { Leaf } from 'lucide-react';
@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function MarketplaceExplorePage() {
     const [allPages, { products }] = await Promise.all([
-        getSalesPages(),
+        Promise.resolve([]), // getSalesPages() - feature removed
         getProducts({ limit: 1000 })
     ]);
 

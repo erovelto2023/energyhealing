@@ -1,5 +1,5 @@
 import { getPendingReviews, getProducts, getGlossaryTerms } from '@/lib/initialData';
-import { getNiches, getSubscribers, getSalesPages } from '@/lib/actions';
+import { getNiches, getSubscribers } from '@/lib/actions';
 import { clearAllData, migrateToSlugs } from './actions';
 import { testDatabaseConnection } from './test-actions';
 import AdminDashboard from '@/components/admin/AdminDashboard';
@@ -86,7 +86,7 @@ export default async function AdminPage() {
     const glossaryTerms = [...standardTerms, ...healingTerms];
     const niches = await getNiches();
     const subscribers = await getSubscribers();
-    const salesPages = await getSalesPages();
+    const salesPages: any[] = []; // Sales pages feature removed
 
     return (
         <div className="min-h-screen bg-slate-100 py-12 px-4 sm:px-6 lg:px-8">

@@ -1,4 +1,4 @@
-import { getSalesPages } from '@/lib/actions';
+// import { getSalesPages } from '@/lib/actions'; // Removed - feature not used
 import { getProducts } from '@/lib/initialData';
 import Link from 'next/link';
 import { ShoppingBag, ArrowRight, Star, CheckCircle2, Compass, Leaf, Sparkles, Heart, ExternalLink } from 'lucide-react';
@@ -34,7 +34,7 @@ function ShieldCheckIcon({ size }: { size: number }) {
 export default async function MarketplacePage() {
     const [{ products: randomProducts }, pages] = await Promise.all([
         getProducts({ random: true, limit: 12 }),
-        getSalesPages()
+        Promise.resolve([]) // getSalesPages() - feature removed
     ]);
 
     const allMarketplacePages = pages.filter((p: any) => p.isPublished && p.showInMarketplace);
