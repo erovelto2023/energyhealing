@@ -734,8 +734,8 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                             <span className="text-xs font-bold bg-amber-100 text-amber-700 px-3 py-1 rounded-full uppercase tracking-wider">Review Needed</span>
                                                         </div>
                                                         <div className="divide-y divide-slate-100">
-                                                            {group.ids.map((id: string, i: number) => {
-                                                                const term = glossaryTerms.find(t => t.id === id);
+                                                            {group.terms.map((term: any, i: number) => {
+                                                                const id = term.id;
                                                                 return (
                                                                     <div key={id} className="px-8 py-4 hover:bg-slate-50 transition-colors flex items-center justify-between group">
                                                                         <div className="flex items-center gap-4">
