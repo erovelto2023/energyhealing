@@ -27,7 +27,7 @@ interface AdminDashboardProps {
     salesPages?: any[];
 }
 
-export default function AdminDashboard({ reviews, products, glossaryTerms, niches = [], subscribers = [], salesPages = [] }: AdminDashboardProps) {
+export default function AdminDashboard({ reviews = [], products = [], glossaryTerms = [], niches = [], subscribers = [], salesPages = [] }: AdminDashboardProps) {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<'reviews' | 'tools' | 'glossary' | 'niches' | 'subscribers' | 'writing' | 'offers'>('reviews');
 
