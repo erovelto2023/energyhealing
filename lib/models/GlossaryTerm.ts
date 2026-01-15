@@ -67,11 +67,13 @@ export interface IGlossaryTerm {
     scientificPerspective?: string;
     culturalNotes?: string;
 
+
     // --- Technical / App-Ready ---
     status?: 'Draft' | 'Reviewed' | 'Published';
     lastUpdated?: Date;
     authorOrReviewer?: string;
     aiTrainingEligible?: boolean;
+    sponsoredBy?: string; // Vendor/sponsor name
 
     // --- Legacy / Compat ---
     niche?: string; // Kept for backward compatibility, sync with category
@@ -146,11 +148,13 @@ const GlossaryTermSchema = new Schema<IGlossaryTerm>({
     scientificPerspective: { type: String },
     culturalNotes: { type: String },
 
+
     // Technical
     status: { type: String, enum: ['Draft', 'Reviewed', 'Published'], default: 'Published' },
     lastUpdated: { type: Date, default: Date.now },
     authorOrReviewer: { type: String },
     aiTrainingEligible: { type: Boolean, default: true },
+    sponsoredBy: { type: String },
 
     // Legacy / Compat
     niche: { type: String, default: "Energy Healing" },
