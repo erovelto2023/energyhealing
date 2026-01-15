@@ -1,505 +1,223 @@
-'use client'
+export const dynamic = 'force-dynamic';
 
-import { FormEvent, useState } from 'react'
-import { SignedIn, SignedOut, SignOutButton } from '@clerk/nextjs'
-import HeroSlideshow from '@/components/HeroSlideshow'
+import React from 'react';
+import Link from 'next/link';
+import { Metadata } from 'next';
+import { Calendar, Sparkles } from 'lucide-react';
+import connectToDatabase from '@/lib/db';
+import UserStory from '@/lib/models/UserStory';
+import Testimonial from '@/lib/models/Testimonial';
+import { getProducts, ensureDatabaseSeeded } from '@/lib/initialData';
+import UserStoryRotator from '@/components/features/UserStoryRotator';
+import TestimonialRotator from '@/components/features/TestimonialRotator';
 
-export default function Home() {
-  const [formSubmitted, setFormSubmitted] = useState(false)
+export const metadata: Metadata = {
+  title: 'Kathleen Heals | Natural Pain Relief Through Energy Healing',
+  description: 'Find natural relief from pain through energy healing, Reiki, and holistic wellness practices. Book your healing session today.',
+};
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+export default async function Home() {
+  await ensureDatabaseSeeded();
+  await connectToDatabase();
 
-    const form = e.currentTarget
-    const formData = new FormData(form)
-    const data = {
-      name: formData.get('name'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-      service: formData.get('service'),
-      message: formData.get('message')
-    }
+  // Fetch featured user stories and testimonials
+  const [featuredStories, featuredTestimonials, { products: randomProducts }] = await Promise.all([
+    UserStory.find({ approved: true, featured: true }).select('id title authorName authorInitials').limit(5).lean(),
+    Testimonial.find({ approved: true, featured: true }).select('id clientName clientInitials rating testimonialText').limit(5).lean(),
+    getProducts({ random: true, limit: 5 })
+  ]);
 
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-
-      if (response.ok) {
-        setFormSubmitted(true)
-        form.reset()
-        setTimeout(() => setFormSubmitted(false), 5000)
-      } else {
-        console.error('Form submission failed')
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error)
-    }
-  }
+  const stories = JSON.parse(JSON.stringify(featuredStories));
+  const testimonials = JSON.parse(JSON.stringify(featuredTestimonials));
 
   return (
-    <>
+    <div className="min-h-screen bg-[#FDFCFB]">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-900">
-        <HeroSlideshow />
+      <section className="relative py-20 md:py-32 overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-emerald-100 rounded-full blur-3xl opacity-30" />
 
-        <div className="container-custom text-center z-10 animate-fade-in-up px-4">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight drop-shadow-lg">
-            Kathleen Heals
+        <div className="max-w-6xl mx-auto px-6 text-center relative z-10">
+          <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 mb-6 tracking-tight">
+            Relief through <br />
+            <span className="text-emerald-600 italic">Energy, Awareness</span> & Wellness
           </h1>
-          <p className="text-xl md:text-2xl text-gray-100 max-w-2xl mx-auto mb-10 font-light drop-shadow-md">
-            Find relief from pain naturally through the power of energy healing.
+          <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
+            A grounded approach to healing chronic pain and emotional stress. We bridge ancient wisdom with modern understanding to help you restore balance.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a href="#contact" className="btn-primary min-w-[200px]">
-              Start Your Journey
-            </a>
-
-            <SignedOut>
-              <a href="/sign-up" className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full font-semibold hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 min-w-[200px]">
-                Create Account
-              </a>
-            </SignedOut>
-
-            <SignedIn>
-              <SignOutButton>
-                <button className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full font-semibold hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 min-w-[200px]">
-                  Log Out
-                </button>
-              </SignOutButton>
-            </SignedIn>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/book-session" className="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-emerald-700 hover:scale-105 transition-all shadow-xl shadow-emerald-100">
+              <Calendar size={20} />
+              Book a Session
+            </Link>
+            <Link href="/stories" className="bg-white text-slate-900 border-2 border-slate-200 px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:border-emerald-600 transition-all">
+              Read Healing Stories
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Healing Services Section */}
-      <section className="section-padding" id="services">
-        <div className="container-custom">
-          <h2 className="text-center mb-4">Healing Services</h2>
-          <p className="text-center text-muted text-lg max-w-2xl mx-auto mb-16">
-            Personalized healing modalities designed to address your unique needs and support your journey to wellness
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <ServiceCard
-              icon="✨"
-              title="Energy Healing"
-              description="Harness the power of universal life force energy to clear blockages, restore balance, and promote deep healing on physical, emotional, and spiritual levels."
-            />
-            <ServiceCard
-              icon="🙏"
-              title="Reiki Sessions"
-              description="Experience the gentle, hands-on healing technique that channels energy to reduce stress, ease pain, and accelerate your body's natural healing processes."
-            />
-            <ServiceCard
-              icon="🌸"
-              title="Chakra Balancing"
-              description="Align and harmonize your seven energy centers to improve vitality, emotional well-being, and overall life force flow throughout your body."
-            />
-            <ServiceCard
-              icon="🧘"
-              title="Holistic Wellness"
-              description="Comprehensive approach combining energy work, mindfulness practices, and natural healing methods tailored to your individual wellness goals."
-            />
-            <ServiceCard
-              icon="💆"
-              title="Pain Relief Therapy"
-              description="Natural, non-invasive techniques to address chronic pain, tension, and discomfort without medication or invasive procedures."
-            />
-            <ServiceCard
-              icon="🌿"
-              title="Stress Release"
-              description="Gentle methods to release accumulated stress and anxiety, promoting deep relaxation and restoring inner peace and calm."
-            />
+      {/* Video Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Experience the Power of Energy Healing
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Watch Kathleen explain how energy healing can transform your life and bring relief from chronic pain.
+            </p>
           </div>
-        </div>
-      </section>
 
-      {/* Activities Preview Section */}
-      <section className="section-padding" style={{ background: 'var(--bg-dark-secondary)' }} id="activities">
-        <div className="container-custom">
-          <h2 className="text-center mb-4">Interactive Healing Activities</h2>
-          <p className="text-center text-muted text-lg max-w-2xl mx-auto mb-16">
-            Engage with powerful tools designed to support your daily healing practice
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Daily Energy Card Pull - Featured */}
-            <a href="/activities/daily-card" className="glass-card p-8 group cursor-pointer block hover:transform hover:-translate-y-2 transition-all duration-300">
-              <div className="text-6xl mb-4 inline-block transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
-                🔮
-              </div>
-              <h3 className="text-2xl font-bold mb-4">Daily Energy Card Pull</h3>
-              <p className="text-secondary mb-4">
-                Receive daily guidance through our mystical energy cards. Each card offers a mantra,
-                healing message, and micro-action to support your emotional wellness journey.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="px-3 py-1 rounded-full text-xs" style={{ background: 'hsla(270, 60%, 65%, 0.2)', color: 'var(--primary-purple-light)' }}>
-                  Daily Practice
-                </span>
-                <span className="px-3 py-1 rounded-full text-xs" style={{ background: 'hsla(180, 55%, 55%, 0.2)', color: 'var(--secondary-teal)' }}>
-                  Streak Tracking
-                </span>
-                <span className="px-3 py-1 rounded-full text-xs" style={{ background: 'hsla(45, 85%, 65%, 0.2)', color: 'var(--accent-gold)' }}>
-                  49 Unique Cards
-                </span>
-              </div>
-              <div className="text-primary-purple-light font-semibold group-hover:translate-x-2 transition-transform inline-block">
-                Try It Now →
-              </div>
-            </a>
-
-            {/* More Activities Coming Soon */}
-            <div className="glass-card p-8">
-              <div className="text-6xl mb-4">✨</div>
-              <h3 className="text-2xl font-bold mb-4">More Activities Coming Soon</h3>
-              <p className="text-secondary mb-6">
-                We&apos;re developing additional interactive tools including guided meditations,
-                energy journaling, chakra assessments, and healing frequencies.
-              </p>
-              <a href="/activities" className="text-secondary-teal font-semibold hover:translate-x-2 transition-transform inline-block">
-                View All Activities →
-              </a>
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-emerald-100 bg-gradient-to-br from-emerald-50 to-teal-50 p-2">
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                className="absolute top-0 left-0 w-full h-full rounded-2xl"
+                src="https://www.youtube.com/embed/TQrGtOpgo0U"
+                title="Kathleen Heals - Energy Healing Introduction"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* About Section */}
-      <section className="section-padding" id="about" style={{ background: 'var(--bg-dark-secondary)' }}>
-        <div className="container-custom">
-          <h2 className="text-center mb-16">About Kathleen</h2>
-          <div className="glass-card max-w-3xl mx-auto p-8 md:p-12">
-            <p className="text-secondary text-lg leading-relaxed mb-6">
-              Welcome! I&apos;m Kathleen, a certified energy healer and Reiki practitioner dedicated to
-              helping people find relief from pain through natural, holistic methods.
-            </p>
-            <p className="text-secondary text-lg leading-relaxed mb-6">
-              For over a decade, I&apos;ve witnessed the incredible healing power that lies within each of us.
-              My approach combines ancient wisdom with modern understanding to create a safe, nurturing
-              space where true healing can occur.
-            </p>
-            <p className="text-secondary text-lg leading-relaxed mb-6">
-              Whether you&apos;re dealing with chronic pain, emotional trauma, stress, or simply seeking
-              greater balance and wellness in your life, I&apos;m here to support your journey with
-              compassion, expertise, and genuine care.
-            </p>
-            <p className="text-center text-xl font-semibold mt-8" style={{ color: 'var(--primary-purple-light)' }}>
-              Your healing journey begins here. 🌟
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* User Stories Rotator */}
+      <UserStoryRotator stories={stories} />
 
-      {/* Benefits Section */}
-      <section className="section-padding bg-dark" id="benefits">
-        <div className="container-custom">
-          <h2 className="text-center mb-4">Benefits of Natural Healing</h2>
-          <p className="text-center text-muted text-lg max-w-2xl mx-auto mb-16">
-            Discover how energy healing and holistic practices can transform your health and well-being
+      {/* Testimonials Rotator */}
+      <TestimonialRotator testimonials={testimonials} />
+
+      {/* Book a Session CTA */}
+      <section id="book-session" className="py-24 bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500 rounded-full blur-3xl opacity-10" />
+
+        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-emerald-300 text-xs font-bold uppercase tracking-widest mb-6">
+            <Sparkles size={14} />
+            Start Your Healing Journey
+          </div>
+
+          <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white">
+            Book Your Healing Session with Confidence!
+          </h2>
+          <p className="text-xl text-slate-200 mb-8 max-w-3xl mx-auto leading-relaxed">
+            I'm so excited to invite you on a transformative healing journey with me. My sessions are designed to help you feel lighter, more at peace, and deeply connected to your inner self.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <BenefitCard
-              title="🌟 Pain Relief"
-              description="Experience significant reduction in chronic pain, headaches, and physical discomfort through gentle, non-invasive energy work."
-            />
-            <BenefitCard
-              title="😌 Stress Reduction"
-              description="Release tension and anxiety, promoting deep relaxation and a profound sense of peace and well-being."
-            />
-            <BenefitCard
-              title="⚡ Increased Energy"
-              description="Restore vitality and life force by clearing energy blockages and optimizing your body's natural energy flow."
-            />
-            <BenefitCard
-              title="💚 Emotional Healing"
-              description="Process and release emotional trauma, grief, and negative patterns that may be contributing to physical symptoms."
-            />
-            <BenefitCard
-              title="🛡️ Immune Support"
-              description="Strengthen your body's natural healing abilities and enhance overall immune system function."
-            />
-            <BenefitCard
-              title="🧠 Mental Clarity"
-              description="Improve focus, reduce brain fog, and enhance mental clarity through balanced energy and reduced stress."
-            />
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 md:p-12 mb-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="flex-1 text-left">
+                <h3 className="text-2xl font-bold mb-4 text-white">60-Minute Energy Healing Session</h3>
+                <ul className="space-y-3 text-slate-200">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 text-lg">✓</span>
+                    Virtual session over phone
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 text-lg">✓</span>
+                    Personalized assessment of your energy field
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 text-lg">✓</span>
+                    Chakra balancing and meridian therapy
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 text-lg">✓</span>
+                    Guided meditation and breathwork
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 text-lg">✓</span>
+                    Self-care techniques for ongoing healing
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 text-lg font-bold">✓</span>
+                    <span className="font-bold text-emerald-300">100% money-back guarantee</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="text-center md:text-right">
+                <div className="text-6xl font-bold text-emerald-400 mb-2">$111</div>
+                <p className="text-sm text-slate-300 mb-6">Per Session</p>
+                <Link
+                  href="/book-session"
+                  className="inline-flex items-center gap-2 bg-emerald-500 text-white px-8 py-4 rounded-2xl font-bold hover:bg-emerald-600 transition-all shadow-xl shadow-emerald-500/30"
+                >
+                  <Calendar size={20} />
+                  Schedule Now
+                </Link>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* Testimonials Section */}
-      <section className="section-padding" id="testimonials" style={{ background: 'var(--bg-dark-secondary)' }}>
-        <div className="container-custom">
-          <h2 className="text-center mb-4">Client Experiences</h2>
-          <p className="text-center text-muted text-lg max-w-2xl mx-auto mb-16">
-            Real stories from people who have found relief and healing
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <TestimonialCard
-              quote="After years of chronic back pain, I was skeptical about energy healing. But after just three sessions with Kathleen, I experienced more relief than I had with years of conventional treatments. She has a true gift."
-              name="Sarah M."
-              role="Chronic Pain Client"
-            />
-            <TestimonialCard
-              quote="Kathleen's Reiki sessions have been transformative for my anxiety and stress. I leave each session feeling lighter, more centered, and genuinely at peace. Her compassionate approach makes all the difference."
-              name="Michael T."
-              role="Stress Management Client"
-            />
-            <TestimonialCard
-              quote="I came to Kathleen with migraines that had plagued me for years. Through her energy healing work, I've not only reduced the frequency of my headaches but also discovered deeper emotional healing I didn't know I needed."
-              name="Jennifer L."
-              role="Migraine Relief Client"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Contact/Booking Section */}
-      <section className="section-padding bg-dark" id="contact">
-        <div className="container-custom">
-          <h2 className="text-center mb-4">Begin Your Healing Journey</h2>
-          <p className="text-center text-muted text-lg max-w-2xl mx-auto mb-16">
-            Ready to experience natural pain relief and holistic wellness? Book your session today.
-          </p>
-
-          <div className="glass-card max-w-2xl mx-auto p-8 md:p-12">
-            {formSubmitted && (
-              <div className="mb-6 p-4 rounded-lg text-center" style={{ background: 'hsla(180, 55%, 55%, 0.2)', border: '1px solid var(--secondary-teal)' }}>
-                <p className="text-secondary-teal font-semibold">
-                  Thank you for your interest! I will contact you within 24 hours to schedule your healing session.
-                </p>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit}>
-              <div className="mb-6">
-                <label htmlFor="name" className="block mb-2 text-secondary font-medium">Full Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  className="w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:outline-none focus:ring-2"
-                  style={{
-                    background: 'var(--bg-dark-secondary)',
-                    borderColor: 'hsla(270, 60%, 65%, 0.3)',
-                    color: 'var(--text-primary)'
-                  }}
-                />
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="email" className="block mb-2 text-secondary font-medium">Email Address</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  className="w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:outline-none focus:ring-2"
-                  style={{
-                    background: 'var(--bg-dark-secondary)',
-                    borderColor: 'hsla(270, 60%, 65%, 0.3)',
-                    color: 'var(--text-primary)'
-                  }}
-                />
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="phone" className="block mb-2 text-secondary font-medium">Phone Number</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  className="w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:outline-none focus:ring-2"
-                  style={{
-                    background: 'var(--bg-dark-secondary)',
-                    borderColor: 'hsla(270, 60%, 65%, 0.3)',
-                    color: 'var(--text-primary)'
-                  }}
-                />
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="service" className="block mb-2 text-secondary font-medium">Service Interest</label>
-                <input
-                  type="text"
-                  id="service"
-                  name="service"
-                  placeholder="e.g., Reiki, Energy Healing, Pain Relief"
-                  className="w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:outline-none focus:ring-2"
-                  style={{
-                    background: 'var(--bg-dark-secondary)',
-                    borderColor: 'hsla(270, 60%, 65%, 0.3)',
-                    color: 'var(--text-primary)'
-                  }}
-                />
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="message" className="block mb-2 text-secondary font-medium">Tell me about your healing needs</label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  rows={5}
-                  placeholder="Share what brings you here and what you hope to achieve through our sessions..."
-                  className="w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:outline-none focus:ring-2 resize-vertical"
-                  style={{
-                    background: 'var(--bg-dark-secondary)',
-                    borderColor: 'hsla(270, 60%, 65%, 0.3)',
-                    color: 'var(--text-primary)'
-                  }}
-                />
-              </div>
-
-              <button type="submit" className="btn-primary w-full">
-                Request Appointment
-              </button>
-            </form>
-
-            <p className="text-center mt-6 text-muted text-sm">
-              I typically respond within 24 hours. All inquiries are confidential.
+          {/* Kathleen's Personal Message */}
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 mb-6 text-left max-w-3xl mx-auto">
+            <p className="text-slate-200 leading-relaxed mb-4">
+              Your well-being is my highest priority.
+            </p>
+            <p className="text-slate-200 leading-relaxed mb-4">
+              To make sure you feel fully supported, I proudly offer a money-back guarantee on all healing sessions. If you don't feel better or lighter by the end of your session, simply let me know—and I'll offer you a full refund, no questions asked.
+            </p>
+            <p className="text-slate-200 leading-relaxed mb-4">
+              I truly believe in the power of healing and am deeply committed to helping you reach your wellness goals. Your journey toward self-love and healing matters, and I want you to feel confident and safe in choosing to work with me.
+            </p>
+            <p className="text-slate-200 leading-relaxed mb-4">
+              Take the first step toward your healing today. I'm here for you.
+            </p>
+            <p className="text-emerald-300 italic font-semibold">
+              With love and presence,<br />
+              Kathleen Heals
             </p>
           </div>
         </div>
       </section>
 
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translate(0, 0) rotate(0deg); }
-          33% { transform: translate(30px, -30px) rotate(5deg); }
-          66% { transform: translate(-20px, 20px) rotate(-5deg); }
-        }
+      {/* Curated Tools for Recovery */}
+      <section className="py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Curated Tools for Recovery</h2>
+            <p className="text-slate-500 max-w-2xl mx-auto">Selected and built by Kathleen to support your daily practice at home.</p>
+          </div>
 
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            {randomProducts && randomProducts.map((product: any) => (
+              <div key={product.id || product._id.toString()} className="bg-white rounded-3xl border border-slate-100 p-2 shadow-sm hover:shadow-md transition-shadow group">
+                <div className="aspect-[4/5] bg-slate-50 rounded-2xl mb-4 flex items-center justify-center relative overflow-hidden">
+                  {product.image ? (
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="text-slate-300 text-4xl">📦</div>
+                  )}
+                </div>
+                <div className="px-3 pb-4 text-center">
+                  <h3 className="font-bold text-slate-900 text-sm mb-1">{product.name}</h3>
+                  <p className="text-xs text-slate-400 mb-3">{product.type || "Tool"}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-emerald-600 font-bold min-h-[1.5rem] flex items-center">
+                      {product.price ? (typeof product.price === 'number' ? `$${product.price}` : product.price) : <span className="text-slate-300 text-[10px] uppercase">View Details</span>}
+                    </span>
+                    <Link href={product.affiliateLink || product.link || `/tools/${product.slug}`} target={product.affiliateLink ? "_blank" : undefined} className="p-2 bg-slate-50 rounded-full text-slate-400 hover:bg-emerald-600 hover:text-white transition-colors">
+                      →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
 
-        .animate-float {
-          animation: float 20s ease-in-out infinite;
-        }
-
-        .animate-float-reverse {
-          animation: float 15s ease-in-out infinite reverse;
-        }
-
-        .animate-fade-in-up {
-          animation: fade-in-up 1s ease-out;
-        }
-
-        .btn-primary {
-          padding: 1rem 2.5rem;
-          font-size: 1.1rem;
-          font-weight: 600;
-          border: none;
-          border-radius: 50px;
-          cursor: pointer;
-          text-decoration: none;
-          display: inline-block;
-          transition: var(--transition-smooth);
-          position: relative;
-          overflow: hidden;
-          background: var(--gradient-accent);
-          color: white;
-          box-shadow: var(--shadow-glow);
-        }
-
-        .btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
-        }
-
-        .btn-secondary {
-          padding: 1rem 2.5rem;
-          font-size: 1.1rem;
-          font-weight: 600;
-          border: 2px solid var(--primary-purple);
-          border-radius: 50px;
-          cursor: pointer;
-          text-decoration: none;
-          display: inline-block;
-          transition: var(--transition-smooth);
-          background: transparent;
-          color: var(--text-primary);
-        }
-
-        .btn-secondary:hover {
-          background: var(--primary-purple);
-          transform: translateY(-2px);
-        }
-
-        .bg-dark {
-          background: var(--bg-dark);
-        }
-
-        .text-secondary {
-          color: var(--text-secondary);
-        }
-
-        .text-muted {
-          color: var(--text-muted);
-        }
-
-        .text-secondary-teal {
-          color: var(--secondary-teal);
-        }
-      `}</style>
-    </>
-  )
-}
-
-// Service Card Component
-function ServiceCard({ icon, title, description }: { icon: string; title: string; description: string }) {
-  return (
-    <div className="glass-card p-8 group">
-      <div className="text-5xl mb-4 inline-block transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
-        {icon}
-      </div>
-      <h3 className="mb-4">{title}</h3>
-      <p className="text-muted">{description}</p>
+          <div className="text-center mt-12">
+            <Link href="/marketplace" className="inline-flex items-center gap-2 text-emerald-600 font-bold hover:gap-3 transition-all">
+              View All Resources →
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
-  )
-}
-
-// Benefit Card Component
-function BenefitCard({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="glass-card p-8">
-      <h3 className="mb-4">{title}</h3>
-      <p className="text-muted">{description}</p>
-    </div>
-  )
-}
-
-// Testimonial Card Component
-function TestimonialCard({ quote, name, role }: { quote: string; name: string; role: string }) {
-  return (
-    <div className="p-8 rounded-2xl transition-all duration-300 hover:transform hover:-translate-y-2"
-      style={{
-        background: 'var(--bg-card)',
-        backdropFilter: 'var(--blur-glass)',
-        border: '1px solid hsla(180, 55%, 55%, 0.2)'
-      }}
-    >
-      <p className="italic text-lg text-secondary mb-6 leading-relaxed">
-        &quot;{quote}&quot;
-      </p>
-      <div>
-        <div className="font-semibold" style={{ color: 'var(--primary-purple-light)' }}>{name}</div>
-        <div className="text-sm text-muted">{role}</div>
-      </div>
-    </div>
-  )
+  );
 }

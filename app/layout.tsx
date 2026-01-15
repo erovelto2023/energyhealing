@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
 
 import './globals.css'
 
@@ -19,16 +21,18 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ClerkProvider>
-      <html
-        lang='en'
-        className='scroll-smooth antialiased'
-        suppressHydrationWarning
-      >
-        <body className={`${inter.variable} ${playfair.variable}`}>
+    <html
+      lang='en'
+      className='scroll-smooth antialiased'
+      suppressHydrationWarning
+    >
+      <body className={`${inter.variable} ${playfair.variable}`}>
+        <ClerkProvider>
+          <Header />
           {children}
-        </body>
-      </html>
-    </ClerkProvider>
+          <Footer />
+        </ClerkProvider>
+      </body>
+    </html>
   )
 }

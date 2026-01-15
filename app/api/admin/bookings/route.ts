@@ -18,7 +18,11 @@ export async function GET(req: NextRequest) {
             .sort({ createdAt: -1 })
             .limit(100)
 
-        return NextResponse.json({ bookings })
+        // Debug: get keys of the first booking
+        const debugKeys = bookings.length > 0 ? Object.keys(bookings[0].toObject()) : [];
+        console.log('Available Booking Keys:', debugKeys);
+
+        return NextResponse.json({ bookings, debugKeys });
     } catch (error) {
         console.error('Error fetching bookings:', error)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
@@ -54,6 +58,30 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({ booking })
     } catch (error) {
         console.error('Error updating booking:', error)
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    }
+}
+export async function DELETE(req: NextRequest) {
+    try {
+        const { userId } = auth()
+        if (!userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        await dbConnect()
+
+        const { searchParams } = new URL(req.url)
+        const id = searchParams.get('id')
+
+        if (!id) {
+            return NextResponse.json({ error: 'Missing booking ID' }, { status: 400 })
+        }
+
+        await BookingRequest.findByIdAndDelete(id)
+
+        return NextResponse.json({ message: 'Booking deleted successfully' })
+    } catch (error) {
+        console.error('Error deleting booking:', error)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }

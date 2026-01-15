@@ -1,91 +1,60 @@
 /* ============================================
    KATHLEEN HEALS - HEALING & WELLNESS WEBSITE
-   Modern Design System with Calming Aesthetics
+   "Healing Calm" Design System
    ============================================ */
 
 /* ===== IMPORTS ===== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ===== CSS VARIABLES ===== */
-:root {
-  /* Color Palette - Healing & Wellness Theme */
-  --primary-purple: hsl(270, 60%, 65%);
-  --primary-purple-light: hsl(270, 60%, 75%);
-  --primary-purple-dark: hsl(270, 60%, 45%);
-
-  --secondary-teal: hsl(180, 55%, 55%);
-  --secondary-teal-light: hsl(180, 55%, 65%);
-  --secondary-teal-dark: hsl(180, 55%, 35%);
-
-  --accent-gold: hsl(45, 85%, 65%);
-  --accent-rose: hsl(340, 70%, 70%);
-
-  /* Neutrals */
-  --bg-dark: hsl(250, 30%, 8%);
-  --bg-dark-secondary: hsl(250, 25%, 12%);
-  --bg-card: hsla(250, 30%, 15%, 0.6);
-  --text-primary: hsl(0, 0%, 98%);
-  --text-secondary: hsl(0, 0%, 75%);
-  --text-muted: hsl(0, 0%, 60%);
-
-  /* Gradients */
-  --gradient-hero: linear-gradient(135deg,
-      hsl(270, 60%, 25%) 0%,
-      hsl(250, 50%, 15%) 50%,
-      hsl(180, 40%, 20%) 100%);
-
-  --gradient-card: linear-gradient(135deg,
-      hsla(270, 60%, 65%, 0.1) 0%,
-      hsla(180, 55%, 55%, 0.1) 100%);
-
-  --gradient-accent: linear-gradient(90deg,
-      var(--primary-purple) 0%,
-      var(--secondary-teal) 100%);
-
-  /* Spacing */
-  --spacing-xs: 0.5rem;
-  --spacing-sm: 1rem;
-  --spacing-md: 2rem;
-  --spacing-lg: 4rem;
-  --spacing-xl: 6rem;
-
-  /* Typography */
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-heading: 'Playfair Display', Georgia, serif;
-
-  /* Effects */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
-
-  --blur-glass: blur(12px);
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
 @layer base {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+  :root {
+    /* --- COLOR PALETTE: HEALING CALM --- */
 
-  html {
-    scroll-behavior: smooth;
-    font-size: 16px;
+    /* Backgrounds */
+    --bg-main: #FAFAF9;
+    /* Stone-50 warm white */
+    --bg-alt: #F3F4F6;
+    /* Gray-100 cool white */
+    --bg-sand: #F5F5DC;
+    /* Soft sand tone */
+    --bg-sage: #F0FDFA;
+    /* Very light teal/sage */
+
+    /* Text */
+    --text-primary: #1F2937;
+    /* Gray-800 Charcoal */
+    --text-secondary: #4B5563;
+    /* Gray-600 Soft charcoal */
+    --text-muted: #9CA3AF;
+    /* Gray-400 */
+
+    /* Accents */
+    --accent-sage: #5F8D78;
+    /* Muted Sage Green */
+    --accent-sand: #D4C5A8;
+    /* Warm Gold/Sand */
+    --accent-lavender: #A78BFA;
+    /* Soft Lavender */
+    --accent-teal: #14B8A6;
+    /* Muted Teal */
+
+    /* Typography */
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Outfit', sans-serif;
+
+    /* Radius */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 40px;
   }
 
   body {
-    font-family: var(--font-body);
-    background: var(--bg-dark);
-    color: var(--text-primary);
-    line-height: 1.7;
-    overflow-x: hidden;
+    @apply bg-[var(--bg-main)] text-[var(--text-primary)] antialiased font-[family-name:var(--font-body)];
   }
 
   h1,
@@ -94,64 +63,67 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-heading);
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: var(--spacing-sm);
-  }
-
-  h1 {
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
-  }
-
-  h2 {
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    color: var(--text-primary);
-  }
-
-  h3 {
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    color: var(--primary-purple-light);
-  }
-
-  p {
-    margin-bottom: var(--spacing-sm);
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-  }
-}
-
-@layer components {
-  .text-gradient {
-    background: var(--gradient-accent);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .glass-card {
-    background: var(--bg-card);
-    backdrop-filter: var(--blur-glass);
-    border: 1px solid hsla(270, 60%, 65%, 0.2);
-    border-radius: 20px;
-    transition: var(--transition-smooth);
-  }
-
-  .glass-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary-purple);
+    @apply font-[family-name:var(--font-heading)] font-medium text-[var(--text-primary)];
   }
 }
 
 @layer utilities {
-  .container-custom {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--spacing-md);
+  .text-balance {
+    text-wrap: balance;
   }
 
-  .section-padding {
-    padding: var(--spacing-xl) 0;
+  .glass-panel {
+    @apply bg-white/60 backdrop-blur-md border border-white/40 shadow-sm;
   }
+}
+
+/* --- TYPOGRAPHY: MARKDOWN SUPPORT --- */
+.prose {
+  @apply max-w-none;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  @apply mt-8 mb-4 font-bold tracking-tight text-slate-900;
+}
+
+.prose h1 {
+  @apply text-3xl;
+}
+
+.prose h2 {
+  @apply text-2xl border-b border-slate-100 pb-2 mb-6;
+}
+
+.prose h3 {
+  @apply text-xl mb-4;
+}
+
+.prose p {
+  @apply mb-4 leading-relaxed text-slate-700;
+}
+
+.prose ul {
+  @apply list-disc list-inside mb-4 space-y-1;
+}
+
+.prose ol {
+  @apply list-decimal list-inside mb-4 space-y-1;
+}
+
+.prose li {
+  @apply text-slate-700;
+}
+
+.prose strong {
+  @apply font-bold text-slate-900;
+}
+
+.prose em {
+  @apply italic text-slate-600;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-indigo-200 pl-4 py-1 italic bg-indigo-50/30 rounded-r-lg mb-6;
 }

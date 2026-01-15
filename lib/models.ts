@@ -349,6 +349,14 @@ const BookingRequestSchema = new Schema({
         type: String,
         maxlength: 100
     },
+    bookingDate: {
+        type: String, // Format: YYYY-MM-DD
+        required: false
+    },
+    bookingTime: {
+        type: String, // Format: HH:mm
+        required: false
+    },
     message: {
         type: String,
         required: true,
@@ -380,6 +388,11 @@ export const JournalEntry = models.JournalEntry || model('JournalEntry', Journal
 export const MoodLog = models.MoodLog || model('MoodLog', MoodLogSchema)
 export const JournalPrompt = models.JournalPrompt || model('JournalPrompt', JournalPromptSchema)
 export const FavoriteAffirmation = models.FavoriteAffirmation || model('FavoriteAffirmation', FavoriteAffirmationSchema)
+
+// Resilient model registration for Next.js hot-reloading
+if (process.env.NODE_ENV === 'development' && mongoose.models.BookingRequest) {
+    delete (mongoose as any).models.BookingRequest;
+}
 
 export const BookingRequest = models.BookingRequest || model('BookingRequest', BookingRequestSchema)
 
