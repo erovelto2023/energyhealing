@@ -45,6 +45,19 @@ export async function getSubscribers() {
     }
 }
 
+export async function getRandomGlossaryTerms(limit: number = 5) {
+    try {
+        await connectToDatabase();
+        const terms = await GlossaryTerm.aggregate([
+            { $sample: { size: limit } }
+        ]);
+        return JSON.parse(JSON.stringify(terms));
+    } catch (e) {
+        console.error("Error fetching random glossary terms", e);
+        return [];
+    }
+}
+
 export async function submitReview(formData: FormData) {
     const productId = Number(formData.get('productId'));
     const productName = String(formData.get('productName') || '');

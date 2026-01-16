@@ -8,8 +8,10 @@ import connectToDatabase from '@/lib/db';
 import UserStory from '@/lib/models/UserStory';
 import Testimonial from '@/lib/models/Testimonial';
 import { getProducts, ensureDatabaseSeeded } from '@/lib/initialData';
+import { getRandomGlossaryTerms } from '@/lib/actions';
 import UserStoryRotator from '@/components/features/UserStoryRotator';
 import TestimonialRotator from '@/components/features/TestimonialRotator';
+import GlossaryRotator from '@/components/features/GlossaryRotator';
 
 export const metadata: Metadata = {
   title: 'Kathleen Heals | Natural Pain Relief Through Energy Healing',
@@ -21,10 +23,11 @@ export default async function Home() {
   await connectToDatabase();
 
   // Fetch featured user stories and testimonials
-  const [featuredStories, featuredTestimonials, { products: randomProducts }] = await Promise.all([
+  const [featuredStories, featuredTestimonials, { products: randomProducts }, randomTerms] = await Promise.all([
     UserStory.find({ approved: true, featured: true }).select('id title authorName authorInitials').limit(5).lean(),
     Testimonial.find({ approved: true, featured: true }).select('id clientName clientInitials rating testimonialText').limit(5).lean(),
-    getProducts({ random: true, limit: 5 })
+    getProducts({ random: true, limit: 5 }),
+    getRandomGlossaryTerms(5)
   ]);
 
   const stories = JSON.parse(JSON.stringify(featuredStories));
@@ -81,6 +84,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Glossary Rotator */}
+      <GlossaryRotator terms={randomTerms} />
 
       {/* User Stories Rotator */}
       <UserStoryRotator stories={stories} />
@@ -218,6 +224,6 @@ export default async function Home() {
           </div>
         </div>
       </section>
-    </div>
+    </div >
   );
 }
