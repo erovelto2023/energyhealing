@@ -145,8 +145,56 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
             setDuplicates(result);
             setWritingView('duplicates');
         } else {
-            alert('❌ Error fetching duplicates');
+            alert('No duplicates found or error occurred.');
         }
+    };
+
+    const handleExportGlossaryUrls = () => {
+        const csvContent = "data:text/csv;charset=utf-8,"
+            + "Term,URL\n"
+            + glossaryTerms.map(t => {
+                const url = `https://www.kathleenheals.com/glossary/${t.slug || t.id}`;
+                return `"${t.term.replace(/"/g, '""')}","${url}"`;
+            }).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "glossary_urls.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const handleExportProductUrls = () => {
+        const csvContent = "data:text/csv;charset=utf-8,"
+            + "ID,Name,URL\n"
+            + products.map(p => {
+                const url = `https://www.kathleenheals.com/tool/${p.slug || p.id}`;
+                return `${p.id},"${p.name.replace(/"/g, '""')}","${url}"`;
+            }).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "product_urls.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const handleExportOfferUrls = () => {
+        const csvContent = "data:text/csv;charset=utf-8,"
+            + "Title,URL,Status\n"
+            + salesPages.map(p => {
+                const url = `https://www.kathleenheals.com/offers/${p.slug}`;
+                return `"${p.title?.replace(/"/g, '""') || 'Untitled'}","${url}","${p.isPublished ? 'Published' : 'Draft'}"`;
+            }).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "offer_urls.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const toggleTermSelection = (id: string) => {
@@ -256,9 +304,15 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                         <h2 className="text-xl font-bold text-slate-800">All Tools ({totalTools})</h2>
                                         <button
                                             onClick={() => { setToolView('create'); setEditingProduct(undefined); }}
-                                            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 flex items-center"
+                                            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 flex items-center gap-2"
                                         >
-                                            <Plus size={16} className="mr-1" /> Add New Tool
+                                            <Plus size={16} /> Add New Tool
+                                        </button>
+                                        <button
+                                            onClick={handleExportProductUrls}
+                                            className="bg-white text-slate-700 border border-slate-200 px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-50 hover:text-green-600 flex items-center gap-2 ml-2"
+                                        >
+                                            <FileText size={16} /> Export
                                         </button>
                                     </div>
                                     <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
@@ -267,6 +321,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                 <tr>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">ID</th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Name</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">URL</th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Niche</th>
                                                     <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
                                                 </tr>
@@ -276,6 +331,20 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                     <tr key={product.id} className="hover:bg-slate-50">
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">#{product.id}</td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{product.name}</td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-[10px] bg-slate-50 px-2 py-0.5 rounded border border-slate-100 max-w-[150px] truncate block">/tool/{product.slug || product.id}</span>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        navigator.clipboard.writeText(`https://www.kathleenheals.com/tool/${product.slug || product.id}`);
+                                                                        alert('Copied!');
+                                                                    }}
+                                                                    className="text-slate-400 hover:text-blue-600 transition-colors"
+                                                                >
+                                                                    <Copy size={12} />
+                                                                </button>
+                                                            </div>
+                                                        </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{product.niche}</td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                                                             <button
@@ -547,6 +616,12 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                         <Download size={18} /> Import
                                                     </button>
                                                     <button
+                                                        onClick={handleExportGlossaryUrls}
+                                                        className="bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-green-600 transition-all flex items-center gap-2"
+                                                    >
+                                                        <FileText size={18} /> Export URLs
+                                                    </button>
+                                                    <button
                                                         onClick={() => handleFindDuplicates()}
                                                         className="bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-amber-600 transition-all flex items-center gap-2"
                                                     >
@@ -597,6 +672,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                             </th>
                                                             <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Term Name</th>
                                                             <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Category / Niche</th>
+                                                            <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">URL</th>
                                                             <th className="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Linked Items</th>
                                                             <th className="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Actions</th>
                                                         </tr>
@@ -622,6 +698,23 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                                     <span className="px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-xs font-bold inline-block border border-slate-200">
                                                                         {term.niche || term.category || "General"}
                                                                     </span>
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <div className="flex items-center gap-2 max-w-[200px]">
+                                                                        <span className="text-[10px] text-slate-500 truncate select-all font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 w-32 block">
+                                                                            {`.../glossary/${term.slug || term.id}`}
+                                                                        </span>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                navigator.clipboard.writeText(`https://www.kathleenheals.com/glossary/${term.slug || term.id}`);
+                                                                                alert('URL Copied!');
+                                                                            }}
+                                                                            className="text-slate-400 hover:text-indigo-600 transition-colors p-1"
+                                                                            title="Copy URL"
+                                                                        >
+                                                                            <Copy size={12} />
+                                                                        </button>
+                                                                    </div>
                                                                 </td>
                                                                 <td className="px-6 py-4 text-center">
                                                                     <div className="flex justify-center gap-2">
@@ -918,9 +1011,15 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                         <h2 className="text-xl font-bold text-slate-800">Sales Pages ({totalOffers})</h2>
                                         <button
                                             onClick={() => { setSalesPageView('create'); setEditingSalesPage(undefined); }}
-                                            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 flex items-center"
+                                            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 flex items-center gap-2"
                                         >
-                                            <Plus size={16} className="mr-1" /> Create New Page
+                                            <Plus size={16} /> Create New Page
+                                        </button>
+                                        <button
+                                            onClick={handleExportOfferUrls}
+                                            className="bg-white text-slate-700 border border-slate-200 px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-50 hover:text-green-600 flex items-center gap-2 ml-2"
+                                        >
+                                            <FileText size={16} /> Export
                                         </button>
                                     </div>
                                     <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
@@ -975,7 +1074,19 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                             </div>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                                            <code className="text-[11px] font-mono bg-slate-50 border border-slate-100 px-2 py-0.5 rounded text-slate-400">/offers/{page.slug}</code>
+                                                            <div className="flex items-center gap-2">
+                                                                <code className="text-[11px] font-mono bg-slate-50 border border-slate-100 px-2 py-0.5 rounded text-slate-400">/offers/{page.slug}</code>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        navigator.clipboard.writeText(`https://www.kathleenheals.com/offers/${page.slug}`);
+                                                                        alert('Copied!');
+                                                                    }}
+                                                                    className="text-slate-400 hover:text-blue-600 transition-colors"
+                                                                    title="Copy Link"
+                                                                >
+                                                                    <Copy size={12} />
+                                                                </button>
+                                                            </div>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                             <div className="flex flex-col gap-1">
