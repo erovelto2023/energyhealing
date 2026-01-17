@@ -29,11 +29,23 @@ export default async function OfferPage({ params }: Props) {
     await connectToDatabase();
 
     // Fetch and increment view count
-    const offer = await Offer.findOneAndUpdate(
+    // URL Decode the slug to handle spaces (e.g. "Abduction%20Pillow" -> "Abduction Pillow")
+    const decodedSlug = decodeURIComponent(params.slug);
+
+    // Try finding by raw slug first, then decoded
+    let offer = await Offer.findOneAndUpdate(
         { slug: params.slug },
         { $inc: { views: 1 } },
         { new: true }
     );
+
+    if (!offer && decodedSlug !== params.slug) {
+        offer = await Offer.findOneAndUpdate(
+            { slug: decodedSlug },
+            { $inc: { views: 1 } },
+            { new: true }
+        );
+    }
 
     if (!offer) {
         // Debug mode: Show why it failed
