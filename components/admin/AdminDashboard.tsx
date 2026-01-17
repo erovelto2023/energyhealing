@@ -1053,7 +1053,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                             Type <ArrowUpDown size={12} />
                                                         </div>
                                                     </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">Slug</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider w-10">Link</th>
                                                     <th
                                                         className="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors"
                                                         onClick={() => handleSort('isPublished')}
@@ -1069,7 +1069,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                             <tbody className="bg-white divide-y divide-slate-200">
                                                 {paginatedOffers.map((page: any) => (
                                                     <tr key={page._id} className="hover:bg-slate-50">
-                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                        <td className="px-6 py-4 whitespace-normal max-w-[240px]">
                                                             <div className="text-sm font-bold text-slate-900">{page.title}</div>
                                                             {page.price && <div className="text-[10px] text-green-600 font-black uppercase tracking-tight">${page.price}</div>}
                                                         </td>
@@ -1085,19 +1085,16 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                             </div>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                                            <div className="flex items-center gap-2">
-                                                                <code className="text-[11px] font-mono bg-slate-50 border border-slate-100 px-2 py-0.5 rounded text-slate-400">/offers/{page.slug}</code>
-                                                                <button
-                                                                    onClick={() => {
-                                                                        navigator.clipboard.writeText(`${window.location.origin}/offers/${page.slug}`);
-                                                                        alert('Copied!');
-                                                                    }}
-                                                                    className="text-slate-400 hover:text-blue-600 transition-colors"
-                                                                    title="Copy Link"
-                                                                >
-                                                                    <Copy size={12} />
-                                                                </button>
-                                                            </div>
+                                                            <button
+                                                                onClick={() => {
+                                                                    navigator.clipboard.writeText(`${window.location.origin}/offers/${page.slug}`);
+                                                                    alert('Link Copied!');
+                                                                }}
+                                                                className="flex items-center gap-1 bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 px-2 py-1 rounded transition-colors text-xs font-bold"
+                                                                title="Copy URL"
+                                                            >
+                                                                <Copy size={12} /> Copy
+                                                            </button>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                             <div className="flex flex-col gap-1">
