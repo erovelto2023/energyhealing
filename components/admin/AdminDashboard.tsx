@@ -1156,9 +1156,9 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                                     try {
                                                                         const res = await getPageContent(page.slug || '');
                                                                         if (res.success) {
-                                                                            setCustomPageCode(res.content);
+                                                                            setCustomPageCode(res.content || '');
                                                                         } else {
-                                                                            setCustomPageCode('// Error loading content: ' + res.error);
+                                                                            setCustomPageCode('// Error loading content: ' + (res.error || 'Unknown error'));
                                                                         }
                                                                     } catch (e) {
                                                                         setCustomPageCode('// Failed to fetch content');
