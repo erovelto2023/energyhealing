@@ -2,11 +2,8 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { generatePage, getPageContent, deletePage } from '@/lib/page-generator';
 import {
-    Users,
-    MessageSquare,
-    BookOpen,
+    Users, MessageSquare, BookOpen, Info,
     Compass, Edit, Trash2, Plus, ArrowLeft, Lightbulb, FileText, Copy, Check, PenTool, ShoppingBag, LayoutGrid, Eye, ArrowUpDown, Tag, Sparkles, Search, Download, AlertTriangle, Wrench
 } from 'lucide-react';
 import AdminReviewList from '@/components/features/AdminReviewList';
@@ -1148,21 +1145,11 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                                 <Eye size={16} />
                                                             </a>
                                                             <button
-                                                                onClick={async () => {
+                                                                onClick={() => {
                                                                     setEditingSalesPage(page);
                                                                     setCustomPageSlug(page.slug || '');
-                                                                    setCustomPageCode('// Loading...');
+                                                                    setCustomPageCode(page.content || '');
                                                                     setSalesPageView('edit');
-                                                                    try {
-                                                                        const res = await getPageContent(page.slug || '');
-                                                                        if (res.success) {
-                                                                            setCustomPageCode(res.content || '');
-                                                                        } else {
-                                                                            setCustomPageCode('// Error loading content: ' + (res.error || 'Unknown error'));
-                                                                        }
-                                                                    } catch (e) {
-                                                                        setCustomPageCode('// Failed to fetch content');
-                                                                    }
                                                                 }}
                                                                 className="text-blue-600 hover:text-blue-900 inline-block"
                                                             >
@@ -1170,16 +1157,18 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                             </button>
                                                             <button
                                                                 onClick={async () => {
-                                                                    if (!confirm(`Delete page "${page.slug}"? This cannot be undone.`)) return;
+                                                                    if (!confirm(`Delete page "${page.slug}"?`)) return;
                                                                     try {
-                                                                        const res = await deletePage(page.slug || '');
-                                                                        if (res.success) {
+                                                                        const res = await fetch(`/api/offers/${page._id || page.slug}`, { method: 'DELETE' });
+                                                                        const data = await res.json();
+                                                                        if (data.success) {
                                                                             window.location.reload();
                                                                         } else {
-                                                                            alert('Error deleting page: ' + res.error);
+                                                                            alert('Error deleting page: ' + data.error);
                                                                         }
                                                                     } catch (e) {
                                                                         console.error(e);
+                                                                        alert('Error deleting page');
                                                                     }
                                                                 }}
                                                                 className="text-red-600 hover:text-red-900 inline-block"
@@ -1238,7 +1227,8 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                         </div>
                                     )}
                                 </div>
-                            )}
+                            )
+                            }
 
                             {(salesPageView === 'create' || salesPageView === 'edit') && (
                                 <div>
@@ -1258,82 +1248,93 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                         initialData={editingSalesPage}
                                         onComplete={() => {
                                             setSalesPageView('list');
+                                        onComplete={() => {
+                                            setSalesPageView('list');
                                             window.location.reload();
                                         }}
                                     /> */}
-                                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 max-w-4xl mx-auto">
-                                        <div className="mb-6">
-                                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                                                <h4 className="font-bold text-yellow-800 mb-1 flex items-center gap-2">
-                                                    <AlertTriangle size={16} /> Advanced Mode
-                                                </h4>
-                                                <p className="text-sm text-yellow-700">
-                                                    Paste your full React component code below. This will create a physical file on the server at <code>app/offers/[slug]/page.tsx</code>.
-                                                    Existing pages with the same slug will be overwritten.
-                                                </p>
+                                    {(salesPageView === 'create' || salesPageView === 'edit') && (
+                                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 max-w-4xl mx-auto">
+                                            <div className="mb-6">
+                                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                                                    <h4 className="font-bold text-blue-800 mb-1 flex items-center gap-2">
+                                                        <Info size={16} /> Instant Publish Mode
+                                                    </h4>
+                                                    <p className="text-sm text-blue-700">
+                                                        Offers are now stored in the database and published instantly. No build required.
+                                                        Supports HTML content.
+                                                    </p>
+                                                </div>
+
+                                                <label className="block text-sm font-bold text-slate-700 mb-2">Page Slug / URL</label>
+                                                <div className="flex items-center">
+                                                    <span className="bg-slate-100 border border-r-0 border-slate-300 rounded-l px-3 py-2 text-slate-500 text-sm font-mono">/offers/</span>
+                                                    <input
+                                                        type="text"
+                                                        value={customPageSlug}
+                                                        onChange={(e) => setCustomPageSlug(e.target.value)}
+                                                        className="flex-1 border border-slate-300 rounded-r px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                                                        placeholder="e.g. breathalyzer-dashboard (Leave empty to auto-generate from content)"
+                                                    />
+                                                </div>
                                             </div>
 
-                                            <label className="block text-sm font-bold text-slate-700 mb-2">Page Slug / URL</label>
-                                            <div className="flex items-center">
-                                                <span className="bg-slate-100 border border-r-0 border-slate-300 rounded-l px-3 py-2 text-slate-500 text-sm font-mono">/offers/</span>
-                                                <input
-                                                    type="text"
-                                                    value={customPageSlug}
-                                                    onChange={(e) => setCustomPageSlug(e.target.value)}
-                                                    className="flex-1 border border-slate-300 rounded-r px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
-                                                    placeholder="e.g. breathalyzer-dashboard (Leave empty to auto-generate from content)"
+                                            <div className="mb-6">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <label className="block text-sm font-bold text-slate-700">Content</label>
+                                                    <span className="text-xs text-slate-500">Paste HTML content (React will be sanitized)</span>
+                                                </div>
+                                                <textarea
+                                                    value={customPageCode}
+                                                    onChange={(e) => setCustomPageCode(e.target.value)}
+                                                    className="w-full h-[500px] font-mono text-xs bg-slate-900 text-emerald-400 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
+                                                    placeholder={`<h1>My Offer</h1><p>...</p>`}
+                                                    spellCheck={false}
                                                 />
                                             </div>
-                                        </div>
 
-                                        <div className="mb-6">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <label className="block text-sm font-bold text-slate-700">Component Code</label>
-                                                <span className="text-xs text-slate-500">Paste React component OR raw HTML content</span>
-                                            </div>
-                                            <textarea
-                                                value={customPageCode}
-                                                onChange={(e) => setCustomPageCode(e.target.value)}
-                                                className="w-full h-[500px] font-mono text-xs bg-slate-900 text-emerald-400 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
-                                                placeholder={`You can paste:\n1. Full React Component ('use client'; export default...)\n2. Raw HTML (<h1>My Offer</h1>...)`}
-                                                spellCheck={false}
-                                            />
-                                        </div>
+                                            <div className="flex justify-end border-t border-slate-100 pt-6">
+                                                <button
+                                                    onClick={async () => {
+                                                        if (!customPageCode) return alert('Please provide page content.');
+                                                        setIsGeneratingPage(true);
+                                                        try {
+                                                            const res = await fetch('/api/offers', {
+                                                                method: 'POST',
+                                                                headers: { 'Content-Type': 'application/json' },
+                                                                body: JSON.stringify({ slug: customPageSlug, content: customPageCode })
+                                                            });
+                                                            const data = await res.json();
 
-                                        <div className="flex justify-end border-t border-slate-100 pt-6">
-                                            <button
-                                                onClick={async () => {
-                                                    if (!customPageCode) return alert('Please provide page code.');
-                                                    setIsGeneratingPage(true);
-                                                    try {
-                                                        const res = await generatePage(customPageSlug, customPageCode);
-                                                        if (res.success) {
-                                                            alert(`✅ Page successfully generated!\nURL: ${res.url}\n\nThe page might take a moment to compile.`);
-                                                            window.open(res.url, '_blank');
-                                                            setCustomPageSlug('');
-                                                            setCustomPageCode('');
-                                                            setSalesPageView('list'); // Go back to list
-                                                        } else {
-                                                            alert('❌ Error generating page: ' + res.error);
+                                                            if (data.success) {
+                                                                alert(`✅ Page successfully ${data.offer ? 'saved' : 'saved'}!\nURL: ${window.location.origin}/offers/${data.offer.slug}`);
+                                                                window.open(`${window.location.origin}/offers/${data.offer.slug}`, '_blank');
+                                                                setCustomPageSlug('');
+                                                                setCustomPageCode('');
+                                                                setSalesPageView('list');
+                                                                window.location.reload();
+                                                            } else {
+                                                                alert('❌ Error saving page: ' + data.error);
+                                                            }
+                                                        } catch (e) {
+                                                            console.error(e);
+                                                            alert('An error occurred.');
+                                                        } finally {
+                                                            setIsGeneratingPage(false);
                                                         }
-                                                    } catch (e) {
-                                                        console.error(e);
-                                                        alert('Failed to connect to generator.');
-                                                    } finally {
-                                                        setIsGeneratingPage(false);
-                                                    }
-                                                }}
-                                                disabled={isGeneratingPage}
-                                                className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-blue-200 transition-all hover:scale-105"
-                                            >
-                                                {isGeneratingPage ? (
-                                                    <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div> Generatiing...</>
-                                                ) : (
-                                                    <><Plus size={18} /> Create Live Page</>
-                                                )}
-                                            </button>
+                                                    }}
+                                                    disabled={isGeneratingPage}
+                                                    className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-blue-200 transition-all hover:scale-105"
+                                                >
+                                                    {isGeneratingPage ? (
+                                                        <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div> Saving...</>
+                                                    ) : (
+                                                        <><Plus size={18} /> Publish Page</>
+                                                    )}
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -1341,6 +1342,6 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                 })()}
 
             </div>
-        </div >
+        </div>
     );
 }

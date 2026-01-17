@@ -2,10 +2,12 @@ import { getPendingReviews, getProducts, getGlossaryTerms } from '@/lib/initialD
 import fs from 'fs';
 import path from 'path';
 import { getNiches, getSubscribers } from '@/lib/actions';
-import { clearAllData, migrateToSlugs } from './actions';
+import { clearAllData, migrateToSlugs, importOffersFromFS } from './actions';
 import { testDatabaseConnection } from './test-actions';
 import AdminDashboard from '@/components/admin/AdminDashboard';
-import { Lock, Trash2, TestTube, RefreshCw } from 'lucide-react';
+import connectToDatabase from '@/lib/db';
+import Offer from '@/lib/models/Offer';
+import { Lock, Trash2, TestTube, RefreshCw, Download } from 'lucide-react';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
@@ -73,6 +75,31 @@ async function MigrateSlugsButton() {
     );
 }
 
+
+async function ImportOffersButton() {
+    async function handleImport() {
+        "use server";
+        const result = await importOffersFromFS();
+        if (result.success) {
+            console.log(result.message);
+            // Cannot alert from server action easily, but redirect refreshes content
+            redirect('/admin/dmn');
+        }
+    }
+
+    return (
+        <form action={handleImport}>
+            <button
+                type="submit"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+            >
+                <Download size={16} />
+                Import Offers
+            </button>
+        </form>
+    );
+}
+
 export default async function AdminPage() {
     const { userId } = await auth();
 
@@ -86,30 +113,11 @@ export default async function AdminPage() {
     const { terms: glossaryTerms } = await getGlossaryTerms({ limit: 10000 });
     const niches = await getNiches();
     const subscribers = await getSubscribers();
-    // Fetch custom sales pages from app/offers
-    const offersDir = path.join(process.cwd(), 'app', 'offers');
-    let salesPages: any[] = [];
 
-    try {
-        if (fs.existsSync(offersDir)) {
-            const dirs = fs.readdirSync(offersDir).filter(file => {
-                return fs.statSync(path.join(offersDir, file)).isDirectory();
-            });
-
-            salesPages = dirs.map(slug => ({
-                _id: slug,
-                slug: slug,
-                title: slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' '),
-                pageType: 'custom',
-                isPublished: true,
-                views: 0,
-                clicks: 0,
-                createdAt: fs.statSync(path.join(offersDir, slug)).birthtime.toISOString()
-            }));
-        }
-    } catch (e) {
-        console.error("Error fetching offers dir:", e);
-    }
+    // Fetch offers from DB
+    await connectToDatabase();
+    const offersData = await Offer.find({}).sort({ createdAt: -1 }).lean();
+    const salesPages = JSON.parse(JSON.stringify(offersData));
 
     return (
         <div className="min-h-screen bg-slate-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -119,9 +127,12 @@ export default async function AdminPage() {
                         <Lock className="mr-3 text-slate-400" /> Admin Dashboard
                     </h1>
                     <div className="flex items-center gap-4">
-                        <TestDatabaseButton />
-                        <MigrateSlugsButton />
-                        <ClearDatabaseButton />
+                        <div className="flex gap-4">
+                            <TestDatabaseButton />
+                            <ClearDatabaseButton />
+                            <MigrateSlugsButton />
+                            <ImportOffersButton />
+                        </div>
                         <div className="bg-white px-4 py-2 rounded-full text-slate-600 text-sm font-medium shadow-sm border border-slate-200">
                             Logged in as {(await currentUser())?.firstName || 'Admin'}
                         </div>
