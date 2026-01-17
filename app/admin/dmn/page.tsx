@@ -1,4 +1,6 @@
 import { getPendingReviews, getProducts, getGlossaryTerms } from '@/lib/initialData';
+import fs from 'fs';
+import path from 'path';
 import { getNiches, getSubscribers } from '@/lib/actions';
 import { clearAllData, migrateToSlugs } from './actions';
 import { testDatabaseConnection } from './test-actions';
@@ -84,7 +86,30 @@ export default async function AdminPage() {
     const { terms: glossaryTerms } = await getGlossaryTerms({ limit: 10000 });
     const niches = await getNiches();
     const subscribers = await getSubscribers();
-    const salesPages: any[] = []; // Sales pages feature removed
+    // Fetch custom sales pages from app/offers
+    const offersDir = path.join(process.cwd(), 'app', 'offers');
+    let salesPages: any[] = [];
+
+    try {
+        if (fs.existsSync(offersDir)) {
+            const dirs = fs.readdirSync(offersDir).filter(file => {
+                return fs.statSync(path.join(offersDir, file)).isDirectory();
+            });
+
+            salesPages = dirs.map(slug => ({
+                _id: slug,
+                slug: slug,
+                title: slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' '),
+                pageType: 'custom',
+                isPublished: true,
+                views: 0,
+                clicks: 0,
+                createdAt: fs.statSync(path.join(offersDir, slug)).birthtime.toISOString()
+            }));
+        }
+    } catch (e) {
+        console.error("Error fetching offers dir:", e);
+    }
 
     return (
         <div className="min-h-screen bg-slate-100 py-12 px-4 sm:px-6 lg:px-8">

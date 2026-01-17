@@ -2,7 +2,13 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageSquare, Wrench, BookOpen, Compass, Edit, Trash2, Plus, ArrowLeft, Lightbulb, Users, FileText, Copy, Check, PenTool, ShoppingBag, LayoutGrid, Eye, ArrowUpDown, Tag, Sparkles, Search, Download } from 'lucide-react';
+import { generatePage } from '@/lib/page-generator';
+import {
+    Users,
+    MessageSquare,
+    BookOpen,
+    Compass, Edit, Trash2, Plus, ArrowLeft, Lightbulb, FileText, Copy, Check, PenTool, ShoppingBag, LayoutGrid, Eye, ArrowUpDown, Tag, Sparkles, Search, Download, AlertTriangle, Wrench
+} from 'lucide-react';
 import AdminReviewList from '@/components/features/AdminReviewList';
 import ProductForm from './ProductForm';
 import GlossaryImporter from './GlossaryImporter';
@@ -35,6 +41,9 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
     const [salesPageView, setSalesPageView] = useState<'list' | 'create' | 'edit'>('list');
     const [editingSalesPage, setEditingSalesPage] = useState<any | undefined>(undefined);
     const [salesPagePagination, setSalesPagePagination] = useState(1);
+    const [customPageSlug, setCustomPageSlug] = useState('');
+    const [customPageCode, setCustomPageCode] = useState('');
+    const [isGeneratingPage, setIsGeneratingPage] = useState(false);
     const [salesPageSortField, setSalesPageSortField] = useState<string>('createdAt');
     const [salesPageSortDir, setSalesPageSortDir] = useState<'asc' | 'desc'>('desc');
     const salesPagePerPage = 10;
@@ -1220,7 +1229,79 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                             window.location.reload();
                                         }}
                                     /> */}
-                                    <p className="text-slate-600">Sales page management is not available in this version.</p>
+                                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 max-w-4xl mx-auto">
+                                        <div className="mb-6">
+                                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                                                <h4 className="font-bold text-yellow-800 mb-1 flex items-center gap-2">
+                                                    <AlertTriangle size={16} /> Advanced Mode
+                                                </h4>
+                                                <p className="text-sm text-yellow-700">
+                                                    Paste your full React component code below. This will create a physical file on the server at <code>app/offers/[slug]/page.tsx</code>.
+                                                    Existing pages with the same slug will be overwritten.
+                                                </p>
+                                            </div>
+
+                                            <label className="block text-sm font-bold text-slate-700 mb-2">Page Slug / URL</label>
+                                            <div className="flex items-center">
+                                                <span className="bg-slate-100 border border-r-0 border-slate-300 rounded-l px-3 py-2 text-slate-500 text-sm font-mono">/offers/</span>
+                                                <input
+                                                    type="text"
+                                                    value={customPageSlug}
+                                                    onChange={(e) => setCustomPageSlug(e.target.value)}
+                                                    className="flex-1 border border-slate-300 rounded-r px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                                                    placeholder="e.g. breathalyzer-dashboard"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-6">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <label className="block text-sm font-bold text-slate-700">Component Code</label>
+                                                <span className="text-xs text-slate-500">Must include imports and 'export default'</span>
+                                            </div>
+                                            <textarea
+                                                value={customPageCode}
+                                                onChange={(e) => setCustomPageCode(e.target.value)}
+                                                className="w-full h-[500px] font-mono text-xs bg-slate-900 text-emerald-400 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
+                                                placeholder={`'use client';\n\nimport React from 'react';\n\nexport default function MyPage() {\n  return <h1>Hello World</h1>;\n}`}
+                                                spellCheck={false}
+                                            />
+                                        </div>
+
+                                        <div className="flex justify-end border-t border-slate-100 pt-6">
+                                            <button
+                                                onClick={async () => {
+                                                    if (!customPageSlug || !customPageCode) return alert('Please fill in both Slug and Code fields.');
+                                                    setIsGeneratingPage(true);
+                                                    try {
+                                                        const res = await generatePage(customPageSlug, customPageCode);
+                                                        if (res.success) {
+                                                            alert(`✅ Page successfully generated!\nURL: ${res.url}\n\nThe page might take a moment to compile.`);
+                                                            window.open(res.url, '_blank');
+                                                            setCustomPageSlug('');
+                                                            setCustomPageCode('');
+                                                            setSalesPageView('list'); // Go back to list
+                                                        } else {
+                                                            alert('❌ Error generating page: ' + res.error);
+                                                        }
+                                                    } catch (e) {
+                                                        console.error(e);
+                                                        alert('Failed to connect to generator.');
+                                                    } finally {
+                                                        setIsGeneratingPage(false);
+                                                    }
+                                                }}
+                                                disabled={isGeneratingPage}
+                                                className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-blue-200 transition-all hover:scale-105"
+                                            >
+                                                {isGeneratingPage ? (
+                                                    <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div> Generatiing...</>
+                                                ) : (
+                                                    <><Plus size={18} /> Create Live Page</>
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
