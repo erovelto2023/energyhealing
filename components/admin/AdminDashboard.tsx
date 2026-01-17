@@ -162,7 +162,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
         const csvContent = "data:text/csv;charset=utf-8,"
             + "Term,URL\n"
             + glossaryTerms.map(t => {
-                const url = `https://www.kathleenheals.com/glossary/${t.slug || t.id}`;
+                const url = `${typeof window !== 'undefined' ? window.location.origin : 'https://www.kathleenheals.com'}/glossary/${t.slug || t.id}`;
                 return `"${t.term.replace(/"/g, '""')}","${url}"`;
             }).join("\n");
         const encodedUri = encodeURI(csvContent);
@@ -178,7 +178,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
         const csvContent = "data:text/csv;charset=utf-8,"
             + "ID,Name,URL\n"
             + products.map(p => {
-                const url = `https://www.kathleenheals.com/tool/${p.slug || p.id}`;
+                const url = `${typeof window !== 'undefined' ? window.location.origin : 'https://www.kathleenheals.com'}/tool/${p.slug || p.id}`;
                 return `${p.id},"${p.name.replace(/"/g, '""')}","${url}"`;
             }).join("\n");
         const encodedUri = encodeURI(csvContent);
@@ -194,7 +194,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
         const csvContent = "data:text/csv;charset=utf-8,"
             + "Title,URL,Status\n"
             + salesPages.map(p => {
-                const url = `https://www.kathleenheals.com/offers/${p.slug}`;
+                const url = `${typeof window !== 'undefined' ? window.location.origin : 'https://www.kathleenheals.com'}/offers/${p.slug}`;
                 return `"${p.title?.replace(/"/g, '""') || 'Untitled'}","${url}","${p.isPublished ? 'Published' : 'Draft'}"`;
             }).join("\n");
         const encodedUri = encodeURI(csvContent);
@@ -345,7 +345,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                                 <span className="text-[10px] bg-slate-50 px-2 py-0.5 rounded border border-slate-100 max-w-[150px] truncate block">/tool/{product.slug || product.id}</span>
                                                                 <button
                                                                     onClick={() => {
-                                                                        navigator.clipboard.writeText(`https://www.kathleenheals.com/tool/${product.slug || product.id}`);
+                                                                        navigator.clipboard.writeText(`${window.location.origin}/tool/${product.slug || product.id}`);
                                                                         alert('Copied!');
                                                                     }}
                                                                     className="text-slate-400 hover:text-blue-600 transition-colors"
@@ -715,7 +715,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                                         </span>
                                                                         <button
                                                                             onClick={() => {
-                                                                                navigator.clipboard.writeText(`https://www.kathleenheals.com/glossary/${term.slug || term.id}`);
+                                                                                navigator.clipboard.writeText(`${window.location.origin}/glossary/${term.slug || term.id}`);
                                                                                 alert('URL Copied!');
                                                                             }}
                                                                             className="text-slate-400 hover:text-indigo-600 transition-colors p-1"
@@ -1092,7 +1092,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                                 <code className="text-[11px] font-mono bg-slate-50 border border-slate-100 px-2 py-0.5 rounded text-slate-400">/offers/{page.slug}</code>
                                                                 <button
                                                                     onClick={() => {
-                                                                        navigator.clipboard.writeText(`https://www.kathleenheals.com/offers/${page.slug}`);
+                                                                        navigator.clipboard.writeText(`${window.location.origin}/offers/${page.slug}`);
                                                                         alert('Copied!');
                                                                     }}
                                                                     className="text-slate-400 hover:text-blue-600 transition-colors"
