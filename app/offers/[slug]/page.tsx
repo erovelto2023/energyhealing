@@ -36,7 +36,17 @@ export default async function OfferPage({ params }: Props) {
     );
 
     if (!offer) {
-        notFound();
+        // Debug mode: Show why it failed
+        return (
+            <div className="p-10 text-center">
+                <h1 className="text-2xl font-bold text-red-600">Debug: Offer Not Found</h1>
+                <p className="mt-4">Slug requested: <code>{params.slug}</code></p>
+                <p>Database Connection: Attempted</p>
+                <p className="text-sm text-slate-500 mt-4">If you see this, the code is running but the database query returned null.</p>
+                <p className="text-sm text-slate-500">Check the Admin Dashboard 'Slug' column for exact match.</p>
+            </div>
+        );
+        // notFound();
     }
 
     return (
