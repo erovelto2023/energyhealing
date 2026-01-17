@@ -9,9 +9,12 @@ export async function generatePage(slug: string, code: string) {
         const safeSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, '-');
         if (!safeSlug) throw new Error("Invalid slug");
 
-        // Auto-add 'use client' if hooks are detected and directive is missing
+        // Auto-add 'use client' if hooks or event handlers are detected and directive is missing
         let finalCode = code;
-        if ((code.includes('useState') || code.includes('useEffect') || code.includes('useMemo')) && !code.includes("'use client'") && !code.includes('"use client"')) {
+        const hasHooks = code.includes('useState') || code.includes('useEffect') || code.includes('useMemo') || code.includes('useCallback');
+        const hasEvents = /on[A-Z][a-zA-Z]+=\{/.test(code) || code.includes('onClick') || code.includes('onChange') || code.includes('onError') || code.includes('onSubmit');
+
+        if ((hasHooks || hasEvents) && !code.includes("'use client'") && !code.includes('"use client"')) {
             finalCode = "'use client';\n\n" + code;
         }
 
