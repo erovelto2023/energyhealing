@@ -5,22 +5,69 @@ import path from 'path';
 
 export async function generatePage(slug: string, code: string) {
     try {
-        // Sanitize slug
-        const safeSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-        if (!safeSlug) throw new Error("Invalid slug");
-
-        // Auto-add 'use client' if hooks or event handlers are detected and directive is missing
         let finalCode = code;
-        const hasHooks = code.includes('useState') || code.includes('useEffect') || code.includes('useMemo') || code.includes('useCallback');
-        const hasEvents = /on[A-Z][a-zA-Z]+=\{/.test(code) || code.includes('onClick') || code.includes('onChange') || code.includes('onError') || code.includes('onSubmit');
+        let finalSlug = slug;
 
-        if ((hasHooks || hasEvents) && !code.includes("'use client'") && !code.includes('"use client"')) {
-            finalCode = "'use client';\n\n" + code;
+        // Auto-Generate Slug if missing: Try to find H1
+        if (!finalSlug || finalSlug.trim() === '') {
+            const h1Match = code.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+            if (h1Match && h1Match[1]) {
+                // Strip tags and special chars
+                const text = h1Match[1].replace(/<[^>]*>/g, '').trim();
+                finalSlug = text;
+            } else {
+                finalSlug = `offer-${Date.now()}`;
+            }
         }
 
-        // Always add @ts-nocheck to prevent build errors on pasted code
-        if (!finalCode.includes('// @ts-nocheck')) {
-            finalCode = "// @ts-nocheck\n" + finalCode;
+        // Sanitize slug
+        const safeSlug = finalSlug.toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
+
+        if (!safeSlug) throw new Error("Invalid slug generated");
+
+        // Logic: specific handling for raw HTML vs React Component
+        if (!code.includes('export default')) {
+            // It's likely raw HTML. Auto-wrap it.
+            let jsx = code
+                .replace(/class=/g, 'className=')
+                .replace(/<!--([\s\S]*?)-->/g, '{/* $1 */}')
+                .replace(/<br>/g, '<br />')
+                .replace(/<hr>/g, '<hr />');
+
+            // Fix self-closing tags (img, input)
+            jsx = jsx.replace(/<(img|input)([^>]*)(?<!\/)>/gi, '<$1$2 />');
+
+            finalCode = `// @ts-nocheck
+'use client';
+import React from 'react';
+import { 
+  Star, Award, Info, ShoppingCart, ArrowRight, Check, Menu, X, 
+  ChevronDown, ChevronRight, ShieldCheck, TrendingUp, Box, Scale 
+} from 'lucide-react';
+
+export default function GeneratedPage() {
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+      ${jsx}
+    </div>
+  );
+}`;
+        } else {
+            // Already a React Component. Apply standard fixes.
+            let prefix = "";
+            const hasHooks = code.includes('useState') || code.includes('useEffect') || code.includes('useMemo');
+            const hasEvents = /on[A-Z][a-zA-Z]+=\{/.test(code) || code.includes('onClick');
+
+            if ((hasHooks || hasEvents) && !code.includes("'use client'")) {
+                prefix += "'use client';\n\n";
+            }
+            if (!code.includes('// @ts-nocheck')) {
+                prefix = "// @ts-nocheck\n" + prefix;
+            }
+            finalCode = prefix + code;
         }
 
         const dir = path.join(process.cwd(), 'app', 'offers', safeSlug);

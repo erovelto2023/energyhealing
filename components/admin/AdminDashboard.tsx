@@ -1281,7 +1281,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                     value={customPageSlug}
                                                     onChange={(e) => setCustomPageSlug(e.target.value)}
                                                     className="flex-1 border border-slate-300 rounded-r px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
-                                                    placeholder="e.g. breathalyzer-dashboard"
+                                                    placeholder="e.g. breathalyzer-dashboard (Leave empty to auto-generate from content)"
                                                 />
                                             </div>
                                         </div>
@@ -1289,13 +1289,13 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                         <div className="mb-6">
                                             <div className="flex justify-between items-center mb-2">
                                                 <label className="block text-sm font-bold text-slate-700">Component Code</label>
-                                                <span className="text-xs text-slate-500">Must include imports and 'export default'</span>
+                                                <span className="text-xs text-slate-500">Paste React component OR raw HTML content</span>
                                             </div>
                                             <textarea
                                                 value={customPageCode}
                                                 onChange={(e) => setCustomPageCode(e.target.value)}
                                                 className="w-full h-[500px] font-mono text-xs bg-slate-900 text-emerald-400 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
-                                                placeholder={`'use client';\n\nimport React from 'react';\n\nexport default function MyPage() {\n  return <h1>Hello World</h1>;\n}`}
+                                                placeholder={`You can paste:\n1. Full React Component ('use client'; export default...)\n2. Raw HTML (<h1>My Offer</h1>...)`}
                                                 spellCheck={false}
                                             />
                                         </div>
@@ -1303,7 +1303,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                         <div className="flex justify-end border-t border-slate-100 pt-6">
                                             <button
                                                 onClick={async () => {
-                                                    if (!customPageSlug || !customPageCode) return alert('Please fill in both Slug and Code fields.');
+                                                    if (!customPageCode) return alert('Please provide page code.');
                                                     setIsGeneratingPage(true);
                                                     try {
                                                         const res = await generatePage(customPageSlug, customPageCode);
