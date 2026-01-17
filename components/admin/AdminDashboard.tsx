@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { generatePage } from '@/lib/page-generator';
+import { generatePage, getPageContent, deletePage } from '@/lib/page-generator';
 import {
     Users,
     MessageSquare,
@@ -1019,7 +1019,12 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                     <div className="flex justify-between items-center mb-6">
                                         <h2 className="text-xl font-bold text-slate-800">Sales Pages ({totalOffers})</h2>
                                         <button
-                                            onClick={() => { setSalesPageView('create'); setEditingSalesPage(undefined); }}
+                                            onClick={() => {
+                                                setSalesPageView('create');
+                                                setEditingSalesPage(undefined);
+                                                setCustomPageSlug('');
+                                                setCustomPageCode('');
+                                            }}
                                             className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 flex items-center gap-2"
                                         >
                                             <Plus size={16} /> Create New Page
@@ -1143,18 +1148,45 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                                 <Eye size={16} />
                                                             </a>
                                                             <button
-                                                                onClick={() => { setEditingSalesPage(page); setSalesPageView('edit'); }}
+                                                                onClick={async () => {
+                                                                    setEditingSalesPage(page);
+                                                                    setCustomPageSlug(page.slug || '');
+                                                                    setCustomPageCode('// Loading...');
+                                                                    setSalesPageView('edit');
+                                                                    try {
+                                                                        const res = await getPageContent(page.slug || '');
+                                                                        if (res.success) {
+                                                                            setCustomPageCode(res.content);
+                                                                        } else {
+                                                                            setCustomPageCode('// Error loading content: ' + res.error);
+                                                                        }
+                                                                    } catch (e) {
+                                                                        setCustomPageCode('// Failed to fetch content');
+                                                                    }
+                                                                }}
                                                                 className="text-blue-600 hover:text-blue-900 inline-block"
                                                             >
                                                                 <Edit size={16} />
                                                             </button>
-                                                            {/* <button
-                                                                onClick={() => handleDeleteSalesPage(page._id)}
-                                                                disabled={isDeleting}
-                                                                className="text-red-600 hover:text-red-900 disabled:opacity-50 inline-block"
+                                                            <button
+                                                                onClick={async () => {
+                                                                    if (!confirm(`Delete page "${page.slug}"? This cannot be undone.`)) return;
+                                                                    try {
+                                                                        const res = await deletePage(page.slug || '');
+                                                                        if (res.success) {
+                                                                            window.location.reload();
+                                                                        } else {
+                                                                            alert('Error deleting page: ' + res.error);
+                                                                        }
+                                                                    } catch (e) {
+                                                                        console.error(e);
+                                                                    }
+                                                                }}
+                                                                className="text-red-600 hover:text-red-900 inline-block"
+                                                                title="Delete Page"
                                                             >
                                                                 <Trash2 size={16} />
-                                                            </button> */}
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 ))}
