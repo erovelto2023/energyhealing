@@ -42,6 +42,8 @@ export async function generatePage(slug: string, code: string) {
 
             finalCode = `// @ts-nocheck
 'use client';
+export const dynamic = 'force-dynamic';
+
 import React from 'react';
 import { 
   Star, Award, Info, ShoppingCart, ArrowRight, Check, Menu, X, 
@@ -63,7 +65,16 @@ export default function GeneratedPage() {
 
             if ((hasHooks || hasEvents) && !code.includes("'use client'")) {
                 prefix += "'use client';\n\n";
+            } else if (!code.includes("'use client'") && !code.includes('"use client"')) {
+                // Even if server component, we force dynamic to avoid build issues
+                prefix += "export const dynamic = 'force-dynamic';\n\n";
             }
+
+            // If it IS a client component, we can still export dynamic
+            if (code.includes("'use client'")) {
+                prefix = code.includes("export const dynamic") ? prefix : prefix + "export const dynamic = 'force-dynamic';\n\n";
+            }
+
             if (!code.includes('// @ts-nocheck')) {
                 prefix = "// @ts-nocheck\n" + prefix;
             }
