@@ -33,6 +33,7 @@ export default function GlossaryList({ terms, initialTotalPages, initialPage }: 
             }
         }, 500);
         return () => clearTimeout(timer);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [localSearch, searchQuery]);
 
     const updateParams = (updates: any) => {

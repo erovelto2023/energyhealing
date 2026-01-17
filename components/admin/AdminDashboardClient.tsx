@@ -14,7 +14,7 @@ export default function AdminDashboardClient() {
         if (isLoaded && !user) {
             router.push('/')
         }
-    }, [user, isLoaded])
+    }, [user, isLoaded, router])
 
     if (!isLoaded) {
         return (

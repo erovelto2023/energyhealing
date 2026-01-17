@@ -36,6 +36,7 @@ export default function AdminBookingsClient() {
         } else if (user) {
             fetchBookings()
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, isLoaded])
 
     const fetchBookings = async () => {
