@@ -15,6 +15,9 @@ export async function generatePage(slug: string, code: string) {
             finalCode = "'use client';\n\n" + code;
         }
 
+        // Always add @ts-nocheck to prevent build errors on pasted code
+        finalCode = "// @ts-nocheck\n" + finalCode;
+
         const dir = path.join(process.cwd(), 'app', 'offers', safeSlug);
         await fs.mkdir(dir, { recursive: true });
 
