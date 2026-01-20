@@ -951,3 +951,35 @@ export async function importAffirmations(rawText: string) {
         return { error: e.message };
     }
 }
+
+export async function deduplicateAffirmations() {
+    try {
+        await connectToDatabase();
+        // Sort by createdAt ascending to keep oldest
+        const all = await Affirmation.find({}).sort({ createdAt: 1 }).lean();
+        const seen = new Set();
+        const duplicates: string[] = [];
+
+        // @ts-ignore
+        for (const item of all) {
+            // @ts-ignore
+            const key = item.title.trim().toLowerCase();
+            if (seen.has(key)) {
+                // @ts-ignore
+                duplicates.push(item.id);
+            } else {
+                seen.add(key);
+            }
+        }
+
+        if (duplicates.length > 0) {
+            await Affirmation.deleteMany({ id: { $in: duplicates } });
+        }
+
+        revalidatePath('/admin');
+        revalidatePath('/affirmations');
+        return { success: true, count: duplicates.length };
+    } catch (error: any) {
+        return { error: error.message };
+    }
+}

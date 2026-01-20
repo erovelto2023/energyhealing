@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     Users, MessageSquare, BookOpen, Info,
-    Compass, Edit, Trash2, Plus, ArrowLeft, Lightbulb, FileText, Copy, Check, PenTool, ShoppingBag, LayoutGrid, Eye, ArrowUpDown, Tag, Sparkles, Search, Download, AlertTriangle, Wrench, Leaf
+    Compass, Edit, Trash2, Plus, ArrowLeft, Lightbulb, FileText, Copy, Check, PenTool, ShoppingBag, LayoutGrid, Eye, ArrowUpDown, Tag, Sparkles, Search, Download, AlertTriangle, Wrench, Leaf, Link as LinkIcon
 } from 'lucide-react';
 import AdminReviewList from '@/components/features/AdminReviewList';
 import ProductForm from './ProductForm';
@@ -17,7 +17,7 @@ import {
     createGlossaryTerm, updateGlossaryTerm, deleteGlossaryTerm, deleteGlossaryTerms,
     findDuplicateGlossaryTerms
 } from "@/lib/actions";
-import { deleteHerb, importHerbs, runBulkSeed, deleteHerbs, deleteAffirmation, deleteAffirmations, importAffirmations } from '@/lib/actions';
+import { deleteHerb, importHerbs, runBulkSeed, deleteHerbs, deleteAffirmation, deleteAffirmations, importAffirmations, deduplicateAffirmations } from '@/lib/actions';
 import { IProduct } from '@/lib/models/Product';
 import { IGlossaryTerm } from '@/lib/models/GlossaryTerm';
 import { INiche } from '@/lib/models/Niche';
@@ -292,6 +292,19 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
         } else {
             alert('❌ Import Failed: ' + result.error);
         }
+    };
+
+    const handleDeduplicateAffirmations = async () => {
+        if (!confirm("This will scan for duplicate titles and keep only the oldest one. Continue?")) return;
+        startDeleteTransition(async () => {
+            const result = await deduplicateAffirmations();
+            if (result.success) {
+                alert(`✅ Removed ${result.count} duplicates.`);
+                window.location.reload();
+            } else {
+                alert('❌ Error: ' + result.error);
+            }
+        });
     };
 
     const handleExportGlossaryUrls = () => {
@@ -1852,6 +1865,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                 />
                                             </div>
                                             <button onClick={() => setAffirmationView('prompt-builder')} className="px-4 py-2 bg-white text-slate-700 font-bold rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center gap-2"><Sparkles size={16} /> Build AI Prompt</button>
+                                            <button onClick={handleDeduplicateAffirmations} className="px-4 py-2 bg-white text-orange-600 font-bold rounded-lg border border-orange-200 hover:bg-orange-50 flex items-center gap-2" title="Remove Duplicates"><Trash2 size={16} /> Cleanup</button>
                                             <button onClick={() => setAffirmationView('import')} className="px-4 py-2 bg-white text-slate-700 font-bold rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center gap-2"><Download size={16} /> Import</button>
                                             <button onClick={() => { setEditingAffirmation(undefined); setAffirmationView('create'); }} className="px-4 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 flex items-center gap-2"><Plus size={16} /> Create Ritual</button>
                                         </div>
@@ -1888,6 +1902,21 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                     <tr key={item.id} className="hover:bg-slate-50 transition-colors">
                                                         <td className="px-6 py-4">
                                                             <div className="font-bold text-slate-900">{item.title}</div>
+                                                            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-mono mt-1 group/slug">
+                                                                <span className="truncate max-w-[120px]" title={item.slug}>/{item.slug}</span>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        const url = `${window.location.origin}/affirmations/${item.slug}`;
+                                                                        navigator.clipboard.writeText(url);
+                                                                        alert('Copied URL: ' + url);
+                                                                    }}
+                                                                    className="opacity-0 group-hover/slug:opacity-100 p-1 hover:bg-slate-100 rounded text-slate-500 hover:text-purple-600 transition-all"
+                                                                    title="Copy URL"
+                                                                >
+                                                                    <Copy size={10} />
+                                                                </button>
+                                                            </div>
                                                             {item.primaryHerb && <div className="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-1"><Leaf size={10} /> {item.primaryHerb}</div>}
                                                         </td>
                                                         <td className="px-6 py-4 bg-slate-50/50">
