@@ -638,9 +638,37 @@ export async function updateHerb(data: any) {
         return { success: true };
     } catch (error: any) {
         console.error("Error updating herb:", error);
+        return { error: error.message || "Failed to update herb" };
+    }
+}
+
+export async function deleteHerbs(ids: string[]) {
+    try {
+        await connectToDatabase();
+        if (!ids || ids.length === 0) return { success: true, count: 0 };
+
+        // Try deleting by custom ID first
+        let result = await Herb.deleteMany({ id: { $in: ids } });
+        let deletedCount = result.deletedCount;
+
+        // If nothing deleted, try by _id
+        if (deletedCount === 0) {
+            const validObjectIds = ids.filter(id => mongoose.Types.ObjectId.isValid(id));
+            if (validObjectIds.length > 0) {
+                result = await Herb.deleteMany({ _id: { $in: validObjectIds } });
+                deletedCount = result.deletedCount;
+            }
+        }
+
+        revalidatePath('/admin');
+        revalidatePath('/healing-pantry');
+        return { success: true, count: deletedCount };
+    } catch (error: any) {
+        console.error("Bulk delete herbs error:", error);
         return { error: error.message };
     }
 }
+
 
 export async function deleteHerb(herbId: string) {
     try {

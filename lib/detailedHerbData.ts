@@ -577,5 +577,6 @@ export const DETAILED_HERB_DATA: Record<string, any> = {
         emotional: "'Inner Light' - combats brain fog.",
         benefits: "Curcumin rivals NSAIDs; pair with pepper.",
         usage: "Golden milk or curries."
-    }
+    },
+
 };

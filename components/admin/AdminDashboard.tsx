@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     Users, MessageSquare, BookOpen, Info,
-    Compass, Edit, Trash2, Plus, ArrowLeft, Lightbulb, FileText, Copy, Check, PenTool, ShoppingBag, LayoutGrid, Eye, ArrowUpDown, Tag, Sparkles, Search, Download, AlertTriangle, Wrench
+    Compass, Edit, Trash2, Plus, ArrowLeft, Lightbulb, FileText, Copy, Check, PenTool, ShoppingBag, LayoutGrid, Eye, ArrowUpDown, Tag, Sparkles, Search, Download, AlertTriangle, Wrench, Leaf
 } from 'lucide-react';
 import AdminReviewList from '@/components/features/AdminReviewList';
 import ProductForm from './ProductForm';
@@ -17,12 +17,12 @@ import {
     createGlossaryTerm, updateGlossaryTerm, deleteGlossaryTerm, deleteGlossaryTerms,
     findDuplicateGlossaryTerms
 } from "@/lib/actions";
+import { deleteHerb, importHerbs, runBulkSeed, deleteHerbs } from '@/lib/actions';
 import { IProduct } from '@/lib/models/Product';
 import { IGlossaryTerm } from '@/lib/models/GlossaryTerm';
 import { INiche } from '@/lib/models/Niche';
 import { ISubscriber } from '@/lib/models/Subscriber';
 import { IHerb } from '@/lib/models/Herb';
-import { deleteHerb, importHerbs, runBulkSeed } from '@/lib/actions';
 
 
 interface AdminDashboardProps {
@@ -46,6 +46,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
     const [pantryPage, setPantryPage] = useState(1);
     const pantryPerPage = 10;
     const [pantryImportText, setPantryImportText] = useState('');
+    const [pantrySelected, setPantrySelected] = useState<Set<string>>(new Set());
 
 
     // Sales Pages State
@@ -184,6 +185,54 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
             alert('❌ Import Failed: ' + result.error);
         }
     }
+
+    const handleFindHerbDuplicates = () => {
+        const nameMap = new Map<string, IHerb[]>();
+        herbs.forEach(h => {
+            const norm = h.name.toLowerCase().trim();
+            if (!nameMap.has(norm)) nameMap.set(norm, []);
+            nameMap.get(norm)?.push(h);
+        });
+
+        const dupes = new Set<string>();
+        let count = 0;
+
+        nameMap.forEach((group) => {
+            if (group.length > 1) {
+                // Keep the one with the most content (longest description)
+                group.sort((a, b) => (b.description?.length || 0) - (a.description?.length || 0));
+
+                // Mark all but the first (best) one for deletion
+                for (let i = 1; i < group.length; i++) {
+                    dupes.add(group[i].id);
+                    count++;
+                }
+            }
+        });
+
+        if (count > 0) {
+            setPantrySelected(dupes);
+            alert(`Found ${count} duplicates! They have been selected. Review and click Delete.`);
+        } else {
+            alert("No duplicates found checking by name.");
+        }
+    };
+
+    const handleBulkDeleteHerbs = () => {
+        if (pantrySelected.size === 0) return;
+        if (!confirm(`Are you sure you want to delete ${pantrySelected.size} herbs?`)) return;
+
+        startDeleteTransition(async () => {
+            const result = await deleteHerbs(Array.from(pantrySelected));
+            if (result.success) {
+                alert(`✅ ${result.count || pantrySelected.size} herbs deleted successfully!`);
+                setPantrySelected(new Set());
+                window.location.reload();
+            } else {
+                alert('❌ Error: ' + result.error);
+            }
+        });
+    };
 
     const handleBulkSeed = async () => {
         if (!confirm("This will add hundreds of herbs to the database. Continue?")) return;
@@ -1487,59 +1536,89 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                 <div className="space-y-6">
                                     {(pantryView === 'list') && (
                                         <>
-                                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                                 <div>
-                                                    <div className="flex items-center gap-3 mb-1">
-                                                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Healing Pantry</h2>
-                                                        <span className="bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wide border border-orange-200">
-                                                            {totalHerbs} Items
+                                                    <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                                                        <Leaf className="text-emerald-500" />
+                                                        Healing Pantry
+                                                        <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded-lg text-xs font-bold border border-slate-200">
+                                                            {filteredHerbs.length} Items
                                                         </span>
-                                                    </div>
-                                                    <p className="text-slate-500 font-medium text-sm">Manage herbs, spices, and healing ingredients.</p>
+                                                    </h2>
+                                                    <p className="text-slate-500 text-sm mt-1">Manage herbs, spices, and healing foods.</p>
                                                 </div>
-                                                <div className="flex flex-wrap gap-2">
+                                                <div className="flex gap-2">
                                                     <button
                                                         onClick={() => { setEditingHerb(undefined); setPantryView('create'); }}
-                                                        className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 hover:bg-slate-800 hover:scale-105 transition-all flex items-center gap-2"
+                                                        className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all flex items-center gap-2 shadow-lg shadow-slate-200 hover:scale-105"
                                                     >
-                                                        <Plus size={18} /> Add Herb
+                                                        <Plus size={18} /> Add Item
                                                     </button>
                                                     <button
                                                         onClick={() => setPantryView('import')}
-                                                        className="bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-indigo-600 transition-all flex items-center gap-2"
+                                                        className="bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-orange-600 transition-all flex items-center gap-2"
                                                     >
-                                                        <Download size={18} /> JSON Import
+                                                        <Download size={18} /> Import
                                                     </button>
                                                     <button
-                                                        onClick={handleBulkSeed}
-                                                        className="bg-orange-50 text-orange-700 border border-orange-100 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-orange-100 transition-all flex items-center gap-2"
-                                                        title="Seed full list from file"
+                                                        onClick={handleFindHerbDuplicates}
+                                                        className="bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-amber-600 transition-all flex items-center gap-2"
                                                     >
-                                                        <PenTool size={14} /> Full Seed
+                                                        <Search size={18} /> Find Dupes
                                                     </button>
                                                 </div>
                                             </div>
 
                                             {/* Filters Bar */}
                                             <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-wrap gap-4 items-center shadow-sm">
-                                                <div className="relative flex-1 min-w-[300px]">
+                                                <div className="relative flex-1 min-w-[200px]">
                                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                                     <input
                                                         type="text"
-                                                        placeholder="Search herbs, healing properties..."
+                                                        placeholder="Search pantry..."
                                                         value={pantrySearch}
                                                         onChange={(e) => setPantrySearch(e.target.value)}
-                                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-none rounded-lg text-sm font-medium focus:ring-2 focus:ring-indigo-100 outline-none transition-all placeholder:text-slate-400 text-slate-700"
+                                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-lg text-sm font-medium focus:ring-2 focus:ring-emerald-100 outline-none"
                                                     />
                                                 </div>
+                                                {pantrySelected.size > 0 && (
+                                                    <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4">
+                                                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{pantrySelected.size} selected</span>
+                                                        <button
+                                                            onClick={handleBulkDeleteHerbs}
+                                                            disabled={isDeleting}
+                                                            className="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-red-100 flex items-center gap-1"
+                                                        >
+                                                            <Trash2 size={12} /> Delete
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* Table */}
                                             <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                                                 <table className="min-w-full divide-y divide-slate-100">
-                                                    <thead className="bg-slate-50/80 backdrop-blur-sm">
+                                                    <thead className="bg-slate-50/50">
                                                         <tr>
-                                                            <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest pl-8">Herb Name</th>
+                                                            <th className="px-6 py-4 text-left w-12">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
+                                                                    checked={paginatedHerbs.length > 0 && paginatedHerbs.every(h => pantrySelected.has(h.id))}
+                                                                    onChange={() => {
+                                                                        const ids = paginatedHerbs.map(h => h.id);
+                                                                        const allSelected = ids.every(id => pantrySelected.has(id));
+                                                                        const newSelected = new Set(pantrySelected);
+                                                                        if (allSelected) {
+                                                                            ids.forEach(id => newSelected.delete(id));
+                                                                        } else {
+                                                                            ids.forEach(id => newSelected.add(id));
+                                                                        }
+                                                                        setPantrySelected(newSelected);
+                                                                    }}
+                                                                />
+                                                            </th>
+                                                            <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Name</th>
                                                             <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Category</th>
                                                             <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Healing Properties</th>
                                                             <th className="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Completed</th>
@@ -1548,8 +1627,24 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                     </thead>
                                                     <tbody className="divide-y divide-slate-100">
                                                         {paginatedHerbs.map((herb) => (
-                                                            <tr key={herb.id} className="hover:bg-slate-50/80 transition-colors group">
-                                                                <td className="px-6 py-4 pl-8">
+                                                            <tr key={herb.id} className={`hover:bg-slate-50/80 transition-colors group ${pantrySelected.has(herb.id) ? 'bg-emerald-50/30' : ''}`}>
+                                                                <td className="px-6 py-4">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
+                                                                        checked={pantrySelected.has(herb.id)}
+                                                                        onChange={() => {
+                                                                            const newSelected = new Set(pantrySelected);
+                                                                            if (newSelected.has(herb.id)) {
+                                                                                newSelected.delete(herb.id);
+                                                                            } else {
+                                                                                newSelected.add(herb.id);
+                                                                            }
+                                                                            setPantrySelected(newSelected);
+                                                                        }}
+                                                                    />
+                                                                </td>
+                                                                <td className="px-6 py-4">
                                                                     <div className="flex flex-col">
                                                                         <span className="font-bold text-slate-800 text-sm">{herb.name}</span>
                                                                         <span className="text-[10px] text-slate-400 font-mono mt-0.5">{herb.slug}</span>
