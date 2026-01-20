@@ -645,11 +645,23 @@ export async function updateHerb(data: any) {
 export async function deleteHerb(herbId: string) {
     try {
         await connectToDatabase();
-        await Herb.findOneAndDelete({ id: herbId });
+        let deleted = await Herb.findOneAndDelete({ id: herbId });
+
+        if (!deleted) {
+            if (mongoose.Types.ObjectId.isValid(herbId)) {
+                deleted = await Herb.findByIdAndDelete(herbId);
+            }
+        }
+
+        if (!deleted) {
+            return { error: "Item not found or could not be deleted." };
+        }
+
         revalidatePath('/admin');
         revalidatePath('/healing-pantry');
         return { success: true };
     } catch (error: any) {
+        console.error("Delete herb error:", error);
         return { error: error.message };
     }
 }
