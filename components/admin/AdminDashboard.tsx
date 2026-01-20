@@ -10,6 +10,7 @@ import AdminReviewList from '@/components/features/AdminReviewList';
 import ProductForm from './ProductForm';
 import GlossaryImporter from './GlossaryImporter';
 import GlossaryForm from './GlossaryForm';
+import HerbForm from './HerbForm';
 
 import {
     createProduct, updateProduct, deleteProduct,
@@ -20,6 +21,9 @@ import { IProduct } from '@/lib/models/Product';
 import { IGlossaryTerm } from '@/lib/models/GlossaryTerm';
 import { INiche } from '@/lib/models/Niche';
 import { ISubscriber } from '@/lib/models/Subscriber';
+import { IHerb } from '@/lib/models/Herb';
+import { deleteHerb, importHerbs, runBulkSeed } from '@/lib/actions';
+
 
 interface AdminDashboardProps {
     reviews: any[];
@@ -28,11 +32,21 @@ interface AdminDashboardProps {
     niches?: INiche[];
     subscribers?: ISubscriber[];
     salesPages?: any[];
+    herbs?: IHerb[];
 }
 
-export default function AdminDashboard({ reviews = [], products = [], glossaryTerms = [], niches = [], subscribers = [], salesPages = [] }: AdminDashboardProps) {
+export default function AdminDashboard({ reviews = [], products = [], glossaryTerms = [], niches = [], subscribers = [], salesPages = [], herbs = [] }: AdminDashboardProps) {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'reviews' | 'tools' | 'glossary' | 'niches' | 'subscribers' | 'writing' | 'offers'>('reviews');
+    const [activeTab, setActiveTab] = useState<'reviews' | 'tools' | 'glossary' | 'niches' | 'subscribers' | 'writing' | 'offers' | 'pantry'>('reviews');
+
+    // Healing Pantry State
+    const [pantryView, setPantryView] = useState<'list' | 'create' | 'edit' | 'import'>('list');
+    const [editingHerb, setEditingHerb] = useState<IHerb | undefined>(undefined);
+    const [pantrySearch, setPantrySearch] = useState('');
+    const [pantryPage, setPantryPage] = useState(1);
+    const pantryPerPage = 10;
+    const [pantryImportText, setPantryImportText] = useState('');
+
 
     // Sales Pages State
     const [salesPageView, setSalesPageView] = useState<'list' | 'create' | 'edit'>('list');
@@ -144,6 +158,43 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
             }
         });
     };
+
+    const handleDeleteHerb = (id: string) => {
+        if (!confirm("Are you sure you want to delete this herb?")) return;
+        startDeleteTransition(async () => {
+            const result = await deleteHerb(id);
+            if (result.success) {
+                alert('✅ Herb deleted!');
+                window.location.reload();
+            } else {
+                alert('❌ Error: ' + result.error);
+            }
+        });
+    };
+
+    const handleImportHerbs = async () => {
+        if (!pantryImportText) return;
+        const result = await importHerbs(pantryImportText);
+        if (result.success) {
+            alert(`✅ Successfully imported ${result.count} herbs!`);
+            setPantryImportText('');
+            setPantryView('list');
+            window.location.reload();
+        } else {
+            alert('❌ Import Failed: ' + result.error);
+        }
+    }
+
+    const handleBulkSeed = async () => {
+        if (!confirm("This will add hundreds of herbs to the database. Continue?")) return;
+        const result = await runBulkSeed();
+        if (result.success) {
+            alert(`✅ Seeded ${result.count} new herbs.`);
+            window.location.reload();
+        } else {
+            alert('❌ Seed failed.');
+        }
+    }
 
     const handleFindDuplicates = async (niche?: string) => {
         const result = await findDuplicateGlossaryTerms(niche);
@@ -281,6 +332,15 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                         }`}
                 >
                     Offer Builder
+                </button>
+                <button
+                    onClick={() => setActiveTab('pantry')}
+                    className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${activeTab === 'pantry'
+                        ? 'bg-orange-600 text-white shadow-lg shadow-orange-200 scale-105'
+                        : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900 border border-slate-200'
+                        }`}
+                >
+                    <span className="flex items-center gap-2">🌿 Healing Pantry</span>
                 </button>
             </div>
 
@@ -578,8 +638,12 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                         );
                     }
 
+
+
+
                     const totalWritingTerms = filteredTerms.length;
                     const totalWritingPages = Math.ceil(totalWritingTerms / writingPerPage);
+
                     const startIndex = (writingPage - 1) * writingPerPage;
                     const endIndex = startIndex + writingPerPage;
                     const paginatedWritingTerms = filteredTerms.slice(startIndex, endIndex);
@@ -617,10 +681,11 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                     </button>
                                                     <button
                                                         onClick={() => setWritingView('import')}
-                                                        className="bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-indigo-600 transition-all flex items-center gap-2"
+                                                        className="bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-orange-600 transition-all flex items-center gap-2"
                                                     >
-                                                        <Download size={18} /> Import
+                                                        <Download size={18} /> JSON Import
                                                     </button>
+
                                                     <button
                                                         onClick={handleExportGlossaryUrls}
                                                         className="bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-green-600 transition-all flex items-center gap-2"
@@ -737,7 +802,15 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                                     </div>
                                                                 </td>
                                                                 <td className="px-6 py-4 text-right">
-                                                                    <div className="flex justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                                                                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                        <a
+                                                                            href={`/glossary/${term.slug || term.id}`}
+                                                                            target="_blank"
+                                                                            className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                                                            title="View Live"
+                                                                        >
+                                                                            <Eye size={16} />
+                                                                        </a>
                                                                         <button
                                                                             onClick={() => { setEditingWritingTerm(term); setWritingView('edit'); }}
                                                                             className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
@@ -1330,6 +1403,273 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                     )}
                                                 </button>
                                             </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })()}
+
+                {/* HEALING PANTRY TAB */}
+                {activeTab === 'pantry' && (() => {
+                    let filteredHerbs = herbs || [];
+
+                    if (pantrySearch) {
+                        const searchLower = pantrySearch.toLowerCase();
+                        filteredHerbs = filteredHerbs.filter(h =>
+                            h.name.toLowerCase().includes(searchLower) ||
+                            (h.description && h.description.toLowerCase().includes(searchLower)) ||
+                            (h.category && h.category.toLowerCase().includes(searchLower))
+                        );
+                    }
+
+                    const totalHerbs = filteredHerbs.length;
+                    const totalPages = Math.ceil(totalHerbs / pantryPerPage);
+                    const startIndex = (pantryPage - 1) * pantryPerPage;
+                    const endIndex = startIndex + pantryPerPage;
+                    const paginatedHerbs = filteredHerbs.slice(startIndex, endIndex);
+
+                    return (
+                        <div className="max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            {pantryView === 'import' ? (
+                                <div>
+                                    <button
+                                        onClick={() => setPantryView('list')}
+                                        className="mb-4 text-sm text-slate-500 hover:text-slate-800 flex items-center bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm font-medium transition-colors"
+                                    >
+                                        <ArrowLeft size={16} className="mr-1" /> Back to List
+                                    </button>
+                                    <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                                        <div className="flex items-start gap-4 mb-6">
+                                            <div className="p-3 bg-indigo-50 rounded-xl">
+                                                <Download className="text-indigo-600" size={24} />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-black text-slate-900 mb-1">Bulk Import Herbs</h3>
+                                                <p className="text-slate-500 text-sm leading-relaxed max-w-2xl">
+                                                    Paste a simple list of terms OR a JSON array of objects.
+                                                    You can also paste the full <code>SPICE_PROFILES</code> object.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="relative">
+                                            <textarea
+                                                className="w-full h-96 p-4 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-y"
+                                                placeholder={`Example JSON:\n[\n  {\n    "name": "Turmeric",\n    "category": "Spices",\n    "healing": ["Inflammation", "Joints"]\n  }\n]\n\nOR Just Names:\nTurmeric\nGinger\nGarlic`}
+                                                value={pantryImportText}
+                                                onChange={(e) => setPantryImportText(e.target.value)}
+                                            />
+                                            <div className="absolute bottom-4 right-4 text-xs text-slate-400 font-medium bg-white/80 px-2 py-1 rounded backdrop-blur-sm">
+                                                {pantryImportText.length} characters
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-6 flex justify-end gap-3">
+                                            <button
+                                                onClick={() => setPantryView('list')}
+                                                className="px-5 py-2.5 text-slate-600 font-bold hover:bg-slate-100 rounded-xl transition-colors"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={handleImportHerbs}
+                                                disabled={!pantryImportText}
+                                                className="bg-indigo-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-200 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                                            >
+                                                <Download size={18} /> Process Import
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-6">
+                                    {(pantryView === 'list') && (
+                                        <>
+                                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                                                <div>
+                                                    <div className="flex items-center gap-3 mb-1">
+                                                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Healing Pantry</h2>
+                                                        <span className="bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wide border border-orange-200">
+                                                            {totalHerbs} Items
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-slate-500 font-medium text-sm">Manage herbs, spices, and healing ingredients.</p>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    <button
+                                                        onClick={() => { setEditingHerb(undefined); setPantryView('create'); }}
+                                                        className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 hover:bg-slate-800 hover:scale-105 transition-all flex items-center gap-2"
+                                                    >
+                                                        <Plus size={18} /> Add Herb
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setPantryView('import')}
+                                                        className="bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 hover:text-indigo-600 transition-all flex items-center gap-2"
+                                                    >
+                                                        <Download size={18} /> JSON Import
+                                                    </button>
+                                                    <button
+                                                        onClick={handleBulkSeed}
+                                                        className="bg-orange-50 text-orange-700 border border-orange-100 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-orange-100 transition-all flex items-center gap-2"
+                                                        title="Seed full list from file"
+                                                    >
+                                                        <PenTool size={14} /> Full Seed
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Filters Bar */}
+                                            <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-wrap gap-4 items-center shadow-sm">
+                                                <div className="relative flex-1 min-w-[300px]">
+                                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Search herbs, healing properties..."
+                                                        value={pantrySearch}
+                                                        onChange={(e) => setPantrySearch(e.target.value)}
+                                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-none rounded-lg text-sm font-medium focus:ring-2 focus:ring-indigo-100 outline-none transition-all placeholder:text-slate-400 text-slate-700"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Table */}
+                                            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                                                <table className="min-w-full divide-y divide-slate-100">
+                                                    <thead className="bg-slate-50/80 backdrop-blur-sm">
+                                                        <tr>
+                                                            <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest pl-8">Herb Name</th>
+                                                            <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Category</th>
+                                                            <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Healing Properties</th>
+                                                            <th className="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Completed</th>
+                                                            <th className="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest pr-8">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-slate-100">
+                                                        {paginatedHerbs.map((herb) => (
+                                                            <tr key={herb.id} className="hover:bg-slate-50/80 transition-colors group">
+                                                                <td className="px-6 py-4 pl-8">
+                                                                    <div className="flex flex-col">
+                                                                        <span className="font-bold text-slate-800 text-sm">{herb.name}</span>
+                                                                        <span className="text-[10px] text-slate-400 font-mono mt-0.5">{herb.slug}</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <span className="px-2.5 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg text-xs font-bold shadow-sm inline-block">
+                                                                        {herb.category}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <div className="flex flex-wrap gap-1">
+                                                                        {(herb.healing || []).slice(0, 3).map((h, i) => (
+                                                                            <span key={i} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                                                                {h}
+                                                                            </span>
+                                                                        ))}
+                                                                        {(herb.healing?.length || 0) > 3 && (
+                                                                            <span className="text-[10px] text-slate-400 font-medium px-1">+{herb.healing.length - 3}</span>
+                                                                        )}
+                                                                    </div>
+                                                                </td>
+                                                                <td className="px-6 py-4 text-center">
+                                                                    {herb.description && !herb.description.includes("generic entry") ? (
+                                                                        <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
+                                                                            <Check size={14} strokeWidth={3} />
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-50 text-amber-400" title="Placeholder Description">
+                                                                            <AlertTriangle size={14} />
+                                                                        </div>
+                                                                    )}
+                                                                </td>
+                                                                <td className="px-6 py-4 text-right pr-8">
+                                                                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                        <a
+                                                                            href={`/healing-pantry?herb=${herb.slug}`}
+                                                                            target="_blank"
+                                                                            className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                                                            title="View Live"
+                                                                        >
+                                                                            <Eye size={16} />
+                                                                        </a>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                setEditingHerb(herb);
+                                                                                setPantryView('edit');
+                                                                            }}
+                                                                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                                            title="Edit"
+                                                                        >
+                                                                            <Edit size={16} />
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => handleDeleteHerb(herb.id)}
+                                                                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                                            title="Delete"
+                                                                        >
+                                                                            <Trash2 size={16} />
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                        {totalHerbs === 0 && (
+                                                            <tr>
+                                                                <td colSpan={5} className="px-6 py-12 text-center">
+                                                                    <div className="flex flex-col items-center justify-center text-slate-400">
+                                                                        <ShoppingBag size={48} className="mb-4 text-slate-200" />
+                                                                        <p className="font-medium text-lg text-slate-500">No herbs found.</p>
+                                                                        <p className="text-sm">Try adjusting your search or add a new item.</p>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            {/* Pagination Controls */}
+                                            {totalPages > 1 && (
+                                                <div className="mt-6 flex items-center justify-between bg-white px-6 py-4 rounded-xl border border-slate-200 shadow-sm">
+                                                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                                        Showing {startIndex + 1}-{Math.min(endIndex, totalHerbs)} of {totalHerbs}
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => setPantryPage(p => Math.max(1, p - 1))}
+                                                            disabled={pantryPage === 1}
+                                                            className="px-4 py-2 border border-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition-colors"
+                                                        >
+                                                            Previous
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setPantryPage(p => Math.min(totalPages, p + 1))}
+                                                            disabled={pantryPage === totalPages}
+                                                            className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-slate-800 disabled:opacity-50 transition-colors shadow-lg shadow-slate-200"
+                                                        >
+                                                            Next
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+
+                                    {(pantryView === 'create' || pantryView === 'edit') && (
+                                        <div>
+                                            <button
+                                                onClick={() => setPantryView('list')}
+                                                className="mb-6 text-sm text-slate-500 hover:text-slate-800 flex items-center bg-white border border-slate-200 w-fit px-3 py-1.5 rounded-lg shadow-sm font-bold transition-all hover:pr-4"
+                                            >
+                                                <ArrowLeft size={16} className="mr-1" /> Back to Pantry
+                                            </button>
+                                            <HerbForm
+                                                initialData={editingHerb}
+                                                products={products}
+                                                onSuccess={() => { setPantryView('list'); router.refresh(); }}
+                                                onCancel={() => setPantryView('list')}
+                                            />
                                         </div>
                                     )}
                                 </div>

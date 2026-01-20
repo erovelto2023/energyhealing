@@ -13,6 +13,9 @@ export default function Header() {
             <Link href='/'>Home</Link>
           </li>
           <li>
+            <Link href='/healing-pantry'>Healing Pantry</Link>
+          </li>
+          <li>
             <Link href='/protected/server'>Protected (server)</Link>
           </li>
           <li>

@@ -3,7 +3,103 @@
 import connectToDatabase from "./db";
 import Product from "./models/Product";
 import GlossaryTerm from "./models/GlossaryTerm";
+import Herb from "./models/Herb";
 import { INITIAL_PRODUCTS, INITIAL_GLOSSARY } from "./constants";
+import { BULK_HERB_NAMES } from "./bulkSeedHerbs";
+import { DETAILED_HERB_DATA } from "./detailedHerbData";
+
+const SPICE_PROFILES: any = {
+    "Adobo Seasoning": {
+        category: "Blend",
+        healing: ["Digestive Aid", "Antioxidant Support", "Circulation"],
+        description: "A foundational Latin American blend of garlic, oregano, and black pepper that serves as a synergistic mix of functional spices.",
+        physical: "The high concentration of garlic acts as a natural antibiotic and vasodilator, helping to lower elevated blood pressure—a common contributor to tension headaches and muscle stiffness. Oregano and cumin modulate immune responses, reducing systemic inflammation that underlies joint pain and arthritis.",
+        emotional: "Associated with 'Grounding.' The earthy, savory notes carry deep, familiar warmth that anchors a scattered or anxious mind. The ritual of cooking with this blend becomes a mindful act of self-care, reminding the user that healing can happen at the dinner table.",
+        benefits: "Garlic's allicin reduces CRP (C-reactive protein), a key marker of inflammation. Oregano provides carvacrol, modulating oxidative stress, while cumin improves gut motility—crucial since inflammation often begins in the gut.",
+        usage: "Stir into soups/lentils for digestive support; toss with roasted cauliflower or sweet potatoes; add to beans to reduce bloating."
+    },
+    "Aji Amarillo Chile Powder": {
+        category: "Chiles",
+        healing: ["Metabolism Boost", "Pain Relief", "Endorphin Release"],
+        description: "The 'sunshine' chile of Peru, known for its fruity heat and bright golden hue.",
+        physical: "Capsaicin acts as a topical and internal analgesic by depleting Substance P, a neurotransmitter that sends pain signals to the brain. It is excellent for metabolic health and improving vascular flow.",
+        emotional: "Used for 'Vitality.' The bright heat helps break through emotional stagnation or lethargy, acting as a 'spark' for those feeling uninspired or emotionally numb.",
+        benefits: "Aids in thermogenesis (fat burning) and triggers a natural 'high' via endorphin release, which can offset the emotional weight of chronic pain.",
+        usage: "Incorporate into creamy sauces, citrus-based marinades, or traditional Peruvian dishes."
+    },
+    "Basil, Dried": {
+        category: "Herbs",
+        healing: ["Stress Reduction", "Antibacterial", "Anti-inflammatory"],
+        description: "A cornerstone of Mediterranean healing, known as 'Royal Herb' for its versatile protective qualities.",
+        physical: "Contains high levels of orientin and viceninare, flavonoids that protect cell structures and chromosomes from radiation and oxygen-based damage. Reduces swelling in joints.",
+        emotional: "Provides 'Centering.' Its sweet, green aroma is used in aromatherapy to reduce the feeling of 'overwhelm' and mental fatigue during high-stress periods.",
+        benefits: "Rich in Eugenol, which blocks the activity of an enzyme called cyclooxygenase (COX), similar to how aspirin or ibuprofen works.",
+        usage: "Infuse into tomato sauces, sprinkle over fresh vegetables, or use in poultry seasoning."
+    },
+    "Black Garlic Cloves": {
+        category: "Superfood",
+        healing: ["Heart Health", "High Antioxidant", "Cellular Protection"],
+        description: "Regular garlic aged through fermentation, concentrating its bio-availability and softening its bite into a balsamic-like sweet flavor.",
+        physical: "Strong cardiovascular support. SAC (S-allylcysteine) helps prevent arterial hardening and supports blood flow to extremities, vital for those with Raynaud's or poor circulation.",
+        emotional: "Fosters 'Resilience.' The slow fermentation process represents patience and transformation; it is used energetically to help one process deep-seated grief and 'heavy' life transitions.",
+        benefits: "Contains twice the antioxidants of raw garlic. Directly inhibits cholesterol synthesis and protects neurons from oxidative stress.",
+        usage: "Blend into vinaigrettes, spread on artisan toast, or eat 1-2 cloves daily as a tonic."
+    },
+    "Cinnamon, Ceylon": {
+        category: "Spices",
+        healing: ["Blood Sugar Stability", "Anti-viral", "Warmth"],
+        description: "Known as 'True Cinnamon,' harvested from the inner bark of the Cinnamomum verum tree.",
+        physical: "Excellent for 'Cold Pain'—stiff joints that worsen in winter or poor circulation. It improves insulin sensitivity, making it a powerful ally for metabolic health.",
+        emotional: "Provides 'Comfort & Connection.' Useful for those feeling emotionally 'frozen' or socially isolated, helping to open the heart center to warmth and empathy.",
+        benefits: "Unlike Cassia, Ceylon is low in coumarin, protecting the liver while delivering cinnamaldehyde for blood-thinning and anti-microbial action.",
+        usage: "Add to morning oats, whisk into coffee, or use in savory Moroccan stews."
+    },
+    "Ginger Root, Sliced": {
+        category: "Spices",
+        healing: ["Anti-emetic", "Muscle Recovery", "Circulation"],
+        description: "A pungent, warming rhizome used for thousands of years in Ayurvedic and Traditional Chinese Medicine.",
+        physical: "A potent remedy for post-workout soreness and osteoarthritis. Gingerols inhibit the formation of inflammatory cytokines, rivaling NSAIDs for pain management.",
+        emotional: "Used for 'Courage.' In traditional medicine, ginger is seen as a way to stoke the 'internal fire,' helping individuals overcome fear-based procrastination.",
+        benefits: "Enhances gastric motility and reduces serum cholesterol. Its warming effect helps move stagnant energy throughout the body.",
+        usage: "Steep into tea with honey and lemon; add to stir-fries; or use in pickling."
+    },
+    "Lavender, Dried (Culinary)": {
+        category: "Herbs",
+        healing: ["Nervous System Sedative", "Migraine Relief", "Sleep Support"],
+        description: "A delicate floral herb prized for its ability to bridge the gap between aromatic pleasure and clinical sedation.",
+        physical: "Relieves tension headaches and migraines by relaxing the central nervous system. It acts as an antispasmodic for the digestive tract and muscles.",
+        emotional: "The ultimate 'Anxiety Relief.' It soothes the frantic spirit and is used to treat 'Emotional Exhaustion' and burn-out, bringing a sense of peace to a chaotic environment.",
+        benefits: "Linalool and linalyl acetate are absorbed into the bloodstream, where they modulate GABA receptors to lower cortisol and induce relaxation.",
+        usage: "Steep in hot water for a bedtime tea; infuse into honey; or bake into light shortbread."
+    },
+    "Reishi Mushrooms, Dried": {
+        category: "Mushrooms",
+        healing: ["Immune Modulation", "Adrenal Support", "Longevity"],
+        description: "Known as the 'Mushroom of Immortality,' it is the premier adaptogen in the fungal kingdom.",
+        physical: "Helps the body manage the physical toll of stress. It modulates the immune system—calming it during autoimmune flares and boosting it during illness.",
+        emotional: "Known as the 'Zen Mushroom.' It calms the 'Shen' (Spirit), reducing irritability, restless sleep, and the 'internal heat' associated with anger and frustration.",
+        benefits: "Rich in triterpenes and beta-glucans which support liver detoxification and lower blood pressure over long-term use.",
+        usage: "Rehydrate in broths, steep as a bitter tea, or grind into a fine powder for smoothies."
+    },
+    "Saffron, Spanish (Superior)": {
+        category: "Spices",
+        healing: ["Serotonin Boost", "Neuro-protection", "PMS Relief"],
+        description: "The world's most expensive spice, sourced from the hand-picked stigmas of the Crocus sativus.",
+        physical: "Clinically proven to reduce the physical severity of PMS and menstrual cramps. Supports retinal health and protects the brain from cellular aging.",
+        emotional: "A powerful 'Natural Antidepressant.' Nicknamed the 'sunshine spice' for its ability to improve mood and emotional regulation during dark winters or depressive cycles.",
+        benefits: "Active compounds crocin and safranal inhibit the reuptake of dopamine and norepinephrine, similar to pharmaceutical SSRIs but with fewer side effects.",
+        usage: "Infuse in warm milk or tea; use in paella and risotto; or steep a few threads in water for a daily mood tonic."
+    },
+    "Turmeric Powder": {
+        category: "Spices",
+        healing: ["Systemic Anti-inflammatory", "Joint Repair", "Cognitive Health"],
+        description: "The 'Golden Spice' of life, containing the potent polyphenol curcumin.",
+        physical: "Targets chronic joint pain by blocking NF-kB, the 'master switch' for inflammation. It protects the liver from toxins and aids in the recovery of damaged tissue.",
+        emotional: "Promotes 'Inner Light.' Used to combat the 'heaviness' and 'fog' of seasonal affective disorder, encouraging a brighter mental outlook.",
+        benefits: "Curcumin rivals certain anti-inflammatory drugs. When paired with black pepper (piperine), absorption increases by up to 2,000%.",
+        usage: "Golden milk (Turmeric latte), curries, or added to salad dressings with black pepper and olive oil."
+    }
+};
 
 export async function ensureDatabaseSeeded() {
     await connectToDatabase();
@@ -22,6 +118,117 @@ export async function ensureDatabaseSeeded() {
     //     console.log("Seeding Glossary...");
     //     await GlossaryTerm.insertMany(INITIAL_GLOSSARY);
     // }
+
+
+    // Seed Herbs
+    // Re-seed only if very few (the manual ones) to ensure full population
+    // We check for < 50 for safety, but we want to make sure the A's get updated if they exist but are empty.
+    // Actually, let's just Upsert the detailed ones to be safe.
+
+    console.log("Seeding/Updating Herbs for Healing Pantry...");
+    const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
+
+    // 1. Prepare Detailed Items
+    const detailedItems = Object.entries(DETAILED_HERB_DATA).map(([key, value]: [string, any]) => {
+        return {
+            name: key,
+            ...value
+        };
+    });
+
+    const detailedNames = new Set(detailedItems.map(i => i.name));
+    const allItems = [...detailedItems];
+
+    // 2. Generic Items (Rest of the list)
+    for (const name of BULK_HERB_NAMES) {
+        if (!detailedNames.has(name)) {
+            // Determine category helper (inline or simplified)
+            let category = "Spices";
+            if (name.includes('Tea') || name.includes('Tisane')) category = "Tea";
+            else if (name.includes('Mushroom')) category = "Mushrooms";
+            else if (name.includes('Chile') || name.includes('Pepper') || name.includes('Paprika')) category = "Chiles";
+            else if (name.includes('Extract') || name.includes('Flavoring')) category = "Extracts";
+            else if (name.includes('Basil') || name.includes('Oregano') || name.includes('Thyme') || name.includes('Lavender') || name.includes('Leaves')) category = "Herbs";
+
+
+            allItems.push({
+                name: name,
+                category: category,
+                healing: [],
+                description: `Premium ${name} suitable for therapeutic and culinary use. Detailed profile coming soon.`,
+                physical: "Traditionally used to support general wellness and vitality.",
+                emotional: "Offers a sense of comfort and stability.",
+                benefits: "Contains natural bioactive compounds supporting health.",
+                usage: "Use in culinary applications or herbal preparations."
+            });
+            detailedNames.add(name);
+        }
+    }
+
+    const existingHerbs = await Herb.find({}).lean();
+    const existingMap = new Map(existingHerbs.map((h: any) => [h.name, h]));
+    const existingSlugs = existingHerbs.map((h: any) => h.slug);
+
+    const dbOps = [];
+
+    for (const item of allItems) {
+        if (existingMap.has(item.name)) {
+            // Update existing if it's a generic one being replaced by detailed, 
+            // OR just strictly update the DETAILED ones to ensure they have the new text.
+            // We generally trust DETAILED_HERB_DATA more than DB for seeded content.
+            const existing = existingMap.get(item.name);
+
+            // Only update if the DB entry looks "empty" or if we have a detailed entry for it
+            const isDetailedSource = DETAILED_HERB_DATA[item.name] !== undefined;
+            const isEmptyDB = !existing.description || existing.description.includes("generic entry");
+
+            if (isDetailedSource || isEmptyDB) {
+                dbOps.push({
+                    updateOne: {
+                        filter: { id: existing.id },
+                        update: {
+                            $set: {
+                                description: item.description,
+                                physical: item.physical,
+                                emotional: item.emotional,
+                                benefits: item.benefits,
+                                usage: item.usage,
+                                healing: item.healing,
+                                category: item.category
+                            }
+                        }
+                    }
+                });
+            }
+        } else {
+            // Insert New
+            const baseSlug = slugify(item.name);
+            const slug = makeUniqueSlug(baseSlug, existingSlugs);
+            existingSlugs.push(slug);
+
+            dbOps.push({
+                insertOne: {
+                    document: {
+                        id: `herb-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
+                        name: item.name,
+                        slug,
+                        category: item.category,
+                        healing: item.healing || [],
+                        description: item.description,
+                        physical: item.physical || "",
+                        emotional: item.emotional || "",
+                        benefits: item.benefits || "",
+                        usage: item.usage || ""
+                    }
+                }
+            });
+        }
+    }
+
+    if (dbOps.length > 0) {
+        await Herb.bulkWrite(dbOps);
+        console.log(`Seeded/Updated ${dbOps.length} pantry items.`);
+    }
 }
 
 export async function getProducts(query?: any): Promise<{ products: any[], total: number, totalPages: number }> {

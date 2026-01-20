@@ -8,6 +8,13 @@ import Niche from "./models/Niche";
 import { revalidatePath } from "next/cache";
 import mongoose from "mongoose";
 import Subscriber from "./models/Subscriber";
+import Herb from "./models/Herb";
+import { bulkSeedHerbs } from "./bulkSeedHerbs";
+
+export async function runBulkSeed() {
+    await connectToDatabase();
+    return await bulkSeedHerbs();
+}
 
 export async function subscribeUser(formData: FormData) {
     const email = formData.get('email') as string;
@@ -582,3 +589,165 @@ Intention # The conscious focusing of mental energy toward a specific outcome. #
     return await importHealingTerms(data);
 }
 
+
+export async function createHerb(data: any) {
+    try {
+        await connectToDatabase();
+        const count = await Herb.countDocuments();
+        const nextId = `herb-${count + 1}-${Date.now()}`;
+
+        let slug = data.slug;
+        if (!slug && data.name) {
+            const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
+            const baseSlug = slugify(data.name);
+            const existingHerbs = await Herb.find({} as any, { slug: 1 }).lean();
+            const existingSlugs = existingHerbs.map((h: any) => h.slug).filter(Boolean);
+            slug = makeUniqueSlug(baseSlug, existingSlugs);
+        }
+
+        const newHerb = await Herb.create({
+            ...data,
+            id: nextId,
+            slug
+        });
+
+        revalidatePath('/admin');
+        revalidatePath('/healing-pantry');
+        return { success: true, herb: JSON.parse(JSON.stringify(newHerb)) };
+    } catch (error: any) {
+        console.error("Error creating herb:", error);
+        return { error: error.message || "Failed to create herb" };
+    }
+}
+
+export async function updateHerb(data: any) {
+    try {
+        await connectToDatabase();
+
+        if (data.name && !data.slug) {
+            const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
+            const baseSlug = slugify(data.name);
+            const existingHerbs = await Herb.find({ id: { $ne: data.id } }, { slug: 1 }).lean();
+            const existingSlugs = existingHerbs.map((h: any) => h.slug).filter(Boolean);
+            data.slug = makeUniqueSlug(baseSlug, existingSlugs);
+        }
+
+        await Herb.findOneAndUpdate({ id: data.id }, data);
+        revalidatePath('/admin');
+        revalidatePath('/healing-pantry');
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error updating herb:", error);
+        return { error: error.message };
+    }
+}
+
+export async function deleteHerb(herbId: string) {
+    try {
+        await connectToDatabase();
+        await Herb.findOneAndDelete({ id: herbId });
+        revalidatePath('/admin');
+        revalidatePath('/healing-pantry');
+        return { success: true };
+    } catch (error: any) {
+        return { error: error.message };
+    }
+}
+
+export async function getHerbs() {
+    try {
+        await connectToDatabase();
+        const herbs = await Herb.find({}).sort({ name: 1 }).lean();
+        return JSON.parse(JSON.stringify(herbs));
+    } catch (e) {
+        console.error("Failed to fetch herbs", e);
+        return [];
+    }
+}
+
+export async function getHerbBySlug(slug: string) {
+    try {
+        await connectToDatabase();
+        const herb = await Herb.findOne({ slug }).lean();
+        if (!herb) return null;
+        return JSON.parse(JSON.stringify(herb));
+    } catch (e) {
+        return null;
+    }
+}
+
+export async function importHerbs(rawText: string) {
+    try {
+        await connectToDatabase();
+        const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
+
+        // Try to parse as JSON first (User request: "setup teh json prompt")
+        let items: any[] = [];
+        try {
+            // Check if it's a JSON object with keys like the example
+            if (rawText.trim().startsWith('{')) {
+                const jsonObj = JSON.parse(rawText);
+                // If user pastes the SPICE_PROFILES object directly, convert to array
+                if (!Array.isArray(jsonObj) && Object.keys(jsonObj).length > 0) {
+                    items = Object.entries(jsonObj).map(([key, value]: [string, any]) => ({
+                        name: key,
+                        ...value
+                    }));
+                } else if (Array.isArray(jsonObj)) {
+                    items = jsonObj;
+                }
+            } else if (rawText.trim().startsWith('[')) {
+                items = JSON.parse(rawText);
+            }
+        } catch (e) {
+            console.log("Not strict JSON, maybe try lax parsing or just fail if user asked for JSON prompt");
+        }
+
+        if (items.length === 0) {
+            return { error: "Invalid JSON format. Please provide an array of objects or the SPICE_PROFILES object structure." };
+        }
+
+        const existingHerbs = await Herb.find({} as any, { slug: 1 }).lean();
+        const existingSlugs = existingHerbs.map((h: any) => h.slug).filter(Boolean);
+        let currentCount = await Herb.countDocuments();
+
+        let createdCount = 0;
+
+        for (const item of items) {
+            // Basic validation
+            if (!item.name && !item.term) continue; // item.term if they mix up formats
+
+            const name = item.name || item.term;
+
+            currentCount++;
+            const nextId = `herb-${currentCount}-${Date.now()}`;
+
+            const baseSlug = slugify(name);
+            const slug = makeUniqueSlug(baseSlug, existingSlugs);
+            existingSlugs.push(slug);
+
+            await Herb.create({
+                id: nextId,
+                name: name,
+                slug,
+                category: item.category || "General",
+                healing: Array.isArray(item.healing) ? item.healing : [],
+                description: item.description || "",
+                physical: item.physical || "",
+                emotional: item.emotional || "",
+                benefits: item.benefits || "",
+                usage: item.usage || "",
+                image: item.image || ""
+            });
+            createdCount++;
+        }
+
+        revalidatePath('/admin');
+        revalidatePath('/healing-pantry');
+        return { success: true, count: createdCount };
+
+    } catch (e: any) {
+        console.error("Import herbs error", e);
+        return { error: e.message };
+    }
+}

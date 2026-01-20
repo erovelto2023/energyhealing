@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { Calendar, Sparkles } from 'lucide-react';
+import { Calendar, Sparkles, Leaf, ArrowRight } from 'lucide-react';
 import connectToDatabase from '@/lib/db';
 import UserStory from '@/lib/models/UserStory';
 import Testimonial from '@/lib/models/Testimonial';
@@ -80,6 +80,68 @@ export default async function Home() {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Healing Pantry Teaser */}
+      <section className="py-24 bg-[#FFF8F0] relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-100 rounded-full blur-3xl opacity-40 -mr-20 -mt-20" />
+
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="order-2 md:order-1 relative">
+              <div className="relative z-10 bg-white p-8 rounded-[2.5rem] shadow-xl border border-orange-100/50 transform rotate-[-2deg] hover:rotate-0 transition-all duration-500">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500">
+                    <Leaf size={24} />
+                  </div>
+                  <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Featured Remedy</span>
+                </div>
+                <h3 className="text-3xl font-black text-slate-800 mb-4">Adobo Seasoning</h3>
+                <p className="text-slate-600 mb-6 leading-relaxed">
+                  A foundational Latin American blend acting as a natural antibiotic and vasodilator. Helps lower elevated blood pressure and supports immune responses.
+                </p>
+                <div className="flex gap-2 mb-6">
+                  <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">Digestive Aid</span>
+                  <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">Circulation</span>
+                </div>
+                <Link href="/healing-pantry" className="text-orange-600 font-bold text-sm flex items-center gap-2 hover:gap-4 transition-all">
+                  Explore Full Entry <ArrowRight size={16} />
+                </Link>
+              </div>
+              {/* Decorative overlapping card */}
+              <div className="absolute top-8 left-8 w-full h-full bg-orange-200/20 rounded-[2.5rem] -z-10 rotate-[4deg]" />
+            </div>
+
+            <div className="order-1 md:order-2">
+              <span className="text-orange-600 font-bold tracking-widest uppercase text-xs mb-4 block">New Resource</span>
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">
+                The Healing Pantry
+              </h2>
+              <p className="text-xl text-slate-600 mb-8 leading-relaxed">
+                Discover the medicinal power of your kitchen. We've curated a comprehensive encyclopedia of spices, herbs, and superfoods that support your physical and emotional well-being.
+              </p>
+              <ul className="space-y-4 mb-10">
+                <li className="flex items-center gap-3 text-slate-700 font-medium">
+                  <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs">✓</div>
+                  Detailed physical & emotional benefits
+                </li>
+                <li className="flex items-center gap-3 text-slate-700 font-medium">
+                  <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs">✓</div>
+                  Scientific insights & research
+                </li>
+                <li className="flex items-center gap-3 text-slate-700 font-medium">
+                  <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs">✓</div>
+                  Culinary rituals and usage tips
+                </li>
+              </ul>
+
+              <Link href="/healing-pantry" className="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200">
+                <Leaf size={20} />
+                Open The Pantry
+              </Link>
             </div>
           </div>
         </div>
