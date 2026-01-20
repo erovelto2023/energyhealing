@@ -44,7 +44,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
     const [editingHerb, setEditingHerb] = useState<IHerb | undefined>(undefined);
     const [pantrySearch, setPantrySearch] = useState('');
     const [pantryPage, setPantryPage] = useState(1);
-    const pantryPerPage = 10;
+    const pantryPerPage = 50;
     const [pantryImportText, setPantryImportText] = useState('');
     const [pantrySelected, setPantrySelected] = useState<Set<string>>(new Set());
 
