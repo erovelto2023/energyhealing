@@ -1820,11 +1820,11 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                             a.category.toLowerCase().includes(affirmationSearch.toLowerCase()) ||
                             a.intention.toLowerCase().includes(affirmationSearch.toLowerCase());
 
-                        const firstChar = a.affirmation.trim().charAt(0).toUpperCase();
+                        const firstChar = a.title.trim().charAt(0).toUpperCase();
                         const matchesAlpha = affirmationAlphaFilter === 'All' || firstChar === affirmationAlphaFilter;
 
                         return matchesSearch && matchesAlpha;
-                    }).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+                    }).sort((a, b) => a.title.localeCompare(b.title));
 
                     const totalPages = Math.ceil(filteredAffirmations.length / affirmationPerPage);
                     const paginatedItems = filteredAffirmations.slice((affirmationPage - 1) * affirmationPerPage, affirmationPage * affirmationPerPage);
@@ -1864,8 +1864,8 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                 key={letter}
                                                 onClick={() => { setAffirmationAlphaFilter(letter); setAffirmationPage(1); }}
                                                 className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${affirmationAlphaFilter === letter
-                                                        ? 'bg-purple-600 text-white shadow-md'
-                                                        : 'bg-white text-slate-400 hover:bg-slate-50 border border-slate-100'
+                                                    ? 'bg-purple-600 text-white shadow-md'
+                                                    : 'bg-white text-slate-400 hover:bg-slate-50 border border-slate-100'
                                                     }`}
                                             >
                                                 {letter}
