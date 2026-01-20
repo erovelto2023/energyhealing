@@ -21,17 +21,17 @@ export default function Header() {
                         <span className="text-lg md:text-xl font-bold tracking-tight text-slate-900">Kathleen<span className="text-emerald-600">Heals</span></span>
                     </Link>
 
-                    <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+                    <div className="hidden lg:flex items-center gap-5 text-sm font-medium text-slate-600">
                         <Link href="/blog" className="hover:text-emerald-600 transition-colors">Blog</Link>
                         <Link href="/glossary" className="hover:text-emerald-600 transition-colors">Glossary</Link>
+                        <Link href="/affirmations" className="hover:text-emerald-600 transition-colors">Daily Affirmations</Link>
+                        <Link href="/healing-pantry" className="hover:text-emerald-600 transition-colors">Herbs and Plants</Link>
                         <Link href="/marketplace" className="hover:text-emerald-600 transition-colors">Resources</Link>
-
-                        {/* Submission Links */}
-                        <Link href="/submit-testimonial" className="hover:text-emerald-600 transition-colors font-semibold">Testimonial ⭐</Link>
-                        <Link href="/share-story" className="hover:text-indigo-600 transition-colors font-semibold">Your Story 💜</Link>
+                        <Link href="/testimonials" className="hover:text-emerald-600 transition-colors">Testimonials</Link>
+                        <Link href="/stories" className="hover:text-emerald-600 transition-colors">Your Story</Link>
 
                         {/* Social Links */}
-                        <div className="flex items-center gap-3 border-l border-slate-200 pl-6 ml-2">
+                        <div className="flex items-center gap-3 border-l border-slate-200 pl-5">
                             <a href="https://www.youtube.com/@KathleenEnergyHealing" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-red-600 transition-colors">
                                 <Youtube size={18} />
                             </a>
@@ -40,7 +40,7 @@ export default function Header() {
                             </a>
                         </div>
 
-                        <Link href="/book-session" className="bg-slate-900 text-white px-5 py-2 rounded-full hover:bg-emerald-700 transition-all ml-4 text-xs md:text-sm">
+                        <Link href="/book-session" className="bg-slate-900 text-white px-5 py-2 rounded-full hover:bg-emerald-700 transition-all text-xs md:text-sm whitespace-nowrap">
                             Book a Session
                         </Link>
                     </div>

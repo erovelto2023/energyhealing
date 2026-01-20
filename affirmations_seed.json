@@ -1,0 +1,1490 @@
+[
+    {
+        "title": "Worthy Ground",
+        "affirmation": "I am worthy of care, not because I’m fixed—but because I showed up for my country and still show up for myself.",
+        "intention": "Reinforce intrinsic self-worth beyond physical ability or productivity.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Morning reflection",
+            "Before medical appointments",
+            "After comparing yourself to others"
+        ],
+        "whyItWorks": "Activates the ventromedial prefrontal cortex linked to self-value, while energetically anchoring identity in service—not just suffering.",
+        "userPrompt": "When did you last honor your presence, not your performance?",
+        "primaryHerb": "Rosemary",
+        "pairing": {
+            "herbs": [
+                "Rosemary",
+                "Lavender"
+            ],
+            "rituals": [
+                "Light a candle and place hand over heart"
+            ],
+            "breathwork": "4-7-8 breathing (inhale 4, hold 7, exhale 8)",
+            "moonPhase": "First Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "self-worth",
+            "veteran identity",
+            "dignity"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Still Waters",
+        "affirmation": "My nervous system is learning safety again, one breath at a time.",
+        "intention": "Cultivate felt safety in the body after trauma-induced hypervigilance.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "During pain flares",
+            "Before sleep",
+            "After loud or chaotic environments"
+        ],
+        "whyItWorks": "Engages the vagus nerve through paced breathing, signaling safety to the amygdala; energetically cools the ‘fire’ of chronic stress response.",
+        "userPrompt": "Where in your body do you feel calm trying to return?",
+        "primaryHerb": "Chamomile",
+        "pairing": {
+            "herbs": [
+                "Chamomile",
+                "Skullcap"
+            ],
+            "rituals": [
+                "Sip warm tea while sitting near a window"
+            ],
+            "breathwork": "Diaphragmatic breathing with hand on belly",
+            "moonPhase": "Waning Crescent"
+        },
+        "linkedGlossaryTerms": [
+            "polyvagal theory",
+            "somatic safety",
+            "nervous system regulation"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Enough As Is",
+        "affirmation": "I belong here—not in spite of my pain, but as a whole person who has carried much and still stands.",
+        "intention": "Counter shame or invisibility with embodied belonging.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Social gatherings",
+            "Veterans’ group meetings",
+            "Moments of isolation"
+        ],
+        "whyItWorks": "Reduces activity in the anterior cingulate cortex (linked to social pain) while energetically weaving personal narrative into collective resilience.",
+        "userPrompt": "Who sees you fully—not just your injury, but your integrity?",
+        "primaryHerb": "Yarrow",
+        "pairing": {
+            "herbs": [
+                "Yarrow",
+                "Mugwort"
+            ],
+            "rituals": [
+                "Write one sentence of truth on paper and burn it safely"
+            ],
+            "breathwork": "Box breathing (4-4-4-4)",
+            "moonPhase": "Full Moon"
+        },
+        "linkedGlossaryTerms": [
+            "belonging",
+            "embodied identity",
+            "veteran community"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Trust the Flow",
+        "affirmation": "I trust that what I need will find me, even when my body feels stuck.",
+        "intention": "Release control and open to support without self-judgment.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Financial stress moments",
+            "Waiting for VA updates",
+            "Feeling resource-depleted"
+        ],
+        "whyItWorks": "Downregulates the dorsolateral prefrontal cortex (over-control center), allowing dopamine pathways to respond to unexpected support; energetically aligns with lunar receptivity.",
+        "userPrompt": "What small gift arrived today that you almost missed?",
+        "primaryHerb": "Holy Basil (Tulsi)",
+        "pairing": {
+            "herbs": [
+                "Holy Basil",
+                "Oat Straw"
+            ],
+            "rituals": [
+                "Place hands palms-up on knees, receiving posture"
+            ],
+            "breathwork": "Sighing exhales (double inhale, long exhale)",
+            "moonPhase": "Waxing Gibbous"
+        },
+        "linkedGlossaryTerms": [
+            "surrender",
+            "divine timing",
+            "resource flow"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Sacred Pause",
+        "affirmation": "Pausing is not quitting—it’s how I honor the rhythm my body needs to heal.",
+        "intention": "Reframe rest as strength, not surrender.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "Mid-task fatigue",
+            "After pushing through pain",
+            "Morning stiffness"
+        ],
+        "whyItWorks": "Triggers parasympathetic dominance via interoceptive awareness; energetically sanctifies stillness as strategic reintegration.",
+        "userPrompt": "What would your younger self say if he saw you resting without guilt?",
+        "primaryHerb": "Lemon Balm",
+        "pairing": {
+            "herbs": [
+                "Lemon Balm",
+                "Passionflower"
+            ],
+            "rituals": [
+                "Lie on floor with legs up wall for 5 minutes"
+            ],
+            "breathwork": "Equal inhale/exhale (5 seconds each)",
+            "moonPhase": "New Moon"
+        },
+        "linkedGlossaryTerms": [
+            "rest as resistance",
+            "interoception",
+            "parasympathetic activation"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Held by Earth",
+        "affirmation": "The ground beneath me holds me like my brothers once did—steadily, without question.",
+        "intention": "Reconnect with physical and emotional support systems.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Standing pain episodes",
+            "Memorial days",
+            "Feeling untethered"
+        ],
+        "whyItWorks": "Grounding (earthing) reduces cortisol and inflammation; energetically links earth’s stability to unit cohesion memories.",
+        "userPrompt": "When did you last feel truly held—by people or planet?",
+        "primaryHerb": "Comfrey",
+        "pairing": {
+            "herbs": [
+                "Comfrey",
+                "Plantain"
+            ],
+            "rituals": [
+                "Walk barefoot on grass or soil for 2 minutes"
+            ],
+            "breathwork": "Deep belly breaths with eyes closed",
+            "moonPhase": "Last Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "grounding",
+            "brotherhood",
+            "embodied support"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Open Hands",
+        "affirmation": "I release the need to earn care—I receive it simply because I exist.",
+        "intention": "Shift from transactional to unconditional self-regard.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "After saying ‘I’m fine’ when you’re not",
+            "During acts of kindness from others",
+            "Therapy sessions"
+        ],
+        "whyItWorks": "Activates the insula (empathy/self-compassion hub); energetically dissolves ‘worthiness barriers’ around receiving.",
+        "userPrompt": "What kindness are you refusing to let in right now?",
+        "primaryHerb": "Calendula",
+        "pairing": {
+            "herbs": [
+                "Calendula",
+                "Rose"
+            ],
+            "rituals": [
+                "Hold warm mug with both hands, breathe in steam"
+            ],
+            "breathwork": "Heart-centered breathing (inhale to chest, exhale slowly)",
+            "moonPhase": "Waxing Crescent"
+        },
+        "linkedGlossaryTerms": [
+            "receiving",
+            "self-compassion",
+            "abundance mindset"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Nerve Whisper",
+        "affirmation": "My body is not my enemy—it’s speaking a language I’m learning to understand.",
+        "intention": "Transform pain narrative from betrayal to communication.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "During flare-ups",
+            "Physical therapy",
+            "Before bed"
+        ],
+        "whyItWorks": "Reduces threat perception in the thalamus by reframing sensation as information; energetically invites dialogue with somatic intelligence.",
+        "userPrompt": "What is your body trying to tell you that you’ve been ignoring?",
+        "primaryHerb": "St. John’s Wort",
+        "pairing": {
+            "herbs": [
+                "St. John’s Wort",
+                "Milky Oats"
+            ],
+            "rituals": [
+                "Gently massage area of discomfort with oil"
+            ],
+            "breathwork": "Soft sighing breaths into the affected area",
+            "moonPhase": "Full Moon"
+        },
+        "linkedGlossaryTerms": [
+            "somatic listening",
+            "neuroception",
+            "body dialogue"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Lineage of Strength",
+        "affirmation": "My resilience is inherited—and I pass it forward, not just carry it alone.",
+        "intention": "Connect personal endurance to ancestral and communal legacy.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Veterans Day",
+            "Mentoring others",
+            "Feeling overwhelmed"
+        ],
+        "whyItWorks": "Engages the default mode network (identity/self-narrative); energetically weaves individual story into larger tapestry of service.",
+        "userPrompt": "Whose strength lives in your bones?",
+        "primaryHerb": "Sage",
+        "pairing": {
+            "herbs": [
+                "White Sage",
+                "Cedar"
+            ],
+            "rituals": [
+                "Smudge space with intention of honoring lineage"
+            ],
+            "breathwork": "Slow nasal breathing with eyes half-closed",
+            "moonPhase": "First Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "ancestral resilience",
+            "veteran legacy",
+            "collective strength"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Quiet Plenty",
+        "affirmation": "Abundance isn’t loud—it’s the steady warmth of a roof, a meal, and breath in my lungs.",
+        "intention": "Recognize sufficiency in simplicity, countering scarcity trauma.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Budgeting stress",
+            "Comparing to others",
+            "Gratitude practice"
+        ],
+        "whyItWorks": "Stimulates the nucleus accumbens (reward center) through micro-appreciation; energetically shifts focus from lack to presence.",
+        "userPrompt": "What quiet abundance surrounds you right now?",
+        "primaryHerb": "Nettle",
+        "pairing": {
+            "herbs": [
+                "Nettle",
+                "Dandelion Root"
+            ],
+            "rituals": [
+                "Brew tea while listing 3 things you have enough of"
+            ],
+            "breathwork": "Gratitude breath (inhale ‘I have,’ exhale ‘enough’)",
+            "moonPhase": "Waning Gibbous"
+        },
+        "linkedGlossaryTerms": [
+            "sufficiency",
+            "quiet abundance",
+            "gratitude neuroplasticity"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Breath Anchor",
+        "affirmation": "With every breath, I return to the present—where I am safe enough to be here.",
+        "intention": "Interrupt flashback or dissociation with somatic presence.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "Nightmares",
+            "Crowded spaces",
+            "Medical triggers"
+        ],
+        "whyItWorks": "Breath directly modulates the amygdala-hippocampus axis; energetically creates a ‘now’ sanctuary distinct from past trauma.",
+        "userPrompt": "What does safety feel like in your body right this second?",
+        "primaryHerb": "Valerian",
+        "pairing": {
+            "herbs": [
+                "Valerian",
+                "Hops"
+            ],
+            "rituals": [
+                "Place cool cloth on forehead, focus on breath"
+            ],
+            "breathwork": "Alternate nostril breathing (Nadi Shodhana)",
+            "moonPhase": "New Moon"
+        },
+        "linkedGlossaryTerms": [
+            "present moment",
+            "somatic grounding",
+            "amygdala regulation"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Seen in Stillness",
+        "affirmation": "I don’t need to prove my worth—I am seen in my silence, my scars, my steadfastness.",
+        "intention": "Affirm visibility without performance.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Family gatherings",
+            "VA evaluations",
+            "Mirror moments"
+        ],
+        "whyItWorks": "Reduces activity in the social evaluation network (mPFC); energetically affirms being over doing.",
+        "userPrompt": "Who sees you when you’re not speaking or serving?",
+        "primaryHerb": "Violet",
+        "pairing": {
+            "herbs": [
+                "Violet Leaf",
+                "Blue Lotus"
+            ],
+            "rituals": [
+                "Sit quietly facing east at sunrise"
+            ],
+            "breathwork": "Soft humming breath (Brahmari)",
+            "moonPhase": "Full Moon"
+        },
+        "linkedGlossaryTerms": [
+            "being seen",
+            "non-performance worth",
+            "silent dignity"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Current Carries Me",
+        "affirmation": "I don’t have to paddle upstream—trust lets the current carry what I cannot carry alone.",
+        "intention": "Surrender control to life’s natural rhythms and support systems.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Bureaucratic delays",
+            "Healing plateaus",
+            "Feeling exhausted"
+        ],
+        "whyItWorks": "Deactivates the ‘effort-driven reward’ loop, allowing passive trust to activate oxytocin pathways; energetically aligns with water element flow.",
+        "userPrompt": "What can you stop fighting today?",
+        "primaryHerb": "Marshmallow Root",
+        "pairing": {
+            "herbs": [
+                "Marshmallow Root",
+                "Licorice"
+            ],
+            "rituals": [
+                "Watch flowing water (stream, faucet, rain) for 3 minutes"
+            ],
+            "breathwork": "Ocean breath (Ujjayi—soft throat constriction)",
+            "moonPhase": "Waxing Gibbous"
+        },
+        "linkedGlossaryTerms": [
+            "surrender",
+            "flow state",
+            "trust in process"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Tender Armor",
+        "affirmation": "My strength includes softness—I protect my heart without locking it away.",
+        "intention": "Integrate vulnerability as part of resilience.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Therapy breakthroughs",
+            "Opening up to loved ones",
+            "Creative expression"
+        ],
+        "whyItWorks": "Balances dorsal (shutdown) and ventral (connection) vagal states; energetically transforms armor into permeable boundary.",
+        "userPrompt": "Where can you soften without collapsing?",
+        "primaryHerb": "Hawthorn",
+        "pairing": {
+            "herbs": [
+                "Hawthorn Berry",
+                "Rose"
+            ],
+            "rituals": [
+                "Place hand over heart, whisper: ‘I am safe to feel’"
+            ],
+            "breathwork": "Heart coherence breathing (5.5 sec inhale/exhale)",
+            "moonPhase": "First Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "vulnerable strength",
+            "heart coherence",
+            "boundaried openness"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Signal Safe",
+        "affirmation": "My body is learning to send and receive signals of safety again.",
+        "intention": "Reprogram nervous system from threat to connection.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "Startle responses",
+            "After arguments",
+            "Before social events"
+        ],
+        "whyItWorks": "Strengthens ventral vagal tone through co-regulation cues; energetically rewires neural pathways from alarm to calm.",
+        "userPrompt": "What small signal of safety can you create right now?",
+        "primaryHerb": "Ashwagandha",
+        "pairing": {
+            "herbs": [
+                "Ashwagandha",
+                "Reishi"
+            ],
+            "rituals": [
+                "Hum or chant softly to stimulate vagus nerve"
+            ],
+            "breathwork": "Extended exhale (2x inhale length)",
+            "moonPhase": "Waning Crescent"
+        },
+        "linkedGlossaryTerms": [
+            "neuroception",
+            "ventral vagal",
+            "co-regulation"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Harvest Within",
+        "affirmation": "I already hold everything I need—the seeds, the soil, and the season to grow.",
+        "intention": "Cultivate internal resource awareness over external validation.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Creative blocks",
+            "Feeling inadequate",
+            "Starting new routines"
+        ],
+        "whyItWorks": "Activates the hippocampus (memory of inner resources); energetically aligns personal cycle with natural growth phases.",
+        "userPrompt": "What inner resource have you forgotten you possess?",
+        "primaryHerb": "Shatavari",
+        "pairing": {
+            "herbs": [
+                "Shatavari",
+                "Alfalfa"
+            ],
+            "rituals": [
+                "Plant a seed or tend to a houseplant mindfully"
+            ],
+            "breathwork": "Circular breathing (no pause between inhale/exhale)",
+            "moonPhase": "Waxing Crescent"
+        },
+        "linkedGlossaryTerms": [
+            "inner abundance",
+            "personal ecology",
+            "seasonal healing"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Brotherhood Echo",
+        "affirmation": "I carry my unit with me—not as ghosts, but as living strength in my bones.",
+        "intention": "Transform grief or loss into enduring connection.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Anniversaries",
+            "PTSD anniversaries",
+            "Feeling alone"
+        ],
+        "whyItWorks": "Engages the social brain network (temporoparietal junction); energetically maintains bonds beyond physical presence.",
+        "userPrompt": "How does your unit live on through your choices today?",
+        "primaryHerb": "Pine Needle",
+        "pairing": {
+            "herbs": [
+                "Pine Needle",
+                "Frankincense"
+            ],
+            "rituals": [
+                "Light incense and speak one name aloud with gratitude"
+            ],
+            "breathwork": "Rhythmic marching breath (inhale 2 steps, exhale 2 steps)",
+            "moonPhase": "Last Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "unit cohesion",
+            "living memory",
+            "embodied brotherhood"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Ease Arrives",
+        "affirmation": "Ease doesn’t wait for pain to leave—it meets me exactly where I am.",
+        "intention": "Invite comfort without requiring cure.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "Chronic pain mornings",
+            "Waiting rooms",
+            "End of difficult days"
+        ],
+        "whyItWorks": "Creates cognitive dissonance that weakens pain catastrophizing loops; energetically opens space for relief alongside discomfort.",
+        "userPrompt": "Where can you invite ease right now—even for 10 seconds?",
+        "primaryHerb": "Willow Bark",
+        "pairing": {
+            "herbs": [
+                "Willow Bark",
+                "Meadowsweet"
+            ],
+            "rituals": [
+                "Apply warm compress with essential oil"
+            ],
+            "breathwork": "Cooling breath (inhale through curled tongue or teeth)",
+            "moonPhase": "Waning Gibbous"
+        },
+        "linkedGlossaryTerms": [
+            "coexisting states",
+            "pain and peace",
+            "non-dual healing"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Gift of Limits",
+        "affirmation": "My boundaries are not walls—they’re the sacred fence around my garden of worth.",
+        "intention": "Reframe limitations as protective and dignified.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Saying no",
+            "Energy depletion",
+            "Overcommitment"
+        ],
+        "whyItWorks": "Strengthens prefrontal regulation over limbic reactivity; energetically consecrates personal space as holy ground.",
+        "userPrompt": "What boundary honors your dignity today?",
+        "primaryHerb": "Rue",
+        "pairing": {
+            "herbs": [
+                "Rue",
+                "Mugwort"
+            ],
+            "rituals": [
+                "Draw a circle in salt or chalk around your chair"
+            ],
+            "breathwork": "Square breathing with visualized boundary",
+            "moonPhase": "First Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "sacred boundaries",
+            "energetic hygiene",
+            "dignified limits"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "River Trust",
+        "affirmation": "Like a river, I move at my own pace—and still reach the sea.",
+        "intention": "Release urgency and trust organic timing.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Recovery impatience",
+            "Career transitions",
+            "Healing comparisons"
+        ],
+        "whyItWorks": "Reduces time-pressure stress in the insula; energetically aligns personal journey with natural law of flow.",
+        "userPrompt": "What if your pace is perfect for your path?",
+        "primaryHerb": "Gotu Kola",
+        "pairing": {
+            "herbs": [
+                "Gotu Kola",
+                "Blue Vervain"
+            ],
+            "rituals": [
+                "Trace a river shape on palm with finger, breathe into it"
+            ],
+            "breathwork": "Wave-like breathing (gradual inhale/exhale rise/fall)",
+            "moonPhase": "Waxing Gibbous"
+        },
+        "linkedGlossaryTerms": [
+            "organic timing",
+            "natural flow",
+            "non-rushed healing"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Nerve Bloom",
+        "affirmation": "My nervous system is capable of blooming into calm, even after years of winter.",
+        "intention": "Instill hope in neuroplasticity and somatic renewal.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "After setbacks",
+            "Beginning new therapies",
+            "Spring mornings"
+        ],
+        "whyItWorks": "Activates BDNF (brain-derived neurotrophic factor) through hopeful expectancy; energetically mirrors seasonal rebirth.",
+        "userPrompt": "What small sign of nervous system spring have you noticed?",
+        "primaryHerb": "Linden Flower",
+        "pairing": {
+            "herbs": [
+                "Linden Flower",
+                "Chamomile"
+            ],
+            "rituals": [
+                "Place fresh flower on windowsill, watch light through it"
+            ],
+            "breathwork": "Floral breath (imagine breathing in blossom scent)",
+            "moonPhase": "New Moon"
+        },
+        "linkedGlossaryTerms": [
+            "neuroplasticity",
+            "somatic hope",
+            "nervous system spring"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "No More Proving",
+        "affirmation": "I’ve proven my courage enough—now I choose to rest in my inherent worth.",
+        "intention": "Release the veteran burden of constant demonstration.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Performance anxiety",
+            "Medical exams",
+            "Family expectations"
+        ],
+        "whyItWorks": "Quiets the anterior cingulate cortex’s error-monitoring loop; energetically lays down the armor of proof.",
+        "userPrompt": "What if you never had to prove your worth again?",
+        "primaryHerb": "Motherwort",
+        "pairing": {
+            "herbs": [
+                "Motherwort",
+                "Skullcap"
+            ],
+            "rituals": [
+                "Write ‘I am enough’ on stone, hold in palm"
+            ],
+            "breathwork": "Sighing release breaths (3x)",
+            "moonPhase": "Waning Crescent"
+        },
+        "linkedGlossaryTerms": [
+            "inherent worth",
+            "veteran burden",
+            "rest as right"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Unseen Harvest",
+        "affirmation": "Even when I can’t see growth, my roots are deepening in trust.",
+        "intention": "Validate invisible progress during stagnant-feeling phases.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Healing plateaus",
+            "Job searches",
+            "Emotional dry spells"
+        ],
+        "whyItWorks": "Engages the default mode network in positive future projection; energetically honors underground work.",
+        "userPrompt": "What unseen root work is happening within you?",
+        "primaryHerb": "Dang Shen",
+        "pairing": {
+            "herbs": [
+                "Dang Shen",
+                "Astragalus"
+            ],
+            "rituals": [
+                "Water a plant while affirming inner growth"
+            ],
+            "breathwork": "Root breath (inhale down to feet, exhale up to crown)",
+            "moonPhase": "Dark Moon"
+        },
+        "linkedGlossaryTerms": [
+            "invisible growth",
+            "root work",
+            "faith in process"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Safe Harbor",
+        "affirmation": "I am my own safe harbor—calm, steady, and always returning home.",
+        "intention": "Build internal refuge independent of external conditions.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "Anxiety spikes",
+            "Homecoming after outings",
+            "Nighttime unrest"
+        ],
+        "whyItWorks": "Strengthens insular cortex interoception; energetically constructs an internal sanctuary.",
+        "userPrompt": "What does your inner harbor look, sound, and feel like?",
+        "primaryHerb": "Lavender",
+        "pairing": {
+            "herbs": [
+                "Lavender",
+                "Clary Sage"
+            ],
+            "rituals": [
+                "Create a ‘harbor corner’ with blanket, pillow, and scent"
+            ],
+            "breathwork": "Harbor breath (slow inhale like tide in, slow exhale like tide out)",
+            "moonPhase": "Last Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "internal refuge",
+            "somatic sanctuary",
+            "self-as-haven"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Scars Speak Honor",
+        "affirmation": "My scars are not flaws—they’re medals written on my skin in the language of survival.",
+        "intention": "Reclaim bodily narrative from shame to honor.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Mirror avoidance",
+            "Intimacy moments",
+            "Medical undressing"
+        ],
+        "whyItWorks": "Reframes somatosensory cortex mapping from threat to pride; energetically transmutes wound into wisdom sigil.",
+        "userPrompt": "What story does your scar tell that only you understand?",
+        "primaryHerb": "Calendula",
+        "pairing": {
+            "herbs": [
+                "Calendula",
+                "Plantain"
+            ],
+            "rituals": [
+                "Anoint scar gently with infused oil, speak its story"
+            ],
+            "breathwork": "Breath into scar tissue with warmth visualization",
+            "moonPhase": "Full Moon"
+        },
+        "linkedGlossaryTerms": [
+            "scar reclamation",
+            "embodied honor",
+            "survival narrative"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Enough Rain",
+        "affirmation": "I’ve weathered enough storms—now I trust the sun will find me.",
+        "intention": "Transition from endurance to receptivity of joy.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Depression lifting",
+            "Unexpected good news",
+            "Simple pleasures"
+        ],
+        "whyItWorks": "Activates serotonin pathways through positive expectancy; energetically opens to light after prolonged shadow.",
+        "userPrompt": "Where is sunlight trying to reach you right now?",
+        "primaryHerb": "St. John’s Wort",
+        "pairing": {
+            "herbs": [
+                "St. John’s Wort",
+                "Lemon Balm"
+            ],
+            "rituals": [
+                "Stand in sunlight for 5 minutes, palms open"
+            ],
+            "breathwork": "Sun breath (inhale golden light, exhale gray clouds)",
+            "moonPhase": "Waxing Crescent"
+        },
+        "linkedGlossaryTerms": [
+            "post-storm joy",
+            "light receptivity",
+            "earned optimism"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Nerve Sanctuary",
+        "affirmation": "Within me is a sanctuary where my nerves can lay down their weapons and rest.",
+        "intention": "Create internal permission for nervous system decommissioning.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "Hypervigilance",
+            "Startle reflex",
+            "Before sleep"
+        ],
+        "whyItWorks": "Downregulates locus coeruleus (norepinephrine center); energetically establishes ceasefire zone in the body.",
+        "userPrompt": "What would true nervous system disarmament feel like?",
+        "primaryHerb": "Kava Kava",
+        "pairing": {
+            "herbs": [
+                "Kava Kava",
+                "Passionflower"
+            ],
+            "rituals": [
+                "Dim lights, wrap in weighted blanket, hum low tone"
+            ],
+            "breathwork": "Warrior’s rest breath (long exhales, jaw relaxed)",
+            "moonPhase": "New Moon"
+        },
+        "linkedGlossaryTerms": [
+            "nervous system ceasefire",
+            "somatic disarmament",
+            "internal sanctuary"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Belonging Bone-Deep",
+        "affirmation": "I belong here—not by invitation, but by the simple fact of my breath and my story.",
+        "intention": "Anchor belonging in existence, not achievement.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Public spaces",
+            "New groups",
+            "Feeling like an outsider"
+        ],
+        "whyItWorks": "Reduces social pain activation in the dorsal anterior cingulate; energetically roots belonging in cellular truth.",
+        "userPrompt": "Where do you forget you already belong?",
+        "primaryHerb": "Solomon’s Seal",
+        "pairing": {
+            "herbs": [
+                "Solomon’s Seal",
+                "Comfrey"
+            ],
+            "rituals": [
+                "Press palm to sternum, feel heartbeat as belonging pulse"
+            ],
+            "breathwork": "Bone breath (imagine breath moving through marrow)",
+            "moonPhase": "First Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "existential belonging",
+            "cellular belonging",
+            "unconditional inclusion"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Trust the Next Step",
+        "affirmation": "I don’t need the whole path—just the next step, and the trust to take it.",
+        "intention": "Reduce overwhelm through micro-trust.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Major decisions",
+            "Uncertain futures",
+            "Daily planning"
+        ],
+        "whyItWorks": "Engages the cerebellum’s predictive modeling with manageable input; energetically focuses on proximal possibility.",
+        "userPrompt": "What is the very next step your soul knows is right?",
+        "primaryHerb": "Ginkgo Biloba",
+        "pairing": {
+            "herbs": [
+                "Ginkgo Biloba",
+                "Rosemary"
+            ],
+            "rituals": [
+                "Place foot firmly on ground, affirm: ‘This step is enough’"
+            ],
+            "breathwork": "Step breath (inhale lift, exhale place foot down—real or imagined)",
+            "moonPhase": "Waxing Gibbous"
+        },
+        "linkedGlossaryTerms": [
+            "micro-trust",
+            "proximal path",
+            "step-by-step faith"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Calm Current",
+        "affirmation": "Beneath the surface of pain, a calm current flows through me—steady and sure.",
+        "intention": "Access deeper somatic stability amid surface turbulence.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "Acute pain",
+            "Emotional storms",
+            "Medical procedures"
+        ],
+        "whyItWorks": "Activates the periaqueductal gray’s descending pain modulation; energetically connects to core stillness.",
+        "userPrompt": "Can you feel the calm beneath your current sensation?",
+        "primaryHerb": "Cramp Bark",
+        "pairing": {
+            "herbs": [
+                "Cramp Bark",
+                "Black Haw"
+            ],
+            "rituals": [
+                "Float in warm bath, imagine sinking below waves"
+            ],
+            "breathwork": "Deep ocean breath (slow, rhythmic, diaphragmatic)",
+            "moonPhase": "Waning Gibbous"
+        },
+        "linkedGlossaryTerms": [
+            "core calm",
+            "descending regulation",
+            "subsurface stability"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Worth Unmeasured",
+        "affirmation": "My worth was never measured in missions completed—but in the heart that kept showing up.",
+        "intention": "Decouple value from output or duty.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Retirement grief",
+            "Identity shifts",
+            "‘Not contributing’ thoughts"
+        ],
+        "whyItWorks": "Disrupts striatal reward conditioning tied to achievement; energetically revalues presence over performance.",
+        "userPrompt": "What if your heart’s persistence is your greatest mission?",
+        "primaryHerb": "Hawthorn",
+        "pairing": {
+            "herbs": [
+                "Hawthorn",
+                "Rose"
+            ],
+            "rituals": [
+                "Hold hand over heart, whisper: ‘You were always enough’"
+            ],
+            "breathwork": "Heart rhythm breath (match breath to pulse)",
+            "moonPhase": "Full Moon"
+        },
+        "linkedGlossaryTerms": [
+            "non-transactional worth",
+            "heart-led value",
+            "post-service identity"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Grace in Waiting",
+        "affirmation": "In waiting, I am not idle—I am gathering grace for what comes next.",
+        "intention": "Sanctify periods of in-between as fertile, not wasted.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "VA delays",
+            "Healing pauses",
+            "Transitional limbo"
+        ],
+        "whyItWorks": "Reduces frustration-related amygdala firing; energetically frames latency as gestation.",
+        "userPrompt": "What grace is gathering in your current wait?",
+        "primaryHerb": "Milk Thistle",
+        "pairing": {
+            "herbs": [
+                "Milk Thistle",
+                "Burdock"
+            ],
+            "rituals": [
+                "Watch seeds float on water, reflect on potential"
+            ],
+            "breathwork": "Gestational breath (slow, nurturing inhales/exhales)",
+            "moonPhase": "Dark Moon"
+        },
+        "linkedGlossaryTerms": [
+            "sacred waiting",
+            "gestational time",
+            "latent abundance"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Nerve Reboot",
+        "affirmation": "With every conscious breath, I reboot my nervous system toward calm.",
+        "intention": "Empower agency in autonomic regulation.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "Panic onset",
+            "Flashbacks",
+            "Overstimulation"
+        ],
+        "whyItWorks": "Directly stimulates vagal afferents via breath; energetically resets neural ‘operating system.’",
+        "userPrompt": "How many breaths until you feel a shift?",
+        "primaryHerb": "Motherwort",
+        "pairing": {
+            "herbs": [
+                "Motherwort",
+                "Skullcap"
+            ],
+            "rituals": [
+                "Splash cool water on face, then breathe deeply"
+            ],
+            "breathwork": "Physiological sigh (double inhale, long exhale)",
+            "moonPhase": "New Moon"
+        },
+        "linkedGlossaryTerms": [
+            "vagal reset",
+            "conscious regulation",
+            "somatic reboot"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Circle of One",
+        "affirmation": "I am complete in my solitude—not waiting to be filled, but full as I am.",
+        "intention": "Transform loneliness into chosen aloneness.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Living alone",
+            "Social withdrawal",
+            "Introspective days"
+        ],
+        "whyItWorks": "Activates the precuneus (self-reflection center) positively; energetically completes the circle of self-containment.",
+        "userPrompt": "What wholeness do you discover in your own company?",
+        "primaryHerb": "Mugwort",
+        "pairing": {
+            "herbs": [
+                "Mugwort",
+                "Yarrow"
+            ],
+            "rituals": [
+                "Draw a circle around yourself with chalk or salt"
+            ],
+            "breathwork": "Circular breath (no pause, continuous loop)",
+            "moonPhase": "Last Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "chosen solitude",
+            "self-completion",
+            "inner circle"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Overflow Begins Within",
+        "affirmation": "My cup fills from within—so I can give without emptying myself.",
+        "intention": "Establish internal source of generosity and energy.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Caregiver fatigue",
+            "Helping others",
+            "Feeling drained"
+        ],
+        "whyItWorks": "Shifts from sympathetic ‘giving from depletion’ to parasympathetic ‘giving from overflow’; energetically reverses leaky vessel metaphor.",
+        "userPrompt": "Where is your inner wellspring right now?",
+        "primaryHerb": "Shatavari",
+        "pairing": {
+            "herbs": [
+                "Shatavari",
+                "Oat Straw"
+            ],
+            "rituals": [
+                "Fill actual cup with water, bless it as your inner source"
+            ],
+            "breathwork": "Fountain breath (inhale up spine, exhale out hands)",
+            "moonPhase": "Waxing Crescent"
+        },
+        "linkedGlossaryTerms": [
+            "inner abundance",
+            "overflow principle",
+            "sustainable giving"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Body Embassy",
+        "affirmation": "My body is sovereign territory—I govern it with compassion, not force.",
+        "intention": "Assert gentle authority over self-care choices.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Medical decisions",
+            "Pain management",
+            "Boundary setting"
+        ],
+        "whyItWorks": "Strengthens dorsolateral prefrontal cortex executive function; energetically declares bodily autonomy as sacred diplomacy.",
+        "userPrompt": "What compassionate law does your body need you to enact today?",
+        "primaryHerb": "Rue",
+        "pairing": {
+            "herbs": [
+                "Rue",
+                "Yarrow"
+            ],
+            "rituals": [
+                "Place hand over abdomen as ‘seat of governance’"
+            ],
+            "breathwork": "Sovereign breath (deep, deliberate, unhurried)",
+            "moonPhase": "First Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "bodily sovereignty",
+            "compassionate governance",
+            "embodied autonomy"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Tide of Calm",
+        "affirmation": "Like the tide, my calm returns—predictable, patient, and mine.",
+        "intention": "Install reliability of regulation after dysregulation.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "Post-anxiety",
+            "After conflict",
+            "Evening wind-down"
+        ],
+        "whyItWorks": "Uses circadian and tidal metaphors to strengthen predictability in HPA axis recovery; energetically syncs with lunar rhythms.",
+        "userPrompt": "When did calm last return to you—and how soon might it come again?",
+        "primaryHerb": "Kelp",
+        "pairing": {
+            "herbs": [
+                "Kelp",
+                "Bladderwrack"
+            ],
+            "rituals": [
+                "Listen to ocean sounds or real waves"
+            ],
+            "breathwork": "Tidal breath (gradual inhale/exhale like shore waves)",
+            "moonPhase": "Waning Crescent"
+        },
+        "linkedGlossaryTerms": [
+            "predictable calm",
+            "tidal regulation",
+            "lunar alignment"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Enough to Share",
+        "affirmation": "I have enough within me—not just to survive, but to share my light.",
+        "intention": "Bridge self-sufficiency and generous contribution.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Mentoring veterans",
+            "Creative sharing",
+            "Community involvement"
+        ],
+        "whyItWorks": "Activates mesolimbic reward pathways through prosocial intention; energetically confirms abundance through circulation.",
+        "userPrompt": "What light within you is ready to be shared?",
+        "primaryHerb": "Calendula",
+        "pairing": {
+            "herbs": [
+                "Calendula",
+                "Sunflower"
+            ],
+            "rituals": [
+                "Light candle, visualize light radiating from heart"
+            ],
+            "breathwork": "Radiant breath (inhale gold, exhale light beams)",
+            "moonPhase": "Full Moon"
+        },
+        "linkedGlossaryTerms": [
+            "generous abundance",
+            "circulating light",
+            "enough to give"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Silent Brotherhood",
+        "affirmation": "I am held by a silent brotherhood—seen, known, and never alone in my struggle.",
+        "intention": "Invoke invisible support network of fellow veterans.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Night watches",
+            "Isolation",
+            "Memorial moments"
+        ],
+        "whyItWorks": "Activates mirror neuron system through imagined connection; energetically weaves into collective veteran field.",
+        "userPrompt": "Who in your silent brotherhood walks with you today?",
+        "primaryHerb": "Pine",
+        "pairing": {
+            "herbs": [
+                "Pine",
+                "Cedar"
+            ],
+            "rituals": [
+                "Salute the sky or photo of unit"
+            ],
+            "breathwork": "Marching breath (rhythmic, synchronized with steps or taps)",
+            "moonPhase": "Last Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "veteran field",
+            "invisible support",
+            "collective holding"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Rooted Enough",
+        "affirmation": "I am rooted enough to bend, strong enough to rest, and whole enough as I am.",
+        "intention": "Integrate flexibility, strength, and wholeness as coexisting truths.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Adapting to limitations",
+            "Accepting help",
+            "Self-acceptance practice"
+        ],
+        "whyItWorks": "Harmonizes default mode and salience networks for self-coherence; energetically embodies tree-like resilience.",
+        "userPrompt": "Where are you rooted enough to rest right now?",
+        "primaryHerb": "Ashwagandha",
+        "pairing": {
+            "herbs": [
+                "Ashwagandha",
+                "Eleuthero"
+            ],
+            "rituals": [
+                "Stand like a tree—feet grounded, arms open"
+            ],
+            "breathwork": "Tree breath (inhale up trunk, exhale through branches)",
+            "moonPhase": "First Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "embodied wholeness",
+            "flexible strength",
+            "rooted rest"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Trust the Unfolding",
+        "affirmation": "I trust the unfolding of my path—even when I can’t see the map.",
+        "intention": "Surrender to nonlinear healing and life progression.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Uncertain diagnoses",
+            "Life transitions",
+            "Faith challenges"
+        ],
+        "whyItWorks": "Reduces anterior insula uncertainty distress; energetically aligns with spiral (not linear) growth patterns.",
+        "userPrompt": "What if your path is unfolding perfectly—even now?",
+        "primaryHerb": "Mullein",
+        "pairing": {
+            "herbs": [
+                "Mullein",
+                "Mugwort"
+            ],
+            "rituals": [
+                "Watch smoke or steam rise in spirals"
+            ],
+            "breathwork": "Spiral breath (inhale circling up, exhale circling down)",
+            "moonPhase": "Waxing Gibbous"
+        },
+        "linkedGlossaryTerms": [
+            "nonlinear trust",
+            "spiral unfolding",
+            "faith in mystery"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Nerve Garden",
+        "affirmation": "My nervous system is a garden—I tend it with patience, not punishment.",
+        "intention": "Replace self-criticism with gardener-like care for regulation.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "After dysregulation",
+            "Morning routine",
+            "Therapy integration"
+        ],
+        "whyItWorks": "Activates caregiving circuits in the hypothalamus; energetically reframes nerves as living ecosystem.",
+        "userPrompt": "What nourishment does your nerve garden need today?",
+        "primaryHerb": "Chamomile",
+        "pairing": {
+            "herbs": [
+                "Chamomile",
+                "Lavender"
+            ],
+            "rituals": [
+                "Tend to a real or imagined garden for 2 minutes"
+            ],
+            "breathwork": "Garden breath (inhale floral scents, exhale weeds)",
+            "moonPhase": "New Moon"
+        },
+        "linkedGlossaryTerms": [
+            "nervous system gardening",
+            "patient tending",
+            "ecological regulation"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Dignity in Stillness",
+        "affirmation": "My dignity lives in my stillness—not just in my action or endurance.",
+        "intention": "Affirm worth in non-doing states.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Bedridden days",
+            "Rest periods",
+            "‘Unproductive’ moments"
+        ],
+        "whyItWorks": "Counters cultural devaluation of rest by activating medial prefrontal self-affirmation nodes; energetically crowns stillness as regal.",
+        "userPrompt": "How does your stillness carry its own honor?",
+        "primaryHerb": "Frankincense",
+        "pairing": {
+            "herbs": [
+                "Frankincense",
+                "Myrrh"
+            ],
+            "rituals": [
+                "Anoint forehead with oil, sit in silence"
+            ],
+            "breathwork": "Regal breath (slow, upright, dignified inhales/exhales)",
+            "moonPhase": "Full Moon"
+        },
+        "linkedGlossaryTerms": [
+            "stillness dignity",
+            "non-doing worth",
+            "rest as royalty"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Current of Care",
+        "affirmation": "I am carried by a current of care—seen, supported, and never truly alone.",
+        "intention": "Open to receiving invisible and visible support.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Feeling abandoned",
+            "Asking for help",
+            "Community gatherings"
+        ],
+        "whyItWorks": "Stimulates oxytocin release through perceived support; energetically connects to web of human and spiritual care.",
+        "userPrompt": "Who or what is carrying you right now that you haven’t acknowledged?",
+        "primaryHerb": "Rose",
+        "pairing": {
+            "herbs": [
+                "Rose",
+                "Hawthorn"
+            ],
+            "rituals": [
+                "Hold hands over heart, then extend outward in offering/receiving"
+            ],
+            "breathwork": "Web breath (inhale connection, exhale gratitude)",
+            "moonPhase": "Waxing Crescent"
+        },
+        "linkedGlossaryTerms": [
+            "received care",
+            "support web",
+            "carried abundance"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Nerve Truce",
+        "affirmation": "Today, I declare a truce with my nerves—we are allies, not enemies.",
+        "intention": "Shift from war metaphor to partnership with nervous system.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "Chronic pain flares",
+            "Anxiety cycles",
+            "Body hatred moments"
+        ],
+        "whyItWorks": "Reduces threat appraisal in the amygdala by reframing relationship; energetically signs peace treaty with soma.",
+        "userPrompt": "What terms of peace can you offer your nervous system today?",
+        "primaryHerb": "Skullcap",
+        "pairing": {
+            "herbs": [
+                "Skullcap",
+                "Milky Oats"
+            ],
+            "rituals": [
+                "Write ‘truce terms’ on paper, then burn or bury"
+            ],
+            "breathwork": "Peace breath (equal inhale/exhale with ‘ceasefire’ mantra)",
+            "moonPhase": "Last Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "somatic truce",
+            "nerve alliance",
+            "peace physiology"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Belonging Breath",
+        "affirmation": "With every breath, I remember: I belong here, exactly as I am.",
+        "intention": "Embed belonging into autonomic rhythm.",
+        "category": "Self-Worth & Belonging",
+        "whenToUse": [
+            "Social anxiety",
+            "New environments",
+            "Morning awakening"
+        ],
+        "whyItWorks": "Links respiratory rhythm to insular sense of belonging; energetically weaves self into fabric of place.",
+        "userPrompt": "Where does your breath say you belong right now?",
+        "primaryHerb": "Violet",
+        "pairing": {
+            "herbs": [
+                "Violet",
+                "Blue Lotus"
+            ],
+            "rituals": [
+                "Breathe while placing hand on heart and belly simultaneously"
+            ],
+            "breathwork": "Belonging breath (inhale ‘I am,’ exhale ‘here’)",
+            "moonPhase": "First Quarter"
+        },
+        "linkedGlossaryTerms": [
+            "breath belonging",
+            "embodied inclusion",
+            "rhythmic homecoming"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Harvest of Now",
+        "affirmation": "I harvest abundance from this moment—not from what’s missing, but what’s present.",
+        "intention": "Cultivate immediate sufficiency awareness.",
+        "category": "Abundance & Trust",
+        "whenToUse": [
+            "Scarcity thinking",
+            "Comparison traps",
+            "Gratitude practice"
+        ],
+        "whyItWorks": "Activates ventral striatum reward response to present-moment cues; energetically gathers ‘now’ as ripe fruit.",
+        "userPrompt": "What abundance is ripe for harvesting in this exact moment?",
+        "primaryHerb": "Nettle",
+        "pairing": {
+            "herbs": [
+                "Nettle",
+                "Dandelion"
+            ],
+            "rituals": [
+                "Gather 3 physical items nearby as ‘harvest’"
+            ],
+            "breathwork": "Harvest breath (inhale gather, exhale store)",
+            "moonPhase": "Waning Gibbous"
+        },
+        "linkedGlossaryTerms": [
+            "present abundance",
+            "moment harvest",
+            "sufficiency now"
+        ],
+        "recommendedProductIds": []
+    },
+    {
+        "title": "Calm Command",
+        "affirmation": "I command my calm—not through force, but through steady, quiet presence.",
+        "intention": "Reclaim agency in regulation with veteran leadership ethos.",
+        "category": "Nervous System Regulation",
+        "whenToUse": [
+            "Leadership roles",
+            "Crisis moments",
+            "Teaching others"
+        ],
+        "whyItWorks": "Engages supplementary motor area with calm intention; energetically blends command presence with parasympathetic tone.",
+        "userPrompt": "How can your calm lead others—and yourself—today?",
+        "primaryHerb": "Rosemary",
+        "pairing": {
+            "herbs": [
+                "Rosemary",
+                "Sage"
+            ],
+            "rituals": [
+                "Stand tall, hand over heart, affirm calm command"
+            ],
+            "breathwork": "Command breath (sharp inhale, slow exhale—like giving orders calmly)",
+            "moonPhase": "Full Moon"
+        },
+        "linkedGlossaryTerms": [
+            "calm authority",
+            "veteran presence",
+            "regulated command"
+        ],
+        "recommendedProductIds": []
+    }
+]
