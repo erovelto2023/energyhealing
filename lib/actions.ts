@@ -10,6 +10,7 @@ import mongoose from "mongoose";
 import Subscriber from "./models/Subscriber";
 import Herb from "./models/Herb";
 import { bulkSeedHerbs } from "./bulkSeedHerbs";
+import Affirmation from "./models/Affirmation";
 
 export async function runBulkSeed() {
     await connectToDatabase();
@@ -802,5 +803,151 @@ export async function getRandomHerb(limit: number = 1) {
     } catch (e) {
         console.error("Error fetching random herb", e);
         return [];
+    }
+}
+
+// --- Affirmation Actions ---
+
+export async function getAffirmations() {
+    try {
+        await connectToDatabase();
+        const affirmations = await Affirmation.find({}).sort({ createdAt: -1 }).lean();
+        return JSON.parse(JSON.stringify(affirmations));
+    } catch (error) {
+        console.error("Error fetching affirmations:", error);
+        return [];
+    }
+}
+
+export async function getAffirmationBySlug(slug: string) {
+    try {
+        await connectToDatabase();
+        const affirmation = await Affirmation.findOne({ slug }).lean();
+        if (!affirmation) return null;
+        return JSON.parse(JSON.stringify(affirmation));
+    } catch (error) {
+        console.error("Error fetching affirmation by slug:", error);
+        return null;
+    }
+}
+
+export async function createAffirmation(data: any) {
+    try {
+        await connectToDatabase();
+
+        // Dynamic Slug Import
+        const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
+
+        const existingAffirmations = await Affirmation.find({}, { slug: 1 }).lean();
+        const existingSlugs = existingAffirmations.map((a: any) => a.slug).filter(Boolean);
+
+        const baseSlug = slugify(data.title);
+        const slug = makeUniqueSlug(baseSlug, existingSlugs);
+
+        const newId = `aff-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+        await Affirmation.create({
+            ...data,
+            id: newId,
+            slug
+        });
+
+        revalidatePath('/admin');
+        revalidatePath('/affirmations');
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error creating affirmation:", error);
+        return { error: error.message };
+    }
+}
+
+export async function updateAffirmation(data: any) {
+    try {
+        await connectToDatabase();
+        // If title changed, might want to update slug, but usually keep consistent for SEO
+        // For now, simple update
+        await Affirmation.findOneAndUpdate({ id: data.id }, data);
+        revalidatePath('/admin');
+        revalidatePath('/affirmations');
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error updating affirmation:", error);
+        return { error: error.message };
+    }
+}
+
+export async function deleteAffirmation(id: string) {
+    try {
+        await connectToDatabase();
+        await Affirmation.findOneAndDelete({ id });
+        revalidatePath('/admin');
+        revalidatePath('/affirmations');
+        return { success: true };
+    } catch (error: any) {
+        return { error: error.message };
+    }
+}
+
+export async function deleteAffirmations(ids: string[]) {
+    try {
+        await connectToDatabase();
+        if (!ids || ids.length === 0) return { success: true, count: 0 };
+
+        const result = await Affirmation.deleteMany({ id: { $in: ids } });
+
+        revalidatePath('/admin');
+        revalidatePath('/affirmations');
+        return { success: true, count: result.deletedCount };
+    } catch (error: any) {
+        return { error: error.message };
+    }
+}
+
+export async function importAffirmations(rawText: string) {
+    try {
+        await connectToDatabase();
+        const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
+
+        let items: any[] = [];
+        try {
+            // Strip markdown code blocks if present (common when copying from AI)
+            const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+            items = JSON.parse(cleanText);
+            if (!Array.isArray(items)) throw new Error("Import must be an array");
+        } catch (e: any) {
+            console.error("JSON Parse Error:", e.message);
+            return { error: "Invalid JSON format. Please ensure you are pasting a valid JSON array. If you copied from AI, check for stray characters." };
+        }
+
+        const existingAffirmations = await Affirmation.find({}, { slug: 1 }).lean();
+        const existingSlugs = existingAffirmations.map((a: any) => a.slug).filter(Boolean);
+
+        let createdCount = 0;
+
+        for (const item of items) {
+            if (!item.title || !item.affirmation) continue;
+
+            const baseSlug = slugify(item.title);
+            const slug = makeUniqueSlug(baseSlug, existingSlugs);
+            existingSlugs.push(slug);
+
+            const newId = `aff-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+
+            await Affirmation.create({
+                ...item,
+                id: newId,
+                slug,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+            createdCount++;
+        }
+
+        revalidatePath('/admin');
+        revalidatePath('/affirmations');
+        return { success: true, count: createdCount };
+
+    } catch (e: any) {
+        return { error: e.message };
     }
 }

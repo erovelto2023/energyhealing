@@ -17,12 +17,15 @@ import {
     createGlossaryTerm, updateGlossaryTerm, deleteGlossaryTerm, deleteGlossaryTerms,
     findDuplicateGlossaryTerms
 } from "@/lib/actions";
-import { deleteHerb, importHerbs, runBulkSeed, deleteHerbs } from '@/lib/actions';
+import { deleteHerb, importHerbs, runBulkSeed, deleteHerbs, deleteAffirmation, deleteAffirmations, importAffirmations } from '@/lib/actions';
 import { IProduct } from '@/lib/models/Product';
 import { IGlossaryTerm } from '@/lib/models/GlossaryTerm';
 import { INiche } from '@/lib/models/Niche';
 import { ISubscriber } from '@/lib/models/Subscriber';
 import { IHerb } from '@/lib/models/Herb';
+import { IAffirmation } from '@/lib/models/Affirmation';
+import AffirmationForm from './AffirmationForm';
+import AffirmationPromptBuilder from './AffirmationPromptBuilder';
 
 
 interface AdminDashboardProps {
@@ -33,11 +36,12 @@ interface AdminDashboardProps {
     subscribers?: ISubscriber[];
     salesPages?: any[];
     herbs?: IHerb[];
+    affirmations?: IAffirmation[];
 }
 
-export default function AdminDashboard({ reviews = [], products = [], glossaryTerms = [], niches = [], subscribers = [], salesPages = [], herbs = [] }: AdminDashboardProps) {
+export default function AdminDashboard({ reviews = [], products = [], glossaryTerms = [], niches = [], subscribers = [], salesPages = [], herbs = [], affirmations = [] }: AdminDashboardProps) {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'reviews' | 'tools' | 'glossary' | 'niches' | 'subscribers' | 'writing' | 'offers' | 'pantry'>('reviews');
+    const [activeTab, setActiveTab] = useState<'reviews' | 'tools' | 'glossary' | 'niches' | 'subscribers' | 'writing' | 'offers' | 'pantry' | 'affirmations'>('reviews');
 
     // Healing Pantry State
     const [pantryView, setPantryView] = useState<'list' | 'create' | 'edit' | 'import'>('list');
@@ -47,6 +51,15 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
     const pantryPerPage = 50;
     const [pantryImportText, setPantryImportText] = useState('');
     const [pantrySelected, setPantrySelected] = useState<Set<string>>(new Set());
+
+    // Affirmations State
+    const [affirmationView, setAffirmationView] = useState<'list' | 'create' | 'edit' | 'import' | 'prompt-builder'>('list');
+    const [editingAffirmation, setEditingAffirmation] = useState<IAffirmation | undefined>(undefined);
+    const [affirmationPage, setAffirmationPage] = useState(1);
+    const [affirmationSearch, setAffirmationSearch] = useState('');
+    const [affirmationAlphaFilter, setAffirmationAlphaFilter] = useState('All');
+    const affirmationPerPage = 20;
+    const [affirmationImportText, setAffirmationImportText] = useState('');
 
 
     // Sales Pages State
@@ -255,6 +268,32 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
         }
     };
 
+    const handleDeleteAffirmation = (id: string) => {
+        if (!confirm("Are you sure you want to delete this affirmation?")) return;
+        startDeleteTransition(async () => {
+            const result = await deleteAffirmation(id);
+            if (result.success) {
+                alert('✅ Affirmation deleted!');
+                window.location.reload();
+            } else {
+                alert('❌ Error: ' + result.error);
+            }
+        });
+    };
+
+    const handleImportAffirmations = async () => {
+        if (!affirmationImportText) return;
+        const result = await importAffirmations(affirmationImportText);
+        if (result.success) {
+            alert(`✅ Successfully imported ${result.count} affirmations!`);
+            setAffirmationImportText('');
+            setAffirmationView('list');
+            window.location.reload();
+        } else {
+            alert('❌ Import Failed: ' + result.error);
+        }
+    };
+
     const handleExportGlossaryUrls = () => {
         const csvContent = "data:text/csv;charset=utf-8,"
             + "Term,URL\n"
@@ -356,15 +395,6 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                     Products / Tools
                 </button>
                 <button
-                    onClick={() => setActiveTab('niches')}
-                    className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${activeTab === 'niches'
-                        ? 'bg-slate-900 text-white shadow-lg shadow-slate-200 scale-105'
-                        : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900 border border-slate-200'
-                        }`}
-                >
-                    Niches
-                </button>
-                <button
                     onClick={() => setActiveTab('subscribers')}
                     className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${activeTab === 'subscribers'
                         ? 'bg-slate-900 text-white shadow-lg shadow-slate-200 scale-105'
@@ -390,6 +420,15 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                         }`}
                 >
                     <span className="flex items-center gap-2">🌿 Healing Pantry</span>
+                </button>
+                <button
+                    onClick={() => setActiveTab('affirmations')}
+                    className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${activeTab === 'affirmations'
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-200 scale-105'
+                        : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900 border border-slate-200'
+                        }`}
+                >
+                    <span className="flex items-center gap-2"><Sparkles size={16} /> Daily Rituals</span>
                 </button>
             </div>
 
@@ -1768,6 +1807,172 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                         </div>
                                     )}
                                 </div>
+                            )}
+                        </div>
+                    );
+                })()}
+
+                {/* AFFIRMATIONS TAB */}
+                {activeTab === 'affirmations' && (() => {
+                    const filteredAffirmations = (affirmations || []).filter(a => {
+                        const matchesSearch = a.title.toLowerCase().includes(affirmationSearch.toLowerCase()) ||
+                            a.affirmation.toLowerCase().includes(affirmationSearch.toLowerCase()) ||
+                            a.category.toLowerCase().includes(affirmationSearch.toLowerCase()) ||
+                            a.intention.toLowerCase().includes(affirmationSearch.toLowerCase());
+
+                        const firstChar = a.affirmation.trim().charAt(0).toUpperCase();
+                        const matchesAlpha = affirmationAlphaFilter === 'All' || firstChar === affirmationAlphaFilter;
+
+                        return matchesSearch && matchesAlpha;
+                    }).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+
+                    const totalPages = Math.ceil(filteredAffirmations.length / affirmationPerPage);
+                    const paginatedItems = filteredAffirmations.slice((affirmationPage - 1) * affirmationPerPage, affirmationPage * affirmationPerPage);
+
+                    const alphabet = ['All', ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))];
+
+                    return (
+                        <div className="max-w-7xl mx-auto">
+                            {affirmationView === 'list' && (
+                                <div>
+                                    <div className="flex justify-between items-center mb-8">
+                                        <div>
+                                            <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Daily Rituals</h2>
+                                            <p className="text-slate-500">Manage affirmations and pairings.</p>
+                                        </div>
+                                        <div className="flex gap-4">
+                                            <div className="relative">
+                                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Search..."
+                                                    className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-purple-500 outline-none"
+                                                    value={affirmationSearch}
+                                                    onChange={e => setAffirmationSearch(e.target.value)}
+                                                />
+                                            </div>
+                                            <button onClick={() => setAffirmationView('prompt-builder')} className="px-4 py-2 bg-white text-slate-700 font-bold rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center gap-2"><Sparkles size={16} /> Build AI Prompt</button>
+                                            <button onClick={() => setAffirmationView('import')} className="px-4 py-2 bg-white text-slate-700 font-bold rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center gap-2"><Download size={16} /> Import</button>
+                                            <button onClick={() => { setEditingAffirmation(undefined); setAffirmationView('create'); }} className="px-4 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 flex items-center gap-2"><Plus size={16} /> Create Ritual</button>
+                                        </div>
+                                    </div>
+
+                                    {/* Alpha Filter */}
+                                    <div className="flex flex-wrap gap-2 mb-6">
+                                        {alphabet.map(letter => (
+                                            <button
+                                                key={letter}
+                                                onClick={() => { setAffirmationAlphaFilter(letter); setAffirmationPage(1); }}
+                                                className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${affirmationAlphaFilter === letter
+                                                        ? 'bg-purple-600 text-white shadow-md'
+                                                        : 'bg-white text-slate-400 hover:bg-slate-50 border border-slate-100'
+                                                    }`}
+                                            >
+                                                {letter}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                                        <table className="min-w-full divide-y divide-slate-100">
+                                            <thead className="bg-slate-50">
+                                                <tr>
+                                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">Title</th>
+                                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">Affirmation</th>
+                                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">Category</th>
+                                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-100">
+                                                {paginatedItems.map((item) => (
+                                                    <tr key={item.id} className="hover:bg-slate-50 transition-colors">
+                                                        <td className="px-6 py-4">
+                                                            <div className="font-bold text-slate-900">{item.title}</div>
+                                                            {item.primaryHerb && <div className="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-1"><Leaf size={10} /> {item.primaryHerb}</div>}
+                                                        </td>
+                                                        <td className="px-6 py-4 bg-slate-50/50">
+                                                            <div className="font-serif italic text-slate-600 text-sm max-w-md line-clamp-2">"{item.affirmation}"</div>
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-50 text-purple-700">
+                                                                {item.category}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-sm font-medium">
+                                                            <div className="flex gap-2">
+                                                                <a href={`/affirmations/${item.slug}`} target="_blank" className="p-2 text-slate-400 hover:text-purple-600 hover:bg-white rounded-lg transition-all border border-transparent hover:border-slate-200">
+                                                                    <Eye size={16} />
+                                                                </a>
+                                                                <button onClick={() => { setEditingAffirmation(item); setAffirmationView('edit'); }} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all border border-transparent hover:border-slate-200">
+                                                                    <Edit size={16} />
+                                                                </button>
+                                                                <button onClick={() => handleDeleteAffirmation(item.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-white rounded-lg transition-all border border-transparent hover:border-slate-200">
+                                                                    <Trash2 size={16} />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                        {paginatedItems.length === 0 && (
+                                            <div className="text-center py-12">
+                                                <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                                                    <Search size={24} />
+                                                </div>
+                                                <h3 className="text-slate-900 font-bold">No rituals found</h3>
+                                                <p className="text-slate-500 text-sm mt-1">Try adjusting your filters.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Pagination */}
+                                    {totalPages > 1 && (
+                                        <div className="flex justify-center mt-8 gap-2">
+                                            <button disabled={affirmationPage === 1} onClick={() => setAffirmationPage(p => p - 1)} className="px-4 py-2 rounded-lg border disabled:opacity-50">Prev</button>
+                                            <span className="px-4 py-2 flex items-center font-bold text-sm text-slate-600">Page {affirmationPage} of {totalPages}</span>
+                                            <button disabled={affirmationPage >= totalPages} onClick={() => setAffirmationPage(p => p + 1)} className="px-4 py-2 rounded-lg border disabled:opacity-50">Next</button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {affirmationView === 'import' && (
+                                <div className="max-w-2xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
+                                    <h3 className="text-2xl font-black text-slate-900 mb-4">Import Rituals</h3>
+                                    <p className="text-slate-500 mb-4">Paste the JSON array of affirmation objects here.</p>
+                                    <textarea
+                                        className="w-full h-64 p-4 bg-slate-50 rounded-xl font-mono text-xs mb-4 focus:ring-2 focus:ring-purple-500 outline-none"
+                                        value={affirmationImportText}
+                                        onChange={e => setAffirmationImportText(e.target.value)}
+                                        placeholder='[{"title": "...", ...}]'
+                                    />
+                                    <div className="flex justify-end gap-4">
+                                        <button onClick={() => setAffirmationView('list')} className="px-6 py-2 text-slate-500 hover:bg-slate-50 rounded-lg">Cancel</button>
+                                        <button onClick={handleImportAffirmations} className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Import JSON</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {affirmationView === 'prompt-builder' && (
+                                <AffirmationPromptBuilder onBack={() => setAffirmationView('list')} />
+                            )}
+
+                            {affirmationView === 'create' && (
+                                <AffirmationForm
+                                    herbs={herbs || []} products={products || []} glossaryTerms={glossaryTerms || []}
+                                    onCancel={() => setAffirmationView('list')}
+                                    onSuccess={() => { setAffirmationView('list'); window.location.reload(); }}
+                                />
+                            )}
+
+                            {affirmationView === 'edit' && editingAffirmation && (
+                                <AffirmationForm
+                                    initialData={editingAffirmation}
+                                    herbs={herbs || []} products={products || []} glossaryTerms={glossaryTerms || []}
+                                    onCancel={() => { setAffirmationView('list'); setEditingAffirmation(undefined); }}
+                                    onSuccess={() => { setAffirmationView('list'); setEditingAffirmation(undefined); window.location.reload(); }}
+                                />
                             )}
                         </div>
                     );

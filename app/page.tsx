@@ -8,10 +8,11 @@ import connectToDatabase from '@/lib/db';
 import UserStory from '@/lib/models/UserStory';
 import Testimonial from '@/lib/models/Testimonial';
 import { getProducts, ensureDatabaseSeeded } from '@/lib/initialData';
-import { getRandomGlossaryTerms, getRandomHerb } from '@/lib/actions';
 import UserStoryRotator from '@/components/features/UserStoryRotator';
 import TestimonialRotator from '@/components/features/TestimonialRotator';
 import GlossaryRotator from '@/components/features/GlossaryRotator';
+import { getAffirmations, getRandomGlossaryTerms, getRandomHerb } from '@/lib/actions';
+import RotatingAffirmations from '@/components/features/RotatingAffirmations';
 
 export const metadata: Metadata = {
   title: 'Kathleen Heals | Natural Pain Relief Through Energy Healing',
@@ -23,17 +24,19 @@ export default async function Home() {
   await connectToDatabase();
 
   // Fetch featured user stories and testimonials
-  const [featuredStories, featuredTestimonials, { products: randomProducts }, randomTerms, featuredHerbs] = await Promise.all([
+  const [featuredStories, featuredTestimonials, { products: randomProducts }, randomTerms, featuredHerbs, allAffirmations] = await Promise.all([
     UserStory.find({ approved: true, featured: true }).select('id title authorName authorInitials').limit(5).lean(),
     Testimonial.find({ approved: true, featured: true }).select('id clientName clientInitials rating testimonialText').limit(5).lean(),
     getProducts({ random: true, limit: 5 }),
     getRandomGlossaryTerms(5),
-    getRandomHerb(1)
+    getRandomHerb(1),
+    getAffirmations()
   ]);
 
   const stories = JSON.parse(JSON.stringify(featuredStories));
   const testimonials = JSON.parse(JSON.stringify(featuredTestimonials));
   const featuredHerb = featuredHerbs && featuredHerbs.length > 0 ? featuredHerbs[0] : null;
+  const affirmations = allAffirmations.slice(0, 10);
 
   return (
     <div className="min-h-screen bg-[#FDFCFB]">
@@ -60,6 +63,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Daily Rituals Rotation */}
+      <RotatingAffirmations affirmations={affirmations} />
 
       {/* Video Section */}
       <section className="py-20 bg-white">
