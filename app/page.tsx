@@ -8,7 +8,7 @@ import connectToDatabase from '@/lib/db';
 import UserStory from '@/lib/models/UserStory';
 import Testimonial from '@/lib/models/Testimonial';
 import { getProducts, ensureDatabaseSeeded } from '@/lib/initialData';
-import { getRandomGlossaryTerms } from '@/lib/actions';
+import { getRandomGlossaryTerms, getRandomHerb } from '@/lib/actions';
 import UserStoryRotator from '@/components/features/UserStoryRotator';
 import TestimonialRotator from '@/components/features/TestimonialRotator';
 import GlossaryRotator from '@/components/features/GlossaryRotator';
@@ -23,15 +23,17 @@ export default async function Home() {
   await connectToDatabase();
 
   // Fetch featured user stories and testimonials
-  const [featuredStories, featuredTestimonials, { products: randomProducts }, randomTerms] = await Promise.all([
+  const [featuredStories, featuredTestimonials, { products: randomProducts }, randomTerms, featuredHerbs] = await Promise.all([
     UserStory.find({ approved: true, featured: true }).select('id title authorName authorInitials').limit(5).lean(),
     Testimonial.find({ approved: true, featured: true }).select('id clientName clientInitials rating testimonialText').limit(5).lean(),
     getProducts({ random: true, limit: 5 }),
-    getRandomGlossaryTerms(5)
+    getRandomGlossaryTerms(5),
+    getRandomHerb(1)
   ]);
 
   const stories = JSON.parse(JSON.stringify(featuredStories));
   const testimonials = JSON.parse(JSON.stringify(featuredTestimonials));
+  const featuredHerb = featuredHerbs && featuredHerbs.length > 0 ? featuredHerbs[0] : null;
 
   return (
     <div className="min-h-screen bg-[#FDFCFB]">
@@ -99,17 +101,38 @@ export default async function Home() {
                   </div>
                   <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Featured Remedy</span>
                 </div>
-                <h3 className="text-3xl font-black text-slate-800 mb-4">Adobo Seasoning</h3>
-                <p className="text-slate-600 mb-6 leading-relaxed">
-                  A foundational Latin American blend acting as a natural antibiotic and vasodilator. Helps lower elevated blood pressure and supports immune responses.
-                </p>
-                <div className="flex gap-2 mb-6">
-                  <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">Digestive Aid</span>
-                  <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">Circulation</span>
-                </div>
-                <Link href="/healing-pantry" className="text-orange-600 font-bold text-sm flex items-center gap-2 hover:gap-4 transition-all">
-                  Explore Full Entry <ArrowRight size={16} />
-                </Link>
+                {featuredHerb ? (
+                  <>
+                    <h3 className="text-3xl font-black text-slate-800 mb-4">{featuredHerb.name}</h3>
+                    <p className="text-slate-600 mb-6 leading-relaxed line-clamp-3">
+                      {featuredHerb.description}
+                    </p>
+                    <div className="flex gap-2 mb-6">
+                      {featuredHerb.healing && featuredHerb.healing.slice(0, 2).map((h: string, i: number) => (
+                        <span key={i} className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
+                          {h}
+                        </span>
+                      ))}
+                    </div>
+                    <Link href={`/healing-pantry?herb=${featuredHerb.slug}`} className="text-orange-600 font-bold text-sm flex items-center gap-2 hover:gap-4 transition-all">
+                      Explore Full Entry <ArrowRight size={16} />
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-3xl font-black text-slate-800 mb-4">Adobo Seasoning</h3>
+                    <p className="text-slate-600 mb-6 leading-relaxed">
+                      A foundational Latin American blend acting as a natural antibiotic and vasodilator. Helps lower elevated blood pressure and supports immune responses.
+                    </p>
+                    <div className="flex gap-2 mb-6">
+                      <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">Digestive Aid</span>
+                      <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">Circulation</span>
+                    </div>
+                    <Link href="/healing-pantry" className="text-orange-600 font-bold text-sm flex items-center gap-2 hover:gap-4 transition-all">
+                      Explore Full Entry <ArrowRight size={16} />
+                    </Link>
+                  </>
+                )}
               </div>
               {/* Decorative overlapping card */}
               <div className="absolute top-8 left-8 w-full h-full bg-orange-200/20 rounded-[2.5rem] -z-10 rotate-[4deg]" />

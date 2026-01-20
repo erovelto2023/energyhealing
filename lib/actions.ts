@@ -751,3 +751,16 @@ export async function importHerbs(rawText: string) {
         return { error: e.message };
     }
 }
+
+export async function getRandomHerb(limit: number = 1) {
+    try {
+        await connectToDatabase();
+        const herbs = await Herb.aggregate([
+            { $sample: { size: limit } }
+        ]);
+        return JSON.parse(JSON.stringify(herbs));
+    } catch (e) {
+        console.error("Error fetching random herb", e);
+        return [];
+    }
+}
