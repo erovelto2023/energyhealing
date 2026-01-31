@@ -13,7 +13,7 @@ export default function Header() {
             </div>
 
             <nav className="bg-white/80 backdrop-blur-md border-b border-slate-100">
-                <div className="max-w-6xl mx-auto px-6 h-16 md:h-20 flex items-center justify-between">
+                <div className="w-full px-4 lg:px-12 h-16 md:h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-600 rounded-lg md:rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
                             <Leaf size={20} />
@@ -21,7 +21,7 @@ export default function Header() {
                         <span className="text-lg md:text-xl font-bold tracking-tight text-slate-900">Kathleen<span className="text-emerald-600">Heals</span></span>
                     </Link>
 
-                    <div className="hidden lg:flex items-center gap-5 text-sm font-medium text-slate-600">
+                    <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-600">
                         <Link href="/blog" className="hover:text-emerald-600 transition-colors">Blog</Link>
                         <Link href="/glossary" className="hover:text-emerald-600 transition-colors">Glossary</Link>
                         <Link href="/questions" className="hover:text-emerald-600 transition-colors">Questions / FAQ</Link>
