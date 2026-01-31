@@ -1215,3 +1215,45 @@ export async function getOfferById(id: string) {
         return null;
     }
 }
+
+export async function deduplicateFAQs() {
+    try {
+        await connectToDatabase();
+        const faqs = await FAQ.find({}, '_id question').sort({ createdAt: 1 }).lean();
+
+        const questionMap = new Map<string, string[]>();
+
+        faqs.forEach((f: any) => {
+            const key = f.question.toLowerCase().trim();
+            if (!questionMap.has(key)) {
+                questionMap.set(key, []);
+            }
+            questionMap.get(key)?.push(f._id.toString());
+        });
+
+        const idsToDelete: string[] = [];
+        let duplicateCount = 0;
+
+        questionMap.forEach((ids) => {
+            if (ids.length > 1) {
+                // Keep the first one (0), delete the rest
+                for (let i = 1; i < ids.length; i++) {
+                    idsToDelete.push(ids[i]);
+                    duplicateCount++;
+                }
+            }
+        });
+
+        if (idsToDelete.length > 0) {
+            await FAQ.deleteMany({ _id: { $in: idsToDelete } });
+        }
+
+        revalidatePath('/admin');
+        revalidatePath('/questions');
+
+        return { success: true, count: duplicateCount };
+    } catch (error: any) {
+        console.error("Error deduplicating FAQs:", error);
+        return { error: error.message };
+    }
+}

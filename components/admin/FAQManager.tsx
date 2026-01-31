@@ -3,7 +3,7 @@ import { useState, useTransition } from 'react';
 import { IFAQ } from '@/lib/models/FAQ';
 import { Plus, Edit, Trash2, Search, ArrowLeft, Download, ExternalLink, RefreshCw, Eye, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import { createFAQ, updateFAQ, deleteFAQ, deleteFAQs, importFAQs } from '@/lib/actions';
+import { createFAQ, updateFAQ, deleteFAQ, deleteFAQs, importFAQs, deduplicateFAQs } from '@/lib/actions';
 import FAQPromptBuilder from './FAQPromptBuilder';
 
 interface FAQManagerProps {
@@ -55,6 +55,19 @@ export default function FAQManager({ faqs = [], offers = [] }: FAQManagerProps) 
         });
     };
 
+    const handleDeduplicate = async () => {
+        if (!confirm('This will keep the oldest version of any duplicate questions and delete the rest. Continue?')) return;
+        startTransition(async () => {
+            const res = await deduplicateFAQs();
+            if (res.success) {
+                alert(`Removed ${res.count} duplicate FAQs.`);
+                window.location.reload();
+            } else {
+                alert('Error: ' + res.error);
+            }
+        });
+    };
+
     return (
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
             {view === 'list' && (
@@ -67,6 +80,13 @@ export default function FAQManager({ faqs = [], offers = [] }: FAQManagerProps) 
                                 className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
                             >
                                 <Plus size={16} /> Add New
+                            </button>
+                            <button
+                                onClick={handleDeduplicate}
+                                className="bg-white text-orange-600 px-4 py-2 rounded-lg font-bold flex items-center gap-2 border border-orange-200 hover:bg-orange-50"
+                                title="Remove Duplicate Questions"
+                            >
+                                <Trash2 size={16} /> Cleanup
                             </button>
                             <button
                                 onClick={() => setView('prompt')}
