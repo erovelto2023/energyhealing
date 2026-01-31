@@ -47,7 +47,7 @@ export default function BookSessionPage() {
                             </a>
                         </div>
 
-                        <p className="text-emerald-300 text-sm">
+                        <p className="text-yellow-300 text-sm">
                             ✓ 100% Money-Back Guarantee • ✓ Virtual Phone Session • ✓ 60 Minutes
                         </p>
                     </div>
@@ -136,7 +136,7 @@ export default function BookSessionPage() {
                             <Shield size={40} className="text-white" />
                         </div>
 
-                        <h2 className="text-3xl md:text-5xl font-bold mb-6">
+                        <h2 className="text-3xl md:text-5xl font-bold mb-6 text-yellow-300">
                             100% Money-Back Guarantee
                         </h2>
 

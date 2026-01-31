@@ -1,7 +1,7 @@
 import { getPendingReviews, getProducts, getGlossaryTerms } from '@/lib/initialData';
 import fs from 'fs';
 import path from 'path';
-import { getNiches, getSubscribers, getHerbs, getAffirmations } from '@/lib/actions';
+import { getNiches, getSubscribers, getHerbs, getAffirmations, getFAQs } from '@/lib/actions';
 import { clearAllData, migrateToSlugs, importOffersFromFS } from './actions';
 import { testDatabaseConnection } from './test-actions';
 import AdminDashboard from '@/components/admin/AdminDashboard';
@@ -115,6 +115,7 @@ export default async function AdminPage() {
     const subscribers = await getSubscribers();
     const herbs = await getHerbs();
     const affirmations = await getAffirmations();
+    const faqs = await getFAQs();
 
     // Fetch offers from DB
     await connectToDatabase();
@@ -150,6 +151,7 @@ export default async function AdminPage() {
                     salesPages={salesPages}
                     herbs={herbs}
                     affirmations={affirmations}
+                    faqs={faqs}
                 />
             </div>
         </div>

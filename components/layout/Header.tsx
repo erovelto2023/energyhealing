@@ -24,6 +24,7 @@ export default function Header() {
                     <div className="hidden lg:flex items-center gap-5 text-sm font-medium text-slate-600">
                         <Link href="/blog" className="hover:text-emerald-600 transition-colors">Blog</Link>
                         <Link href="/glossary" className="hover:text-emerald-600 transition-colors">Glossary</Link>
+                        <Link href="/questions" className="hover:text-emerald-600 transition-colors">Knowledge Base</Link>
                         <Link href="/affirmations" className="hover:text-emerald-600 transition-colors">Daily Affirmations</Link>
                         <Link href="/healing-pantry" className="hover:text-emerald-600 transition-colors">Herbs and Plants</Link>
                         <Link href="/marketplace" className="hover:text-emerald-600 transition-colors">Resources</Link>

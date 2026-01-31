@@ -26,6 +26,8 @@ import { IHerb } from '@/lib/models/Herb';
 import { IAffirmation } from '@/lib/models/Affirmation';
 import AffirmationForm from './AffirmationForm';
 import AffirmationPromptBuilder from './AffirmationPromptBuilder';
+import FAQManager from './FAQManager';
+import { IFAQ } from '@/lib/models/FAQ';
 
 
 interface AdminDashboardProps {
@@ -37,11 +39,12 @@ interface AdminDashboardProps {
     salesPages?: any[];
     herbs?: IHerb[];
     affirmations?: IAffirmation[];
+    faqs?: IFAQ[];
 }
 
-export default function AdminDashboard({ reviews = [], products = [], glossaryTerms = [], niches = [], subscribers = [], salesPages = [], herbs = [], affirmations = [] }: AdminDashboardProps) {
+export default function AdminDashboard({ reviews = [], products = [], glossaryTerms = [], niches = [], subscribers = [], salesPages = [], herbs = [], affirmations = [], faqs = [] }: AdminDashboardProps) {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'reviews' | 'tools' | 'glossary' | 'niches' | 'subscribers' | 'writing' | 'offers' | 'pantry' | 'affirmations'>('reviews');
+    const [activeTab, setActiveTab] = useState<'reviews' | 'tools' | 'glossary' | 'niches' | 'subscribers' | 'writing' | 'offers' | 'pantry' | 'affirmations' | 'faqs'>('reviews');
 
     // Healing Pantry State
     const [pantryView, setPantryView] = useState<'list' | 'create' | 'edit' | 'import'>('list');
@@ -443,9 +446,23 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                 >
                     <span className="flex items-center gap-2"><Sparkles size={16} /> Daily Rituals</span>
                 </button>
+                <button
+                    onClick={() => setActiveTab('faqs')}
+                    className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${activeTab === 'faqs'
+                        ? 'bg-blue-800 text-white shadow-lg shadow-blue-200 scale-105'
+                        : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900 border border-slate-200'
+                        }`}
+                >
+                    <span className="flex items-center gap-2"><BookOpen size={16} /> Questions</span>
+                </button>
             </div>
 
             <div className="animate-in fade-in duration-300">
+
+                {/* FAQS TAB */}
+                {activeTab === 'faqs' && (
+                    <FAQManager faqs={faqs} offers={salesPages} />
+                )}
 
                 {/* REVIEWS TAB */}
                 {activeTab === 'reviews' && (

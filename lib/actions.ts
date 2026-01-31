@@ -11,6 +11,8 @@ import Subscriber from "./models/Subscriber";
 import Herb from "./models/Herb";
 import { bulkSeedHerbs } from "./bulkSeedHerbs";
 import Affirmation from "./models/Affirmation";
+import FAQ from "./models/FAQ";
+import Offer from "./models/Offer";
 
 export async function runBulkSeed() {
     await connectToDatabase();
@@ -981,5 +983,235 @@ export async function deduplicateAffirmations() {
         return { success: true, count: duplicates.length };
     } catch (error: any) {
         return { error: error.message };
+    }
+}
+
+// --- FAQ Actions ---
+
+export async function getFAQs() {
+    try {
+        await connectToDatabase();
+        const faqs = await FAQ.find({}).sort({ createdAt: -1 }).lean();
+        return JSON.parse(JSON.stringify(faqs));
+    } catch (error) {
+        console.error("Error fetching FAQs:", error);
+        return [];
+    }
+}
+
+export async function getFAQBySlug(slug: string) {
+    try {
+        await connectToDatabase();
+        const faq = await FAQ.findOne({ slug }).lean();
+        if (!faq) return null;
+        return JSON.parse(JSON.stringify(faq));
+    } catch (error) {
+        console.error("Error fetching FAQ by slug:", error);
+        return null;
+    }
+}
+
+export async function createFAQ(data: any) {
+    try {
+        await connectToDatabase();
+
+        // Dynamic Slug Generation
+        let slug = data.slug;
+        if (!slug && data.question) {
+            const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
+            const baseSlug = slugify(data.question);
+            const existingFAQs = await FAQ.find({}, { slug: 1 }).lean();
+            const existingSlugs = existingFAQs.map((f: any) => f.slug).filter(Boolean);
+            slug = makeUniqueSlug(baseSlug, existingSlugs);
+        }
+
+        const newFAQ = await FAQ.create({
+            ...data,
+            slug
+        });
+
+        revalidatePath('/admin');
+        revalidatePath('/questions');
+        return { success: true, faq: JSON.parse(JSON.stringify(newFAQ)) };
+    } catch (error: any) {
+        console.error("Error creating FAQ:", error);
+        return { error: error.message };
+    }
+}
+
+export async function updateFAQ(data: any) {
+    try {
+        await connectToDatabase();
+
+        // If question changed and no slug provided, we might want to update slug? 
+        // Usually safer to keep slug stable unless explicitly changed.
+
+        await FAQ.findByIdAndUpdate(data._id || data.id, data);
+
+        revalidatePath('/admin');
+        revalidatePath('/questions');
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error updating FAQ:", error);
+        return { error: error.message };
+    }
+}
+
+export async function deleteFAQ(id: string) {
+    try {
+        await connectToDatabase();
+        await FAQ.findByIdAndDelete(id);
+        revalidatePath('/admin');
+        revalidatePath('/questions');
+        return { success: true };
+    } catch (error: any) {
+        return { error: error.message };
+    }
+}
+
+export async function deleteFAQs(ids: string[]) {
+    try {
+        await connectToDatabase();
+        if (!ids || ids.length === 0) return { success: true, count: 0 };
+
+        const result = await FAQ.deleteMany({ _id: { $in: ids } });
+
+        revalidatePath('/admin');
+        revalidatePath('/questions');
+        return { success: true, count: result.deletedCount };
+    } catch (error: any) {
+        return { error: error.message };
+    }
+}
+
+export async function importFAQs(rawText: string) {
+    try {
+        await connectToDatabase();
+        const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
+
+        let items: any[] = [];
+        try {
+            const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+            items = JSON.parse(cleanText);
+            if (!Array.isArray(items)) throw new Error("Import must be an array");
+        } catch (e: any) {
+            console.error("JSON Parse Error:", e.message);
+            return { error: "Invalid JSON format. Please ensure you are pasting a valid JSON array." };
+        }
+
+        const existingFAQs = await FAQ.find({}, { slug: 1 }).lean();
+        const existingSlugs = existingFAQs.map((f: any) => f.slug).filter(Boolean);
+
+        let createdCount = 0;
+
+        for (const item of items) {
+            if (!item.question) continue;
+
+            // Generate slug if missing
+            let slug = item.slug;
+            if (!slug) {
+                const baseSlug = slugify(item.question);
+                slug = makeUniqueSlug(baseSlug, existingSlugs);
+                existingSlugs.push(slug);
+            }
+
+            // Ensure nested objects exist
+            const deepDive = item.deepDive || {};
+
+            await FAQ.create({
+                ...item,
+                slug,
+                deepDive,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+            createdCount++;
+        }
+
+        revalidatePath('/admin');
+        revalidatePath('/questions');
+        return { success: true, count: createdCount };
+
+    } catch (e: any) {
+        return { error: e.message };
+    }
+}
+
+export async function searchFAQs(query: string = '', page: number = 1, limit: number = 20) {
+    try {
+        await connectToDatabase();
+
+        const skip = (page - 1) * limit;
+        let faqs = [];
+        let totalCount = 0;
+
+        // "Random" initial load (Page 1 only, no query)
+        if (!query && page === 1) {
+            // Use aggregation sample to get random docs
+            faqs = await FAQ.aggregate([{ $sample: { size: limit } }]);
+            // For total count, in "random" mode, it's effectively infinite or just total count?
+            // Let's just say total count is total documents so pagination showing "Page 1 of X" works.
+            totalCount = await FAQ.countDocuments();
+        }
+        // Standard Pagination / Fallback for random (Page > 1, no query)
+        // Note: Paginating random is tricky (duplicates). 
+        // We switch to stable sort for page > 1 if no query to avoid duplicates, 
+        // OR we just accept we can't truly paginate random without seed.
+        // User asked for "pageanate the results to 20 per page".
+        else if (!query && page > 1) {
+            // Fallback to latest for pages > 1 to allow exploring all content
+            faqs = await FAQ.find({})
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean();
+            totalCount = await FAQ.countDocuments();
+        }
+        else {
+            // Search Mode
+            // Regular expression for partial match since text index might be too strict for short terms
+            // Or use $text if query is long enough. 
+            // User asked "if yoga is typed, then everything with yoga should show". 
+            // Regex is safest for simple "contains" logic.
+            const regex = new RegExp(query, 'i');
+            const searchFilter = {
+                $or: [
+                    { question: regex },
+                    { 'deepDive.problem': regex },
+                    { 'deepDive.methodology': regex },
+                    { h1Title: regex }
+                ]
+            };
+
+            totalCount = await FAQ.countDocuments(searchFilter);
+            faqs = await FAQ.find(searchFilter)
+                .sort({ createdAt: -1 }) // Sort relevance not easy with regex, so just latest
+                .skip(skip)
+                .limit(limit)
+                .lean();
+        }
+
+        return {
+            faqs: JSON.parse(JSON.stringify(faqs)),
+            totalPages: Math.ceil(totalCount / limit),
+            currentPage: page,
+            totalCount
+        };
+
+    } catch (error) {
+        console.error("Error searching FAQs:", error);
+        return { faqs: [], totalPages: 0, currentPage: 1, totalCount: 0 };
+    }
+}
+
+export async function getOfferById(id: string) {
+    try {
+        await connectToDatabase();
+        if (!id) return null;
+        const offer = await Offer.findById(id).lean();
+        if (!offer) return null;
+        return JSON.parse(JSON.stringify(offer));
+    } catch (error) {
+        return null;
     }
 }
