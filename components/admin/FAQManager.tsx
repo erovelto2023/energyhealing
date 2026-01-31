@@ -166,6 +166,30 @@ export default function FAQManager({ faqs = [], offers = [] }: FAQManagerProps) 
                             </tbody>
                         </table>
                     </div>
+
+                    {totalPages > 1 && (
+                        <div className="flex justify-between items-center mt-4 pt-4 border-t border-slate-100">
+                            <div className="text-sm text-slate-500">
+                                Page <span className="font-bold text-slate-900">{page}</span> of {totalPages}
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    disabled={page === 1}
+                                    className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg disabled:opacity-50 hover:bg-slate-50 disabled:hover:bg-white transition-colors"
+                                >
+                                    Previous
+                                </button>
+                                <button
+                                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={page >= totalPages}
+                                    className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg disabled:opacity-50 hover:bg-slate-50 disabled:hover:bg-white transition-colors"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </>
             )}
 
