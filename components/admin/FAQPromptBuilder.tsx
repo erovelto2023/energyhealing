@@ -120,37 +120,39 @@ export default function FAQPromptBuilder({ onBack }: FAQPromptBuilderProps) {
 
                 {/* Preview Side */}
                 <div className="flex flex-col h-full">
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                        2. Final Prompt Preview
-                    </label>
+                    <div className="flex justify-between items-center mb-2">
+                        <label className="text-sm font-bold text-slate-700">
+                            2. Final Prompt Preview
+                        </label>
+                        <button
+                            onClick={handleCopy}
+                            disabled={!inputData.trim()}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold text-white transition-all shadow-md hover:scale-105 active:scale-95 ${copied
+                                ? 'bg-green-500 shadow-green-200'
+                                : 'bg-slate-900 shadow-slate-300 hover:bg-slate-800 disabled:opacity-50 disabled:scale-100 disabled:shadow-none'
+                                }`}
+                        >
+                            {copied ? (
+                                <>
+                                    <Check size={14} /> Copied!
+                                </>
+                            ) : (
+                                <>
+                                    <Copy size={14} /> Copy Prompt
+                                </>
+                            )}
+                        </button>
+                    </div>
                     <div className="flex-1 relative border border-slate-300 rounded-xl bg-slate-50 overflow-hidden flex flex-col">
                         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
                         <div className="overflow-auto p-6 flex-1 text-xs font-mono text-slate-600 whitespace-pre-wrap">
                             {fullPrompt}
                         </div>
 
-                        <div className="p-4 bg-white border-t border-slate-200 flex justify-between items-center bg-opacity-95 backdrop-blur-sm">
+                        <div className="p-3 bg-white border-t border-slate-200 flex justify-between items-center bg-opacity-95 backdrop-blur-sm">
                             <span className="text-xs font-bold text-slate-400">
                                 {fullPrompt.length} characters
                             </span>
-                            <button
-                                onClick={handleCopy}
-                                disabled={!inputData.trim()}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-white transition-all shadow-lg hover:scale-105 active:scale-95 ${copied
-                                        ? 'bg-green-500 shadow-green-200'
-                                        : 'bg-slate-900 shadow-slate-300 hover:bg-slate-800 disabled:opacity-50 disabled:scale-100 disabled:shadow-none'
-                                    }`}
-                            >
-                                {copied ? (
-                                    <>
-                                        <Check size={18} /> Copied!
-                                    </>
-                                ) : (
-                                    <>
-                                        <Copy size={18} /> Copy Full Prompt
-                                    </>
-                                )}
-                            </button>
                         </div>
                     </div>
                 </div>
