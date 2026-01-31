@@ -1,8 +1,7 @@
-import { getFAQBySlug, getFAQs, getOfferById } from "@/lib/actions";
+import { getFAQBySlug, getFAQs, getOfferById, searchFAQs } from "@/lib/actions";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-
 import { ArrowLeft, BookOpen, BrainCircuit, Lightbulb, Stethoscope, ArrowRight } from "lucide-react";
 
 interface PageProps {
@@ -40,11 +39,11 @@ export default async function QuestionPage({ params }: PageProps) {
         offer = await getOfferById(faq.relatedOfferId);
     }
 
-    // Get random related questions for sidebar/bottom
-    const allFaqs = await getFAQs();
-    const relatedFaqs = allFaqs
+    // Get random related questions for sidebar/bottom (using searchFAQs with random sample)
+    const { faqs: randomFaqs } = await searchFAQs('', 1, 4);
+    // Fetch 4 to have buffer if current faq is included
+    const relatedFaqs = randomFaqs
         .filter((f: any) => f._id !== faq._id)
-        .sort(() => 0.5 - Math.random())
         .slice(0, 3);
 
     return (
