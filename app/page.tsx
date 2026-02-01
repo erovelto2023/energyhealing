@@ -13,6 +13,9 @@ import TestimonialRotator from '@/components/features/TestimonialRotator';
 import GlossaryRotator from '@/components/features/GlossaryRotator';
 import { getAffirmations, getRandomGlossaryTerms, getRandomHerb } from '@/lib/actions';
 import RotatingAffirmations from '@/components/features/RotatingAffirmations';
+import HeroSlideshow from '@/components/features/HeroSlideshow';
+import path from 'path';
+import fs from 'fs';
 
 export const metadata: Metadata = {
   title: 'Kathleen Heals | Natural Pain Relief Through Energy Healing',
@@ -22,6 +25,16 @@ export const metadata: Metadata = {
 export default async function Home() {
   await ensureDatabaseSeeded();
   await connectToDatabase();
+
+  const heroImagesDir = path.join(process.cwd(), 'public/images/hero-slideshow');
+  let heroImages: string[] = [];
+  try {
+    const files = fs.readdirSync(heroImagesDir);
+    heroImages = files.filter(file => /\.(png|jpg|jpeg|webp)$/i.test(file))
+      .map(file => `/images/hero-slideshow/${file}`);
+  } catch (error) {
+    console.error("Error reading hero images:", error);
+  }
 
   // Fetch featured user stories and testimonials
   const [featuredStories, featuredTestimonials, { products: randomProducts }, randomTerms, featuredHerbs, allAffirmations] = await Promise.all([
@@ -41,28 +54,8 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-[#FDFCFB]">
       {/* Hero Section */}
-      <section className="relative py-20 md:py-32 overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-emerald-100 rounded-full blur-3xl opacity-30" />
-
-        <div className="max-w-6xl mx-auto px-6 text-center relative z-10">
-          <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 mb-6 tracking-tight">
-            Relief through <br />
-            <span className="text-emerald-600 italic">Energy, Awareness</span> & Wellness
-          </h1>
-          <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-            A grounded approach to healing chronic pain and emotional stress. We bridge ancient wisdom with modern understanding to help you restore balance.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/book-session" className="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-emerald-700 hover:scale-105 transition-all shadow-xl shadow-emerald-100">
-              <Calendar size={20} />
-              Book a Session
-            </Link>
-            <Link href="/stories" className="bg-white text-slate-900 border-2 border-slate-200 px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:border-emerald-600 transition-all">
-              Read Healing Stories
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Hero Section */}
+      <HeroSlideshow images={heroImages} />
 
       {/* Daily Rituals Rotation */}
       <RotatingAffirmations affirmations={affirmations} />

@@ -2,8 +2,19 @@
 import { getProducts } from '@/lib/initialData';
 import Link from 'next/link';
 import { ShoppingBag, ArrowRight, Star, CheckCircle2, Compass, Leaf, Sparkles, Heart, ExternalLink } from 'lucide-react';
+import HeroSlideshow, { HeroContent } from '@/components/features/HeroSlideshow';
+import path from 'path';
+import fs from 'fs';
 
 export const dynamic = 'force-dynamic';
+
+const MARKETPLACE_HERO_CONTENT: HeroContent[] = [
+    { title: "Tools for Your Transformation", subtitle: "Curated resources to support your healing journey at every level.", category: "Marketplace" },
+    { title: "Elevate Your Daily Practice", subtitle: "Discover products that align with your energy and values.", category: "Lifestyle" },
+    { title: "Empower Your Self-Care", subtitle: "Invest in your well-being with quality, conscious essentials.", category: "Self-Care" },
+    { title: "Healing, Accessible to All", subtitle: "Practical tools for modern energy maintenance.", category: "Growth" },
+    { title: "Harmonize Your Environment", subtitle: "Create a sanctuary that supports your inner peace.", category: "Sanctuary" }
+];
 
 function getProductTag(product: any) {
     if (product.affiliateLink) return "Affiliate";
@@ -37,23 +48,25 @@ export default async function MarketplacePage() {
         Promise.resolve([]) // getSalesPages() - feature removed
     ]);
 
+    const heroImagesDir = path.join(process.cwd(), 'public/images/hero-slideshow');
+    let heroImages: string[] = [];
+    try {
+        const files = fs.readdirSync(heroImagesDir);
+        heroImages = files.filter(file => /\.(png|jpg|jpeg|webp)$/i.test(file))
+            .map(file => `/images/hero-slideshow/${file}`);
+    } catch (error) {
+        console.error("Error reading hero images:", error);
+    }
+
     const allMarketplacePages = pages.filter((p: any) => p.isPublished && p.showInMarketplace);
 
     return (
-        <div className="min-h-screen bg-[#FDFCFB] py-20 px-4">
-            <div className="max-w-7xl mx-auto">
-                {/* Hero section */}
-                <div className="text-center mb-20 animate-in fade-in slide-in-from-top-4 duration-1000">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full text-sm font-bold uppercase tracking-widest mb-6">
-                        <Leaf size={16} /> Curated Healing Marketplace
-                    </div>
-                    <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-6 tracking-tight">
-                        Wellness <span className="text-emerald-600 italic">Marketplace</span>
-                    </h1>
-                    <p className="text-xl text-slate-500 max-w-2xl mx-auto font-light leading-relaxed mb-12">
-                        Discover tools and resources carefully selected to support your energetic wellbeing. From physical healing aids to digital guided practices.
-                    </p>
+        <div className="min-h-screen bg-[#FDFCFB]">
+            <HeroSlideshow images={heroImages} content={MARKETPLACE_HERO_CONTENT} />
 
+            <div className="max-w-7xl mx-auto px-4 py-20">
+                {/* Intro Content */}
+                <div className="text-center mb-20">
                     <div className="flex flex-wrap justify-center gap-4">
                         <Link
                             href="/marketplace/explore"

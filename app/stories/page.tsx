@@ -3,6 +3,17 @@ import Link from 'next/link';
 import connectToDatabase from '@/lib/db';
 import UserStory from '@/lib/models/UserStory';
 import { BookHeart, Calendar, MapPin, User } from 'lucide-react';
+import HeroSlideshow, { HeroContent } from '@/components/features/HeroSlideshow';
+import path from 'path';
+import fs from 'fs';
+
+const STORIES_HERO_CONTENT: HeroContent[] = [
+    { title: "Journeys of Healing", subtitle: "Personal stories of resilience, recovery, and hope.", category: "Inspiration" },
+    { title: "You Are More Than Your Pain", subtitle: "Read how others have found their way back to themselves.", category: "Empowerment" },
+    { title: "Shared Wisdom, Shared Strength", subtitle: "Connecting through the power of our lived experiences.", category: "Community" },
+    { title: "From Surviving to Thriving", subtitle: "Real accounts of navigating chronic conditions with grace.", category: "Resilience" },
+    { title: "Every Story Matters", subtitle: "Your voice adds to the collective healing of our community.", category: "Connection" }
+];
 
 export const metadata: Metadata = {
     title: 'Healing Stories | Kathleen Heals',
@@ -19,22 +30,21 @@ export default async function StoriesPage() {
 
     const serializedStories = JSON.parse(JSON.stringify(stories));
 
+    const heroImagesDir = path.join(process.cwd(), 'public/images/hero-slideshow');
+    let heroImages: string[] = [];
+    try {
+        const files = fs.readdirSync(heroImagesDir);
+        heroImages = files.filter(file => /\.(png|jpg|jpeg|webp)$/i.test(file))
+            .map(file => `/images/hero-slideshow/${file}`);
+    } catch (error) {
+        console.error("Error reading hero images:", error);
+    }
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-20">
-            <div className="max-w-6xl mx-auto px-6">
-                {/* Header */}
-                <div className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full text-indigo-700 text-xs font-bold uppercase tracking-widest mb-6 shadow-sm border border-indigo-100">
-                        <BookHeart size={14} />
-                        Community Healing Stories
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6">
-                        Real Stories, Real People
-                    </h1>
-                    <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                        Read personal journeys from people living with chronic pain, sharing what they've learned and where they are now.
-                    </p>
-                </div>
+        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+            <HeroSlideshow images={heroImages} content={STORIES_HERO_CONTENT} />
+
+            <div className="max-w-6xl mx-auto px-6 py-12">
 
                 {/* Stories Grid */}
                 {serializedStories.length === 0 ? (

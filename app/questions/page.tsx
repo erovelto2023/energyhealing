@@ -2,6 +2,17 @@ import { searchFAQs } from "@/lib/actions";
 import Link from "next/link";
 import { ArrowRight, BookOpen, HelpCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import FAQSearchBar from "@/components/features/FAQSearchBar";
+import HeroSlideshow, { HeroContent } from "@/components/features/HeroSlideshow";
+import path from "path";
+import fs from "fs";
+
+const QUESTIONS_HERO_CONTENT: HeroContent[] = [
+    { title: "Answers for Your Healing Journey", subtitle: "Find clarity on energy healing, pain relief, and holistic wellness.", category: "Knowledge Base" },
+    { title: "Healing Begins with Understanding", subtitle: "Curated answers to support your journey to recovery.", category: "Education" },
+    { title: "Deepen Your Knowledge", subtitle: "Explore the science and spirit behind energy medicine.", category: "Insight" },
+    { title: "Navigating Your Wellness Path", subtitle: "Common questions about what to expect during your sessions.", category: "Guidance" },
+    { title: "Empower Yourself with Answers", subtitle: "Knowledge is the first step toward lasting relief.", category: "Empowerment" }
+];
 
 interface KnowledgeBasePageProps {
     searchParams: {
@@ -17,18 +28,24 @@ export default async function KnowledgeBasePage({ searchParams }: KnowledgeBaseP
 
     const { faqs, totalPages, totalCount } = await searchFAQs(query, page, limit);
 
+    const heroImagesDir = path.join(process.cwd(), 'public/images/hero-slideshow');
+    let heroImages: string[] = [];
+    try {
+        const files = fs.readdirSync(heroImagesDir);
+        heroImages = files.filter(file => /\.(png|jpg|jpeg|webp)$/i.test(file))
+            .map(file => `/images/hero-slideshow/${file}`);
+    } catch (error) {
+        console.error("Error reading hero images:", error);
+    }
+
     return (
         <div className="min-h-screen bg-slate-50">
+            <HeroSlideshow images={heroImages} content={QUESTIONS_HERO_CONTENT} />
 
-            <main className="pt-24 pb-16 px-4">
+            <main className="py-16 px-4">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-12">
-                        <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">
-                            Healing Knowledge Base
-                        </h1>
-                        <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
-                            Explore the most common questions people are asking. Clear, direct answers to help you navigate your journey in holistic health and energy healing.
-                        </p>
+
 
                         {/* SEARCH COMPONENT */}
                         <FAQSearchBar />

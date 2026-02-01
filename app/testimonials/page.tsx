@@ -3,6 +3,17 @@ import Link from 'next/link';
 import connectToDatabase from '@/lib/db';
 import Testimonial from '@/lib/models/Testimonial';
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import HeroSlideshow, { HeroContent } from '@/components/features/HeroSlideshow';
+import path from 'path';
+import fs from 'fs';
+
+const TESTIMONIALS_HERO_CONTENT: HeroContent[] = [
+    { title: "Real Stories. Real Healing.", subtitle: "Hear from those who have walked this path before you.", category: "Community" },
+    { title: "Transformations That Speak Volumes", subtitle: "Witness the power of energy work through client experiences.", category: "Results" },
+    { title: "You Are Not Alone", subtitle: "Join a community of people dedicated to their own healing.", category: "Connection" },
+    { title: "Validation for Your Journey", subtitle: "See how others have overcome chronic pain and stress.", category: "Hope" },
+    { title: "Gratitude and Growth", subtitle: "Celebrating the breakthroughs and shifts in perspective.", category: "Celebration" }
+];
 
 export const metadata: Metadata = {
     title: 'Client Testimonials | Kathleen Heals',
@@ -30,6 +41,16 @@ export default async function TestimonialsPage({
         Testimonial.countDocuments({ approved: true })
     ]);
 
+    const heroImagesDir = path.join(process.cwd(), 'public/images/hero-slideshow');
+    let heroImages: string[] = [];
+    try {
+        const files = fs.readdirSync(heroImagesDir);
+        heroImages = files.filter(file => /\.(png|jpg|jpeg|webp)$/i.test(file))
+            .map(file => `/images/hero-slideshow/${file}`);
+    } catch (error) {
+        console.error("Error reading hero images:", error);
+    }
+
     const serializedTestimonials = JSON.parse(JSON.stringify(testimonials));
     const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
@@ -48,20 +69,12 @@ export default async function TestimonialsPage({
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-20">
-            <div className="max-w-6xl mx-auto px-6">
-                {/* Header */}
+        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50">
+            <HeroSlideshow images={heroImages} content={TESTIMONIALS_HERO_CONTENT} />
+
+            <div className="max-w-6xl mx-auto px-6 py-20">
+                {/* Header Info */}
                 <div className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full text-emerald-700 text-xs font-bold uppercase tracking-widest mb-6 shadow-sm border border-emerald-100">
-                        <Star size={14} className="fill-emerald-600" />
-                        Client Testimonials
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6">
-                        What Clients Say About Kathleen
-                    </h1>
-                    <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                        Real experiences from clients who have found relief through energy healing.
-                    </p>
                     <div className="mt-6 text-slate-500">
                         Showing <span className="font-bold text-emerald-600">{totalCount}</span> testimonials
                     </div>
@@ -166,8 +179,8 @@ export default async function TestimonialsPage({
                                                 key={pageNum}
                                                 href={`/testimonials?page=${pageNum}`}
                                                 className={`w-10 h-10 flex items-center justify-center rounded-xl font-bold transition-colors ${pageNum === currentPage
-                                                        ? 'bg-emerald-600 text-white'
-                                                        : 'bg-white border-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50'
+                                                    ? 'bg-emerald-600 text-white'
+                                                    : 'bg-white border-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50'
                                                     }`}
                                             >
                                                 {pageNum}

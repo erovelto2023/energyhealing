@@ -3,6 +3,17 @@ import { getAffirmations } from '@/lib/actions';
 import { Sparkles } from 'lucide-react';
 import { Metadata } from 'next';
 import AffirmationsList from '@/components/features/AffirmationsList';
+import HeroSlideshow, { HeroContent } from '@/components/features/HeroSlideshow';
+import path from 'path';
+import fs from 'fs';
+
+const AFFIRMATIONS_HERO_CONTENT: HeroContent[] = [
+    { title: "Words That Heal. Rituals That Ground.", subtitle: "Daily somatic practices to regulate your nervous system.", category: "Daily Rituals" },
+    { title: "Rewire Your Beliefs", subtitle: "Transform your inner dialogue with intention and awareness.", category: "Mindset" },
+    { title: "Embody Your Truth", subtitle: "Connect deeply with your body's wisdom and innate worth.", category: "Somatic Healing" },
+    { title: "Healing Through Intention", subtitle: "Powerful affirmations to guide your journey back to balance.", category: "Empowerment" },
+    { title: "Cultivate Inner Peace", subtitle: "Simple, profound practices for a calm and centered mind.", category: "Wellness" }
+];
 
 export const metadata: Metadata = {
     title: 'Daily Rituals & Affirmations | Kathleen Heals',
@@ -12,25 +23,19 @@ export const metadata: Metadata = {
 export default async function AffirmationsPage() {
     const affirmations = await getAffirmations();
 
+    const heroImagesDir = path.join(process.cwd(), 'public/images/hero-slideshow');
+    let heroImages: string[] = [];
+    try {
+        const files = fs.readdirSync(heroImagesDir);
+        heroImages = files.filter(file => /\.(png|jpg|jpeg|webp)$/i.test(file))
+            .map(file => `/images/hero-slideshow/${file}`);
+    } catch (error) {
+        console.error("Error reading hero images:", error);
+    }
+
     return (
         <div className="min-h-screen bg-slate-50 font-sans">
-            {/* Hero Section */}
-            <div className="bg-purple-900 text-white py-24 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-                    <div className="flex justify-center mb-6">
-                        <span className="bg-purple-800 text-purple-200 px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-widest flex items-center gap-2">
-                            <Sparkles size={16} /> Somatic Healing Library
-                        </span>
-                    </div>
-                    <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8">
-                        Daily <span className="text-purple-300 font-serif italic">Rituals</span>
-                    </h1>
-                    <p className="text-xl text-purple-100 max-w-2xl mx-auto leading-relaxed">
-                        A curated collection of neuro-somatic affirmations and herbal pairings designed to regulate your nervous system and rewire your beliefs.
-                    </p>
-                </div>
-            </div>
+            <HeroSlideshow images={heroImages} content={AFFIRMATIONS_HERO_CONTENT} />
 
             <AffirmationsList initialAffirmations={affirmations} />
         </div>

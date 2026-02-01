@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Heart, Sparkles, Award, BookHeart } from 'lucide-react';
+import AnimatedHero from '@/components/AnimatedHero';
 
 export const metadata: Metadata = {
     title: 'About Kathleen | Energy Healing Practitioner',
@@ -9,21 +10,18 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-20">
-            <div className="max-w-4xl mx-auto px-6">
-                {/* Header */}
-                <div className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full text-emerald-700 text-xs font-bold uppercase tracking-widest mb-6 shadow-sm border border-emerald-100">
-                        <Heart size={14} />
-                        About Kathleen
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6">
-                        Meet Your Energy Healing Guide
-                    </h1>
-                    <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                        Dedicated to helping you find relief, restore balance, and reconnect with your inner healing power.
-                    </p>
+        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50">
+            <AnimatedHero
+                title="Meet Your Energy Healing Guide"
+                subtitle="Dedicated to helping you find relief, restore balance, and reconnect with your inner healing power."
+            >
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-emerald-800 text-xs font-bold uppercase tracking-widest shadow-sm border border-emerald-100/30">
+                    <Heart size={14} />
+                    About Kathleen
                 </div>
+            </AnimatedHero>
+
+            <div className="max-w-4xl mx-auto px-6 py-12">
 
                 {/* Main Content */}
                 <div className="bg-white rounded-3xl shadow-xl border border-emerald-100 p-8 md:p-12 mb-12">

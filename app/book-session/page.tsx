@@ -1,6 +1,17 @@
 import { Metadata } from 'next';
 import Script from 'next/script';
 import { Sparkles, CheckCircle, Heart, Shield, Clock, Phone } from 'lucide-react';
+import HeroSlideshow, { HeroContent } from '@/components/features/HeroSlideshow';
+import path from 'path';
+import fs from 'fs';
+
+const BOOKING_HERO_CONTENT: HeroContent[] = [
+    { title: "Book Your Healing Session", subtitle: "Transform your life with a personalized energy healing session.", category: "Booking" },
+    { title: "Your Path to Relief Starts Here", subtitle: "Guidance, balance, and healing tailored to your needs.", category: "Personalized" },
+    { title: "Reclaim Your Inner Peace", subtitle: "A safe space to release, restore, and renew.", category: "Safe Space" },
+    { title: "Expert Care, Virtual Comfort", subtitle: "Receive powerful healing from the comfort of your home.", category: "Virtual" },
+    { title: "Invest in Your Wellness", subtitle: "100% Money-Back Guarantee for your peace of mind.", category: "Risk-Free" }
+];
 
 export const metadata: Metadata = {
     title: 'Book Your Healing Session - $111 | Kathleen Heals',
@@ -8,6 +19,16 @@ export const metadata: Metadata = {
 };
 
 export default function BookSessionPage() {
+    const heroImagesDir = path.join(process.cwd(), 'public/images/hero-slideshow');
+    let heroImages: string[] = [];
+    try {
+        const files = fs.readdirSync(heroImagesDir);
+        heroImages = files.filter(file => /\.(png|jpg|jpeg|webp)$/i.test(file))
+            .map(file => `/images/hero-slideshow/${file}`);
+    } catch (error) {
+        console.error("Error reading hero images:", error);
+    }
+
     return (
         <>
             {/* GrooveSell Tracking Pixel */}
@@ -18,40 +39,20 @@ export default function BookSessionPage() {
             />
 
             <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900">
-                {/* Hero Section */}
-                <section className="relative py-20 md:py-32 overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500 rounded-full blur-3xl opacity-10" />
-
-                    <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-emerald-300 text-xs font-bold uppercase tracking-widest mb-6">
-                            <Sparkles size={14} />
-                            Transform Your Life Today
-                        </div>
-
-                        <h1 className="text-4xl md:text-7xl font-bold mb-6 text-white leading-tight">
-                            Book Your Healing Session<br />with Confidence!
-                        </h1>
-
-                        <p className="text-xl md:text-2xl text-slate-200 mb-8 max-w-3xl mx-auto leading-relaxed">
-                            I'm so excited to invite you on a transformative healing journey with me. My sessions are designed to help you feel lighter, more at peace, and deeply connected to your inner self.
-                        </p>
-
-                        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-                            <a
-                                href="https://kathleenhealsession.groovesell.com/checkout/f8ac887535314baf577c8edc5feeb194"
-                                className="bg-emerald-500 text-white px-10 py-5 rounded-2xl font-bold text-lg hover:bg-emerald-600 transition-all shadow-2xl shadow-emerald-500/50 hover:scale-105 inline-flex items-center justify-center gap-3"
-                            >
-                                <CheckCircle size={24} />
-                                Book Your Session Now - $111
-                            </a>
-                        </div>
-
-                        <p className="text-yellow-300 text-sm">
+                <HeroSlideshow images={heroImages} content={BOOKING_HERO_CONTENT}>
+                    <div className="flex flex-col items-center gap-4">
+                        <a
+                            href="https://kathleenhealsession.groovesell.com/checkout/f8ac887535314baf577c8edc5feeb194"
+                            className="bg-emerald-600 text-white px-10 py-5 rounded-2xl font-bold text-lg hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-500/30 hover:scale-105 inline-flex items-center justify-center gap-3"
+                        >
+                            <CheckCircle size={24} />
+                            Book Your Session Now - $111
+                        </a>
+                        <p className="text-emerald-300 font-medium text-sm text-shadow-sm">
                             ✓ 100% Money-Back Guarantee • ✓ Virtual Phone Session • ✓ 60 Minutes
                         </p>
                     </div>
-                </section>
+                </HeroSlideshow>
 
                 {/* What's Included Section */}
                 <section className="py-20 bg-white">

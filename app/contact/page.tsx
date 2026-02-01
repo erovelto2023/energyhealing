@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Mail, MessageCircle, Phone, MapPin } from 'lucide-react';
+import AnimatedHero from '@/components/AnimatedHero';
 
 export const metadata: Metadata = {
     title: 'Contact Support | Kathleen Heals',
@@ -9,21 +10,18 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-20">
-            <div className="max-w-4xl mx-auto px-6">
-                {/* Header */}
-                <div className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full text-emerald-700 text-xs font-bold uppercase tracking-widest mb-6 shadow-sm border border-emerald-100">
-                        <MessageCircle size={14} />
-                        Contact Support
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6">
-                        Get in Touch
-                    </h1>
-                    <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                        Have questions about energy healing or need help with your booking? I'm here to support you.
-                    </p>
+        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50">
+            <AnimatedHero
+                title="Get in Touch"
+                subtitle="Have questions about energy healing or need help with your booking? I'm here to support you."
+            >
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-emerald-800 text-xs font-bold uppercase tracking-widest shadow-sm border border-emerald-100/30">
+                    <MessageCircle size={14} />
+                    Contact Support
                 </div>
+            </AnimatedHero>
+
+            <div className="max-w-4xl mx-auto px-6 py-12">
 
                 {/* Contact Options */}
                 <div className="grid md:grid-cols-2 gap-6 mb-12">
