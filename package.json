@@ -90,6 +90,18 @@
     "react-quill": {
       "react": "$react",
       "react-dom": "$react-dom"
+    },
+    "eslint-plugin-import": {
+      "eslint": "$eslint"
+    },
+    "eslint-plugin-jsx-a11y": {
+      "eslint": "$eslint"
+    },
+    "eslint-plugin-react": {
+      "eslint": "$eslint"
+    },
+    "eslint-plugin-react-hooks": {
+      "eslint": "$eslint"
     }
   }
 }
