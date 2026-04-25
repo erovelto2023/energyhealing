@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import UserStoryReviewDashboard from '@/components/admin/UserStoryReviewDashboard';
+import AdminGuard from '@/components/admin/AdminGuard';
 
 export const metadata: Metadata = {
     title: 'Review User Stories | Admin',
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function AdminUserStoriesPage() {
-    return <UserStoryReviewDashboard />;
+    return (
+        <AdminGuard>
+            <UserStoryReviewDashboard />
+        </AdminGuard>
+    );
 }

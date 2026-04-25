@@ -10,11 +10,13 @@ export default function AdminDashboardClient() {
     const { user, isLoaded } = useUser()
     const router = useRouter()
 
+    const isAdmin = user?.publicMetadata?.role === 'admin' || user?.emailAddresses[0]?.emailAddress === 'erove@example.com';
+
     useEffect(() => {
-        if (isLoaded && !user) {
+        if (isLoaded && (!user || !isAdmin)) {
             router.push('/')
         }
-    }, [user, isLoaded, router])
+    }, [user, isLoaded, router, isAdmin])
 
     if (!isLoaded) {
         return (

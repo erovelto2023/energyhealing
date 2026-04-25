@@ -396,41 +396,5 @@ if (process.env.NODE_ENV === 'development' && mongoose.models.BookingRequest) {
 
 export const BookingRequest = models.BookingRequest || model('BookingRequest', BookingRequestSchema)
 
-const BlogPostSchema = new Schema({
-    title: {
-        type: String,
-        required: [true, 'Please provide a title'],
-        maxlength: [100, 'Title cannot be more than 100 characters']
-    },
-    slug: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    content: {
-        type: String,
-        required: [true, 'Please provide content']
-    },
-    excerpt: {
-        type: String,
-        maxlength: [300, 'Excerpt cannot be more than 300 characters']
-    },
-    coverImage: {
-        type: String
-    },
-    tags: {
-        type: [String],
-        default: []
-    },
-    isPublished: {
-        type: Boolean,
-        default: false
-    },
-    publishedAt: {
-        type: Date
-    }
-}, {
-    timestamps: true
-})
-
-export const BlogPost = models.BlogPost || model('BlogPost', BlogPostSchema)
+// Centralized export for BlogPost
+export { BlogPost } from './models/BlogPost';

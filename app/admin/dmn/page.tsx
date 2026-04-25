@@ -1,6 +1,4 @@
 import { getPendingReviews, getProducts, getGlossaryTerms } from '@/lib/initialData';
-import fs from 'fs';
-import path from 'path';
 import { getNiches, getSubscribers, getHerbs, getAffirmations, getFAQs } from '@/lib/actions';
 import { clearAllData, migrateToSlugs, importOffersFromFS } from './actions';
 import { testDatabaseConnection } from './test-actions';
@@ -8,8 +6,9 @@ import AdminDashboard from '@/components/admin/AdminDashboard';
 import connectToDatabase from '@/lib/db';
 import Offer from '@/lib/models/Offer';
 import { Lock, Trash2, TestTube, RefreshCw, Download } from 'lucide-react';
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
+import { protectAdmin } from '@/lib/auth';
 
 async function TestDatabaseButton() {
     async function handleTest() {
@@ -101,11 +100,8 @@ async function ImportOffersButton() {
 }
 
 export default async function AdminPage() {
-    const { userId } = await auth();
-
-    if (!userId) {
-        redirect('/sign-in');
-    }
+    // Role-based security check
+    await protectAdmin();
 
     const reviews = await getPendingReviews();
     const { products } = await getProducts({});
@@ -157,4 +153,3 @@ export default async function AdminPage() {
         </div>
     );
 }
-

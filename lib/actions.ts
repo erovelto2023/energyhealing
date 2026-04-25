@@ -13,6 +13,9 @@ import { bulkSeedHerbs } from "./bulkSeedHerbs";
 import Affirmation from "./models/Affirmation";
 import FAQ from "./models/FAQ";
 import Offer from "./models/Offer";
+import { validateAdmin } from "./auth";
+import { SubscriberSchema, ProductSchema, GlossaryTermSchema, HerbSchema, AffirmationSchema, FAQSchema } from "./validations";
+
 
 export async function runBulkSeed() {
     await connectToDatabase();
@@ -20,8 +23,14 @@ export async function runBulkSeed() {
 }
 
 export async function subscribeUser(formData: FormData) {
-    const email = formData.get('email') as string;
-    if (!email) return { error: "Email is required" };
+    const rawEmail = formData.get('email');
+    const validated = SubscriberSchema.safeParse({ email: rawEmail });
+    
+    if (!validated.success) {
+        return { error: validated.error.issues[0].message };
+    }
+
+    const { email } = validated.data;
 
     try {
         await connectToDatabase();
@@ -94,6 +103,8 @@ export async function submitReview(formData: FormData) {
 }
 
 export async function approveReview(reviewId: string) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
+    
     await connectToDatabase();
     const review = await PendingReview.findById(reviewId);
     if (!review) return { error: "Review not found" };
@@ -111,7 +122,7 @@ export async function approveReview(reviewId: string) {
                     isApproved: true
                 }
             },
-            $inc: { reviewsCount: 1 } // Naive increment, simple for now. Avg rating update would be better.
+            $inc: { reviewsCount: 1 } 
         }
     );
 
@@ -123,6 +134,8 @@ export async function approveReview(reviewId: string) {
 }
 
 export async function rejectReview(reviewId: string) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
+
     await connectToDatabase();
     await PendingReview.findByIdAndDelete(reviewId);
     revalidatePath('/admin');
@@ -130,6 +143,12 @@ export async function rejectReview(reviewId: string) {
 }
 
 export async function createProduct(data: any) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
+
+    const validated = ProductSchema.safeParse(data);
+    if (!validated.success) return { error: validated.error.issues[0].message };
+    const validData = validated.data;
+
     try {
         await connectToDatabase();
         // Simple ID generation for now
@@ -137,10 +156,10 @@ export async function createProduct(data: any) {
         const nextId = lastProduct ? lastProduct.id + 1 : 1;
 
         // Generate slug from name if not provided
-        let slug = data.slug;
-        if (!slug && data.name) {
+        let slug = validData.slug;
+        if (!slug && validData.name) {
             const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
-            const baseSlug = slugify(data.name);
+            const baseSlug = slugify(validData.name);
             // Get existing slugs to ensure uniqueness
             const existingProducts = await Product.find({} as any, { slug: 1 }).lean();
             const existingSlugs = existingProducts.map((p: any) => p.slug).filter(Boolean);
@@ -148,7 +167,7 @@ export async function createProduct(data: any) {
         }
 
         const newProduct = await Product.create({
-            ...data,
+            ...validData,
             id: nextId,
             slug,
             rating: 0,
@@ -168,6 +187,12 @@ export async function createProduct(data: any) {
 
 
 export async function createGlossaryTerm(data: any) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
+
+    const validated = GlossaryTermSchema.safeParse(data);
+    if (!validated.success) return { error: validated.error.issues[0].message };
+    const validData = validated.data;
+
     try {
         await connectToDatabase();
         // Simple ID generation
@@ -175,10 +200,10 @@ export async function createGlossaryTerm(data: any) {
         const nextId = `g${count + 1}-${Date.now()}`; // Unique string ID
 
         // Generate slug from term if not provided
-        let slug = data.slug;
-        if (!slug && data.term) {
+        let slug = validData.slug;
+        if (!slug && validData.term) {
             const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
-            const baseSlug = slugify(data.term);
+            const baseSlug = slugify(validData.term);
             // Get existing slugs to ensure uniqueness
             const existingTerms = await GlossaryTerm.find({} as any, { slug: 1 }).lean();
             const existingSlugs = existingTerms.map((t: any) => t.slug).filter(Boolean);
@@ -186,7 +211,7 @@ export async function createGlossaryTerm(data: any) {
         }
 
         const newTerm = await GlossaryTerm.create({
-            ...data,
+            ...validData,
             id: nextId,
             slug
         });
@@ -213,20 +238,26 @@ export async function trackProductClick(productId: number) {
 }
 
 export async function updateProduct(data: any) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
+
+    const validated = ProductSchema.partial().safeParse(data);
+    if (!validated.success) return { error: validated.error.issues[0].message };
+    const validData = validated.data;
+
     try {
         await connectToDatabase();
 
         // Regenerate slug if name changed and no custom slug provided
-        if (data.name && !data.slug) {
+        if (validData.name && !validData.slug) {
             const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
-            const baseSlug = slugify(data.name);
+            const baseSlug = slugify(validData.name);
             // Get existing slugs excluding current product
             const existingProducts = await Product.find({ id: { $ne: data.id } } as any, { slug: 1 }).lean();
             const existingSlugs = existingProducts.map((p: any) => p.slug).filter(Boolean);
-            data.slug = makeUniqueSlug(baseSlug, existingSlugs);
+            validData.slug = makeUniqueSlug(baseSlug, existingSlugs);
         }
 
-        await Product.findOneAndUpdate({ id: data.id } as any, data);
+        await Product.findOneAndUpdate({ id: data.id } as any, validData);
         revalidatePath('/admin');
         revalidatePath('/');
         return { success: true };
@@ -237,6 +268,8 @@ export async function updateProduct(data: any) {
 }
 
 export async function deleteProduct(productId: number) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
+
     try {
         console.log('🗑️ Attempting to delete product with ID:', productId);
         await connectToDatabase();
@@ -260,20 +293,26 @@ export async function deleteProduct(productId: number) {
 }
 
 export async function updateGlossaryTerm(data: any) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
+
+    const validated = GlossaryTermSchema.partial().safeParse(data);
+    if (!validated.success) return { error: validated.error.issues[0].message };
+    const validData = validated.data;
+
     try {
         await connectToDatabase();
 
         // Regenerate slug if term changed and no custom slug provided
-        if (data.term && !data.slug) {
+        if (validData.term && !validData.slug) {
             const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
-            const baseSlug = slugify(data.term);
+            const baseSlug = slugify(validData.term);
             // Get existing slugs excluding current term
             const existingTerms = await GlossaryTerm.find({ id: { $ne: data.id } }, { slug: 1 }).lean();
             const existingSlugs = existingTerms.map(t => t.slug).filter(Boolean);
-            data.slug = makeUniqueSlug(baseSlug, existingSlugs);
+            validData.slug = makeUniqueSlug(baseSlug, existingSlugs);
         }
 
-        await GlossaryTerm.findOneAndUpdate({ id: data.id }, data);
+        await GlossaryTerm.findOneAndUpdate({ id: data.id }, validData);
         revalidatePath('/admin');
         revalidatePath('/glossary');
         return { success: true };
@@ -284,6 +323,8 @@ export async function updateGlossaryTerm(data: any) {
 }
 
 export async function deleteGlossaryTerm(termId: string) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
+
     try {
         console.log('🗑️ Attempting to delete glossary term with ID:', termId);
         await connectToDatabase();
@@ -376,6 +417,7 @@ export async function getNicheBySlug(slug: string) {
 }
 
 export async function bulkCreateGlossaryTerms(termsData: any[]) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
@@ -425,6 +467,7 @@ export async function bulkCreateGlossaryTerms(termsData: any[]) {
 
 
 export async function deleteGlossaryTerms(termIds: string[]) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         await GlossaryTerm.deleteMany({ id: { $in: termIds } });
@@ -464,6 +507,7 @@ export async function findDuplicateGlossaryTerms(niche?: string) {
 }
 
 export async function importHealingTerms(rawText: string) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
@@ -594,22 +638,28 @@ Intention # The conscious focusing of mental energy toward a specific outcome. #
 
 
 export async function createHerb(data: any) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
+    
+    const validated = HerbSchema.safeParse(data);
+    if (!validated.success) return { error: validated.error.issues[0].message };
+    const validData = validated.data;
+
     try {
         await connectToDatabase();
         const count = await Herb.countDocuments();
         const nextId = `herb-${count + 1}-${Date.now()}`;
 
-        let slug = data.slug;
-        if (!slug && data.name) {
+        let slug = validData.slug;
+        if (!slug && validData.name) {
             const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
-            const baseSlug = slugify(data.name);
+            const baseSlug = slugify(validData.name);
             const existingHerbs = await Herb.find({} as any, { slug: 1 }).lean();
             const existingSlugs = existingHerbs.map((h: any) => h.slug).filter(Boolean);
             slug = makeUniqueSlug(baseSlug, existingSlugs);
         }
 
         const newHerb = await Herb.create({
-            ...data,
+            ...validData,
             id: nextId,
             slug
         });
@@ -624,18 +674,24 @@ export async function createHerb(data: any) {
 }
 
 export async function updateHerb(data: any) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
+
+    const validated = HerbSchema.partial().safeParse(data);
+    if (!validated.success) return { error: validated.error.issues[0].message };
+    const validData = validated.data;
+
     try {
         await connectToDatabase();
 
-        if (data.name && !data.slug) {
+        if (validData.name && !validData.slug) {
             const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
-            const baseSlug = slugify(data.name);
+            const baseSlug = slugify(validData.name);
             const existingHerbs = await Herb.find({ id: { $ne: data.id } }, { slug: 1 }).lean();
             const existingSlugs = existingHerbs.map((h: any) => h.slug).filter(Boolean);
-            data.slug = makeUniqueSlug(baseSlug, existingSlugs);
+            validData.slug = makeUniqueSlug(baseSlug, existingSlugs);
         }
 
-        await Herb.findOneAndUpdate({ id: data.id }, data);
+        await Herb.findOneAndUpdate({ id: data.id }, validData);
         revalidatePath('/admin');
         revalidatePath('/healing-pantry');
         return { success: true };
@@ -646,6 +702,7 @@ export async function updateHerb(data: any) {
 }
 
 export async function deleteHerbs(ids: string[]) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         if (!ids || ids.length === 0) return { success: true, count: 0 };
@@ -674,6 +731,7 @@ export async function deleteHerbs(ids: string[]) {
 
 
 export async function deleteHerb(herbId: string) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         let deleted = await Herb.findOneAndDelete({ id: herbId });
@@ -720,6 +778,7 @@ export async function getHerbBySlug(slug: string) {
 }
 
 export async function importHerbs(rawText: string) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
@@ -834,6 +893,12 @@ export async function getAffirmationBySlug(slug: string) {
 }
 
 export async function createAffirmation(data: any) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
+
+    const validated = AffirmationSchema.safeParse(data);
+    if (!validated.success) return { error: validated.error.issues[0].message };
+    const validData = validated.data;
+
     try {
         await connectToDatabase();
 
@@ -843,13 +908,13 @@ export async function createAffirmation(data: any) {
         const existingAffirmations = await Affirmation.find({}, { slug: 1 }).lean();
         const existingSlugs = existingAffirmations.map((a: any) => a.slug).filter(Boolean);
 
-        const baseSlug = slugify(data.title);
+        const baseSlug = slugify(validData.title);
         const slug = makeUniqueSlug(baseSlug, existingSlugs);
 
         const newId = `aff-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
         await Affirmation.create({
-            ...data,
+            ...validData,
             id: newId,
             slug
         });
@@ -864,6 +929,7 @@ export async function createAffirmation(data: any) {
 }
 
 export async function updateAffirmation(data: any) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         // If title changed, might want to update slug, but usually keep consistent for SEO
@@ -879,6 +945,7 @@ export async function updateAffirmation(data: any) {
 }
 
 export async function deleteAffirmation(id: string) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         await Affirmation.findOneAndDelete({ id });
@@ -891,6 +958,7 @@ export async function deleteAffirmation(id: string) {
 }
 
 export async function deleteAffirmations(ids: string[]) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         if (!ids || ids.length === 0) return { success: true, count: 0 };
@@ -906,6 +974,7 @@ export async function deleteAffirmations(ids: string[]) {
 }
 
 export async function importAffirmations(rawText: string) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
@@ -955,6 +1024,7 @@ export async function importAffirmations(rawText: string) {
 }
 
 export async function deduplicateAffirmations() {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         // Sort by createdAt ascending to keep oldest
@@ -1012,21 +1082,27 @@ export async function getFAQBySlug(slug: string) {
 }
 
 export async function createFAQ(data: any) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
+
+    const validated = FAQSchema.safeParse(data);
+    if (!validated.success) return { error: validated.error.issues[0].message };
+    const validData = validated.data;
+
     try {
         await connectToDatabase();
 
         // Dynamic Slug Generation
-        let slug = data.slug;
-        if (!slug && data.question) {
+        let slug = validData.slug;
+        if (!slug && validData.question) {
             const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
-            const baseSlug = slugify(data.question);
+            const baseSlug = slugify(validData.question);
             const existingFAQs = await FAQ.find({}, { slug: 1 }).lean();
             const existingSlugs = existingFAQs.map((f: any) => f.slug).filter(Boolean);
             slug = makeUniqueSlug(baseSlug, existingSlugs);
         }
 
         const newFAQ = await FAQ.create({
-            ...data,
+            ...validData,
             slug
         });
 
@@ -1040,6 +1116,7 @@ export async function createFAQ(data: any) {
 }
 
 export async function updateFAQ(data: any) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
 
@@ -1058,6 +1135,7 @@ export async function updateFAQ(data: any) {
 }
 
 export async function deleteFAQ(id: string) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         await FAQ.findByIdAndDelete(id);
@@ -1070,6 +1148,7 @@ export async function deleteFAQ(id: string) {
 }
 
 export async function deleteFAQs(ids: string[]) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         if (!ids || ids.length === 0) return { success: true, count: 0 };
@@ -1085,6 +1164,7 @@ export async function deleteFAQs(ids: string[]) {
 }
 
 export async function importFAQs(rawText: string) {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         const { slugify, makeUniqueSlug } = await import('@/lib/utils/slugify');
@@ -1217,6 +1297,7 @@ export async function getOfferById(id: string) {
 }
 
 export async function deduplicateFAQs() {
+    if (!await validateAdmin()) return { error: "Unauthorized" };
     try {
         await connectToDatabase();
         const faqs = await FAQ.find({}, '_id question').sort({ createdAt: 1 }).lean();

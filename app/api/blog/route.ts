@@ -1,59 +1,46 @@
-import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
-import dbConnect from '@/lib/mongodb'
-import { BlogPost } from '@/lib/models'
-import slugify from 'slugify'
+import { NextResponse } from 'next/server';
+import connectToDatabase from '@/lib/db';
+import { BlogPost } from '@/lib/models';
+import { validateAdmin } from '@/lib/auth';
 
-export async function GET(req: Request) {
+export async function GET(request: Request) {
     try {
-        await dbConnect()
-        const { userId } = auth()
-        const url = new URL(req.url)
-        const isAdmin = userId // In a real app, check for specific admin role/ID
-        const showAll = isAdmin && url.searchParams.get('all') === 'true'
+        await connectToDatabase();
+        const { searchParams } = new URL(request.url);
+        const limit = parseInt(searchParams.get('limit') || '10');
+        const skip = parseInt(searchParams.get('skip') || '0');
 
-        const query = showAll ? {} : { isPublished: true }
-        const posts = await BlogPost.find(query).sort({ createdAt: -1 })
+        const posts = await BlogPost.find({})
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
 
-        return NextResponse.json({ posts })
-    } catch (error) {
-        console.error('Error fetching posts:', error)
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+        const total = await BlogPost.countDocuments();
+
+        return NextResponse.json({ posts, total });
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
     try {
-        const { userId } = auth()
-        if (!userId) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        if (!await validateAdmin()) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        await dbConnect()
-        const body = await req.json()
+        await connectToDatabase();
+        const data = await request.json();
 
-        // Generate slug from title if not provided
-        let slug = body.slug
-        if (!slug && body.title) {
-            slug = slugify(body.title, { lower: true, strict: true })
+        // Basic validation
+        if (!data.title || !data.content) {
+            return NextResponse.json({ error: 'Missing title or content' }, { status: 400 });
         }
 
-        // Ensure slug is unique
-        let uniqueSlug = slug
-        let counter = 1
-        while (await BlogPost.findOne({ slug: uniqueSlug })) {
-            uniqueSlug = `${slug}-${counter}`
-            counter++
-        }
-
-        const post = await BlogPost.create({
-            ...body,
-            slug: uniqueSlug
-        })
-
-        return NextResponse.json({ post }, { status: 201 })
-    } catch (error) {
-        console.error('Error creating post:', error)
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+        const newPost = await BlogPost.create(data);
+        return NextResponse.json(newPost);
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

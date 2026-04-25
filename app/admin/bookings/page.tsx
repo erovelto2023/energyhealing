@@ -1,5 +1,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
+import AdminGuard from '@/components/admin/AdminGuard';
 
 const AdminBookingsClient = dynamic(() => import('@/components/admin/AdminBookingsClient'), {
     ssr: false,
@@ -17,5 +18,9 @@ export const metadata = {
 };
 
 export default function AdminBookingsPage() {
-    return <AdminBookingsClient />;
+    return (
+        <AdminGuard>
+            <AdminBookingsClient />
+        </AdminGuard>
+    );
 }

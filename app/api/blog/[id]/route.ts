@@ -1,68 +1,71 @@
-import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
-import dbConnect from '@/lib/mongodb'
-import { BlogPost } from '@/lib/models'
+import { NextResponse } from 'next/server';
+import connectToDatabase from '@/lib/db';
+import { BlogPost } from '@/lib/models';
+import { validateAdmin } from '@/lib/auth';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        await dbConnect()
-        const post = await BlogPost.findById(params.id)
+        await connectToDatabase();
+        const { id } = await params;
+        const post = await BlogPost.findById(id).lean();
 
         if (!post) {
-            return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+            return NextResponse.json({ error: 'Post not found' }, { status: 404 });
         }
 
-        return NextResponse.json({ post })
-    } catch (error) {
-        console.error('Error fetching post:', error)
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+        return NextResponse.json(post);
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        const { userId } = auth()
-        if (!userId) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        if (!await validateAdmin()) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        await dbConnect()
-        const body = await req.json()
+        await connectToDatabase();
+        const { id } = await params;
+        const data = await request.json();
 
-        const post = await BlogPost.findByIdAndUpdate(
-            params.id,
-            { ...body, updatedAt: new Date() },
-            { new: true }
-        )
+        const updatedPost = await BlogPost.findByIdAndUpdate(id, data, { new: true });
 
-        if (!post) {
-            return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+        if (!updatedPost) {
+            return NextResponse.json({ error: 'Post not found' }, { status: 404 });
         }
 
-        return NextResponse.json({ post })
-    } catch (error) {
-        console.error('Error updating post:', error)
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+        return NextResponse.json(updatedPost);
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        const { userId } = auth()
-        if (!userId) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        if (!await validateAdmin()) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        await dbConnect()
-        const post = await BlogPost.findByIdAndDelete(params.id)
+        await connectToDatabase();
+        const { id } = await params;
+        const deletedPost = await BlogPost.findByIdAndDelete(id);
 
-        if (!post) {
-            return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+        if (!deletedPost) {
+            return NextResponse.json({ error: 'Post not found' }, { status: 404 });
         }
 
-        return NextResponse.json({ message: 'Post deleted successfully' })
-    } catch (error) {
-        console.error('Error deleting post:', error)
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+        return NextResponse.json({ message: 'Post deleted successfully' });
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

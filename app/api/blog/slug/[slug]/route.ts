@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server'
-import dbConnect from '@/lib/mongodb'
+import connectToDatabase from '@/lib/db'
 import { BlogPost } from '@/lib/models'
 
-export async function GET(req: Request, { params }: { params: { slug: string } }) {
+export async function GET(
+    req: Request,
+    { params }: { params: Promise<{ slug: string }> }
+) {
     try {
-        await dbConnect()
-        const post = await BlogPost.findOne({ slug: params.slug, isPublished: true })
+        await connectToDatabase()
+        const { slug } = await params
+        const post = await BlogPost.findOne({ slug: slug, isPublished: true })
 
         if (!post) {
             return NextResponse.json({ error: 'Post not found' }, { status: 404 })

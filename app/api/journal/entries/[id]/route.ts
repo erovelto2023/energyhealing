@@ -1,22 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import dbConnect from '@/lib/mongodb'
+import connectToDatabase from '@/lib/db'
 import { JournalEntry } from '@/lib/models'
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { userId } = auth()
+        const { userId } = await auth()
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        await dbConnect()
+        const { id } = await params;
+        await connectToDatabase()
 
         const entry = await JournalEntry.findOne({
-            _id: params.id,
+            _id: id,
             userId
         })
 
@@ -33,15 +34,16 @@ export async function GET(
 
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { userId } = auth()
+        const { userId } = await auth()
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        await dbConnect()
+        const { id } = await params;
+        await connectToDatabase()
 
         const body = await req.json()
 
@@ -64,7 +66,7 @@ export async function PUT(
         // Protect sensitive fields from direct update if needed, 
         // but generally allow updating content/metadata
         const entry = await JournalEntry.findOneAndUpdate(
-            { _id: params.id, userId },
+            { _id: id, userId },
             { $set: body },
             { new: true }
         )
@@ -82,18 +84,19 @@ export async function PUT(
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { userId } = auth()
+        const { userId } = await auth()
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        await dbConnect()
+        const { id } = await params;
+        await connectToDatabase()
 
         const entry = await JournalEntry.findOneAndDelete({
-            _id: params.id,
+            _id: id,
             userId
         })
 

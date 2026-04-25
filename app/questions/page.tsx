@@ -15,15 +15,16 @@ const QUESTIONS_HERO_CONTENT: HeroContent[] = [
 ];
 
 interface KnowledgeBasePageProps {
-    searchParams: {
+    searchParams: Promise<{
         q?: string;
         page?: string;
-    };
+    }>;
 }
 
 export default async function KnowledgeBasePage({ searchParams }: KnowledgeBasePageProps) {
-    const query = searchParams.q || '';
-    const page = parseInt(searchParams.page || '1');
+    const resolvedSearchParams = await searchParams;
+    const query = resolvedSearchParams.q || '';
+    const page = parseInt(resolvedSearchParams.page || '1');
     const limit = 20;
 
     const { faqs, totalPages, totalCount } = await searchFAQs(query, page, limit);
@@ -31,9 +32,11 @@ export default async function KnowledgeBasePage({ searchParams }: KnowledgeBaseP
     const heroImagesDir = path.join(process.cwd(), 'public/images/hero-slideshow');
     let heroImages: string[] = [];
     try {
-        const files = fs.readdirSync(heroImagesDir);
-        heroImages = files.filter(file => /\.(png|jpg|jpeg|webp)$/i.test(file))
-            .map(file => `/images/hero-slideshow/${file}`);
+        if (fs.existsSync(heroImagesDir)) {
+            const files = fs.readdirSync(heroImagesDir);
+            heroImages = files.filter(file => /\.(png|jpg|jpeg|webp)$/i.test(file))
+                .map(file => `/images/hero-slideshow/${file}`);
+        }
     } catch (error) {
         console.error("Error reading hero images:", error);
     }

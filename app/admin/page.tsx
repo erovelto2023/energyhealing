@@ -1,5 +1,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
+import AdminGuard from '@/components/admin/AdminGuard';
 
 const AdminDashboardClient = dynamic(() => import('@/components/admin/AdminDashboardClient'), {
     ssr: false,
@@ -17,5 +18,9 @@ export const metadata = {
 };
 
 export default function AdminPage() {
-    return <AdminDashboardClient />;
+    return (
+        <AdminGuard>
+            <AdminDashboardClient />
+        </AdminGuard>
+    );
 }

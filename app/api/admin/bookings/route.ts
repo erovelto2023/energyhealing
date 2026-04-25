@@ -1,28 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
-import dbConnect from '@/lib/mongodb'
+import connectToDatabase from '@/lib/db'
 import { BookingRequest } from '@/lib/models'
+import { validateAdmin } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
     try {
-        const { userId } = auth()
-        if (!userId) {
+        if (!await validateAdmin()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        await dbConnect()
+        await connectToDatabase()
 
         const bookings = await BookingRequest.find({})
             .sort({ createdAt: -1 })
             .limit(100)
 
-        // Debug: get keys of the first booking
-        const debugKeys = bookings.length > 0 ? Object.keys(bookings[0].toObject()) : [];
-        console.log('Available Booking Keys:', debugKeys);
-
-        return NextResponse.json({ bookings, debugKeys });
+        return NextResponse.json({ bookings });
     } catch (error) {
         console.error('Error fetching bookings:', error)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
@@ -31,12 +26,11 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
     try {
-        const { userId } = auth()
-        if (!userId) {
+        if (!await validateAdmin()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        await dbConnect()
+        await connectToDatabase()
 
         const body = await req.json()
         const { id, status, notes } = body
@@ -61,14 +55,14 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }
+
 export async function DELETE(req: NextRequest) {
     try {
-        const { userId } = auth()
-        if (!userId) {
+        if (!await validateAdmin()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        await dbConnect()
+        await connectToDatabase()
 
         const { searchParams } = new URL(req.url)
         const id = searchParams.get('id')

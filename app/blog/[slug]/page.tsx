@@ -1,25 +1,26 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import dbConnect from '@/lib/mongodb'
+import connectToDatabase from '@/lib/db'
 import { BlogPost } from '@/lib/models'
 
 export const revalidate = 60
 
 async function getPost(slug: string) {
-    await dbConnect()
+    await connectToDatabase()
     const post = await BlogPost.findOne({ slug, isPublished: true }).lean()
 
     if (!post) return null
 
     return {
         ...post,
-        _id: post._id.toString(),
-        createdAt: post.createdAt.toISOString()
+        _id: (post._id as any).toString(),
+        createdAt: (post.createdAt as any).toISOString()
     }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-    const post = await getPost(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
+    const post = await getPost(slug)
     if (!post) return {}
 
     return {
@@ -28,8 +29,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     }
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-    const post = await getPost(params.slug)
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
+    const post = await getPost(slug)
 
     if (!post) {
         notFound()

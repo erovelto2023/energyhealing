@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import AdminGuard from '@/components/admin/AdminGuard'
 
 interface BlogPost {
     _id: string
@@ -14,19 +14,16 @@ interface BlogPost {
     views?: number
 }
 
-export default function AdminBlogDashboard() {
-    const { user, isLoaded } = useUser()
-    const router = useRouter()
+function BlogDashboardContent() {
+    const { user } = useUser()
     const [posts, setPosts] = useState<BlogPost[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        if (isLoaded && !user) {
-            router.push('/')
-        } else if (user) {
+        if (user) {
             fetchPosts()
         }
-    }, [user, isLoaded])
+    }, [user])
 
     const fetchPosts = async () => {
         try {
@@ -76,11 +73,9 @@ export default function AdminBlogDashboard() {
         }
     }
 
-    if (!isLoaded || loading) {
+    if (loading) {
         return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">Loading...</div>
     }
-
-    if (!user) return null
 
     return (
         <div className="min-h-screen bg-gray-900 text-white p-8">
@@ -167,5 +162,13 @@ export default function AdminBlogDashboard() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function AdminBlogDashboard() {
+    return (
+        <AdminGuard>
+            <BlogDashboardContent />
+        </AdminGuard>
     )
 }

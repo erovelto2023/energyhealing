@@ -8,9 +8,10 @@ export const metadata = {
     description: "Explore the encyclopedia of therapeutic spices and remedies.",
 };
 
-export default async function HealingPantryPage({ searchParams }: { searchParams: { herb?: string } }) {
+export default async function HealingPantryPage({ searchParams }: { searchParams: Promise<{ herb?: string }> }) {
+    const { herb } = await searchParams;
     const herbs = await getHerbs();
     const { products } = await getProducts();
 
-    return <HealingPantryClient herbs={herbs} products={products} initialSlug={searchParams.herb} />;
+    return <HealingPantryClient herbs={herbs} products={products} initialSlug={herb} />;
 }

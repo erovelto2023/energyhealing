@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
+import { validateAdmin } from '@/lib/auth';
 import connectToDatabase from '@/lib/db';
 import UserStory from '@/lib/models/UserStory';
 
 // GET - Fetch all user stories (pending and approved)
 export async function GET(request: Request) {
     try {
-        const { userId } = await auth();
-        if (!userId) {
+        const user = await validateAdmin();
+        if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -40,8 +41,8 @@ export async function GET(request: Request) {
 // PATCH - Approve/Deny user story
 export async function PATCH(request: Request) {
     try {
-        const { userId } = await auth();
-        if (!userId) {
+        const user = await validateAdmin();
+        if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

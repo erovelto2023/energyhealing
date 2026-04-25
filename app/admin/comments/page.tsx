@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import CommentReviewDashboard from '@/components/admin/CommentReviewDashboard';
+import AdminGuard from '@/components/admin/AdminGuard';
 
 export const metadata: Metadata = {
     title: 'Review Comments | Admin',
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function AdminCommentsPage() {
-    return <CommentReviewDashboard />;
+    return (
+        <AdminGuard>
+            <CommentReviewDashboard />
+        </AdminGuard>
+    );
 }

@@ -5,13 +5,14 @@ import Link from "next/link";
 import { ArrowLeft, BookOpen, BrainCircuit, Lightbulb, Stethoscope, ArrowRight } from "lucide-react";
 
 interface PageProps {
-    params: {
+    params: Promise<{
         slug: string;
-    };
+    }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const faq = await getFAQBySlug(params.slug);
+    const { slug } = await params;
+    const faq = await getFAQBySlug(slug);
     if (!faq) return { title: "Question Not Found" };
     return {
         title: `${faq.h1Title || faq.question} | Kathleen Heals`,
@@ -27,7 +28,8 @@ export async function generateStaticParams() {
 }
 
 export default async function QuestionPage({ params }: PageProps) {
-    const faq = await getFAQBySlug(params.slug);
+    const { slug } = await params;
+    const faq = await getFAQBySlug(slug);
 
     if (!faq) {
         notFound();

@@ -1,20 +1,20 @@
 import React from 'react';
 import Link from 'next/link';
 import { getAffirmationBySlug } from '@/lib/actions';
-import { Sparkles, ArrowLeft, Leaf, Moon, Wind, Heart, Info, BookOpen } from 'lucide-react';
+import { Sparkles, ArrowLeft, Leaf, Moon, Wind, Heart, BookOpen } from 'lucide-react';
 import { Metadata, ResolvingMetadata } from 'next';
 import { notFound } from 'next/navigation';
 
 type Props = {
-    params: { slug: string }
-    searchParams: { [key: string]: string | string[] | undefined }
+    params: Promise<{ slug: string }>
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata(
     { params }: Props,
     parent: ResolvingMetadata
 ): Promise<Metadata> {
-    const slug = params.slug;
+    const { slug } = await params;
     const affirmation = await getAffirmationBySlug(slug);
 
     if (!affirmation) {
@@ -30,7 +30,8 @@ export async function generateMetadata(
 }
 
 export default async function AffirmationDetailPage({ params }: Props) {
-    const affirmation = await getAffirmationBySlug(params.slug);
+    const { slug } = await params;
+    const affirmation = await getAffirmationBySlug(slug);
 
     if (!affirmation) {
         return notFound();

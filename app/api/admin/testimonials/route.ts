@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import connectToDatabase from '@/lib/db';
 import Testimonial from '@/lib/models/Testimonial';
+import { validateAdmin } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 // GET - Fetch all testimonials (pending and approved)
 export async function GET(request: Request) {
     try {
-        const { userId } = await auth();
-        if (!userId) {
+        if (!await validateAdmin()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -40,8 +41,7 @@ export async function GET(request: Request) {
 // PATCH - Approve/Deny testimonial
 export async function PATCH(request: Request) {
     try {
-        const { userId } = await auth();
-        if (!userId) {
+        if (!await validateAdmin()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

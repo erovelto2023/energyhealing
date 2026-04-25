@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { generateWithOllamaStream } from '@/lib/ollama'
+import { validateAdmin } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300 // 5 minutes timeout for long generation
 
 export async function POST(req: NextRequest) {
     try {
-        const { userId } = auth()
-        if (!userId) {
+        const user = await validateAdmin()
+        if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
-        // const userId = 'debug_user'
 
         const body = await req.json()
         const {

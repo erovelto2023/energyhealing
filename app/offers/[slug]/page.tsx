@@ -4,7 +4,7 @@ import Offer from '@/lib/models/Offer';
 import { Metadata } from 'next';
 
 interface Props {
-    params: { slug: string };
+    params: Promise<{ slug: string }>;
 }
 
 // Force dynamic rendering so new offers appear instantly without build
@@ -13,8 +13,9 @@ export const revalidate = 0;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     try {
+        const { slug } = await params;
         await connectToDatabase();
-        const offer = await Offer.findOne({ slug: params.slug });
+        const offer = await Offer.findOne({ slug });
         if (!offer) return { title: 'Offer Not Found' };
         return {
             title: offer.title,
@@ -26,20 +27,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function OfferPage({ params }: Props) {
+    const { slug } = await params;
     await connectToDatabase();
 
     // Fetch and increment view count
     // URL Decode the slug to handle spaces (e.g. "Abduction%20Pillow" -> "Abduction Pillow")
-    const decodedSlug = decodeURIComponent(params.slug);
+    const decodedSlug = decodeURIComponent(slug);
 
     // Try finding by raw slug first, then decoded
     let offer = await Offer.findOneAndUpdate(
-        { slug: params.slug },
+        { slug: slug },
         { $inc: { views: 1 } },
         { new: true }
     );
 
-    if (!offer && decodedSlug !== params.slug) {
+    if (!offer && decodedSlug !== slug) {
         offer = await Offer.findOneAndUpdate(
             { slug: decodedSlug },
             { $inc: { views: 1 } },
@@ -52,7 +54,7 @@ export default async function OfferPage({ params }: Props) {
         return (
             <div className="p-10 text-center">
                 <h1 className="text-2xl font-bold text-red-600">Debug: Offer Not Found</h1>
-                <p className="mt-4">Slug requested: <code>{params.slug}</code></p>
+                <p className="mt-4">Slug requested: <code>{slug}</code></p>
                 <p>Database Connection: Attempted</p>
                 <p className="text-sm text-slate-500 mt-4">If you see this, the code is running but the database query returned null.</p>
                 <p className="text-sm text-slate-500">Check the Admin Dashboard 'Slug' column for exact match.</p>
