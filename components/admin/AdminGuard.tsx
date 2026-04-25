@@ -8,7 +8,8 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
     const { user, isLoaded } = useUser()
     const router = useRouter()
 
-    const isAdmin = user?.publicMetadata?.role === 'admin' || user?.emailAddresses[0]?.emailAddress === 'erove@example.com';
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'erove@example.com';
+    const isAdmin = user?.publicMetadata?.role === 'admin' || user?.emailAddresses[0]?.emailAddress === adminEmail;
 
     useEffect(() => {
         if (isLoaded && (!user || !isAdmin)) {

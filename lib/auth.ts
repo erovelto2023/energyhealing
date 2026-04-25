@@ -16,7 +16,7 @@ export async function validateAdmin() {
     
     // Fallback: Check if the user's email matches a known admin email
     // This is useful for initial setup before metadata is set.
-    const adminEmails = [process.env.EMAIL_TO, 'erove@example.com']; // Example admin email
+    const adminEmails = [process.env.EMAIL_TO, process.env.NEXT_PUBLIC_ADMIN_EMAIL, 'erove@example.com'].filter(Boolean);
     const userEmail = user.emailAddresses[0]?.emailAddress;
     
     const isEmailAdmin = userEmail && adminEmails.includes(userEmail);

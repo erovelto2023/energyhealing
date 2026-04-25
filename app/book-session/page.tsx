@@ -31,12 +31,6 @@ export default function BookSessionPage() {
 
     return (
         <>
-            {/* GrooveSell Tracking Pixel */}
-            <img
-                src="https://tracking.groovesell.com/salespage/tracking/91728"
-                style={{ border: '0px', width: '0px', height: '0px' }}
-                alt=""
-            />
 
             <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900">
                 <HeroSlideshow images={heroImages} content={BOOKING_HERO_CONTENT}>
