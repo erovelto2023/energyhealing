@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Leaf, Youtube, Facebook, Heart } from 'lucide-react';
+import { Leaf, YoutubeIcon as Youtube, FacebookIcon as Facebook, Heart } from 'lucide-react';
 
 export default function Footer() {
     return (
