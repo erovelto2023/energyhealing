@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongodb';
+import dbConnect from '@/lib/db';
+
 import { BookingRequest } from '@/lib/models';
 import { sendBookingNotification } from '@/lib/mail';
 

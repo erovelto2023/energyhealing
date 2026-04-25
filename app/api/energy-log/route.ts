@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import dbConnect from '@/lib/mongodb'
+import dbConnect from '@/lib/db'
+
 import { EnergyLog, CardPull } from '@/lib/models'
 import { getCardById } from '@/lib/cardData'
 

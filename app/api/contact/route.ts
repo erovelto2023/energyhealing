@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import dbConnect from '@/lib/mongodb'
+import dbConnect from '@/lib/db'
+
 import { BookingRequest } from '@/lib/models'
 import nodemailer from 'nodemailer'
 

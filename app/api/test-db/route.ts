@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import dbConnect from '@/lib/mongodb'
+import dbConnect from '@/lib/db'
+
 import { JournalEntry } from '@/lib/models'
 
 export const dynamic = 'force-dynamic'

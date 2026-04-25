@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { analyzeChakras } from '@/lib/chakraAnalysis'
-import dbConnect from '@/lib/mongodb'
+import dbConnect from '@/lib/db'
+
 import { AIInteraction } from '@/lib/models'
 
 // POST - Analyze chakra imbalances

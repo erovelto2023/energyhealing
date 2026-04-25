@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import dbConnect from '@/lib/mongodb'
+import dbConnect from '@/lib/db'
+
 import { BlogPost } from '@/lib/models'
 import HeroSlideshow, { HeroContent } from '@/components/features/HeroSlideshow'
 import path from 'path'
@@ -62,7 +63,7 @@ async function getPosts() {
     return posts.map(post => ({
         ...post,
         _id: post._id.toString(),
-        createdAt: post.createdAt.toISOString()
+        createdAt: (post.createdAt || new Date()).toISOString()
     }))
 }
 

@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic';
 import AdminGuard from '@/components/admin/AdminGuard';
 
 const AdminDashboardClient = dynamic(() => import('@/components/admin/AdminDashboardClient'), {
-    ssr: false,
     loading: () => (
         <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center gap-4">
             <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
@@ -11,6 +10,7 @@ const AdminDashboardClient = dynamic(() => import('@/components/admin/AdminDashb
         </div>
     )
 });
+
 
 export const metadata = {
     title: 'Admin Dashboard | Kathleen Heals',
