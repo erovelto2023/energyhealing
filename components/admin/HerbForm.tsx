@@ -7,7 +7,8 @@ import { IHerb } from "@/lib/models/Herb";
 import { Save, Loader2, X } from "lucide-react";
 
 import { IProduct } from "@/lib/models/Product";
-import { Link as LinkIcon } from "lucide-react";
+import { Link as LinkIcon, Image as ImageIcon } from "lucide-react";
+import MediaPicker from "./MediaPicker";
 
 interface HerbFormProps {
     initialData?: IHerb;
@@ -145,6 +146,21 @@ export default function HerbForm({ initialData, products = [], onSuccess, onCanc
                                 placeholder="Leave empty to auto-generate"
                                 className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-orange-200 outline-none text-slate-500 font-mono text-sm"
                             />
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-bold text-slate-700 mb-1">Featured Image URL</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    name="image"
+                                    value={formData.image}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-orange-200 outline-none"
+                                    placeholder="https://..."
+                                />
+                                <MediaPicker onSelect={(url) => setFormData(prev => ({ ...prev, image: url }))} />
+                            </div>
                         </div>
 
                         <div>

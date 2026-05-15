@@ -11,6 +11,9 @@ import ProductForm from './ProductForm';
 import GlossaryImporter from './GlossaryImporter';
 import GlossaryForm from './GlossaryForm';
 import HerbForm from './HerbForm';
+import MediaLibrary from './media/MediaLibrary';
+import AssetWarehouse from './media/AssetWarehouse';
+import { UploadModal } from './media/UploadModal';
 
 import {
     createProduct, updateProduct, deleteProduct,
@@ -44,7 +47,7 @@ interface AdminDashboardProps {
 
 export default function AdminDashboard({ reviews = [], products = [], glossaryTerms = [], niches = [], subscribers = [], salesPages = [], herbs = [], affirmations = [], faqs = [] }: AdminDashboardProps) {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'reviews' | 'tools' | 'glossary' | 'niches' | 'subscribers' | 'writing' | 'offers' | 'pantry' | 'affirmations' | 'faqs'>('reviews');
+    const [activeTab, setActiveTab] = useState<'reviews' | 'tools' | 'glossary' | 'niches' | 'subscribers' | 'writing' | 'offers' | 'pantry' | 'affirmations' | 'faqs' | 'media'>('reviews');
 
     // Healing Pantry State
     const [pantryView, setPantryView] = useState<'list' | 'create' | 'edit' | 'import'>('list');
@@ -105,6 +108,10 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
     // Subscribers Pagination
     const [subscriberPage, setSubscriberPage] = useState(1);
     const subscriberPerPage = 20;
+
+    // Media State
+    const [mediaTab, setMediaTab] = useState<'library' | 'warehouse'>('library');
+    const [isUploadOpen, setIsUploadOpen] = useState(false);
 
     const [isDeleting, startDeleteTransition] = useTransition();
 
@@ -455,6 +462,15 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                 >
                     <span className="flex items-center gap-2"><BookOpen size={16} /> Questions</span>
                 </button>
+                <button
+                    onClick={() => setActiveTab('media')}
+                    className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${activeTab === 'media'
+                        ? 'bg-[#6366F1] text-white shadow-lg shadow-indigo-200 scale-105'
+                        : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900 border border-slate-200'
+                        }`}
+                >
+                    <span className="flex items-center gap-2"><LayoutGrid size={16} /> Media Center</span>
+                </button>
             </div>
 
             <div className="animate-in fade-in duration-300">
@@ -462,6 +478,55 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                 {/* FAQS TAB */}
                 {activeTab === 'faqs' && (
                     <FAQManager faqs={faqs} offers={salesPages} />
+                )}
+
+                {/* MEDIA CENTER TAB */}
+                {activeTab === 'media' && (
+                    <div className="space-y-8">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">Universal Media Center</h2>
+                                <p className="text-slate-500 font-medium">Manage all your cross-platform assets in one secure vault.</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="bg-slate-100 p-1 rounded-2xl flex border border-slate-200">
+                                    <button 
+                                        onClick={() => setMediaTab('library')}
+                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${mediaTab === 'library' ? 'bg-white text-[#6366F1] shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                                    >
+                                        Library
+                                    </button>
+                                    <button 
+                                        onClick={() => setMediaTab('warehouse')}
+                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${mediaTab === 'warehouse' ? 'bg-white text-[#6366F1] shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                                    >
+                                        Warehouse
+                                    </button>
+                                </div>
+                                <button 
+                                    onClick={() => setIsUploadOpen(true)}
+                                    className="bg-[#6366F1] text-white px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#5850EC] transition-all shadow-lg shadow-indigo-100 flex items-center gap-2"
+                                >
+                                    <Plus size={16} /> Upload Asset
+                                </button>
+                            </div>
+                        </div>
+
+                        {mediaTab === 'library' ? (
+                            <MediaLibrary />
+                        ) : (
+                            <AssetWarehouse />
+                        )}
+
+                        <UploadModal 
+                            isOpen={isUploadOpen} 
+                            onClose={() => setIsUploadOpen(false)} 
+                            onSuccess={() => {
+                                // The library/warehouse components handle their own refresh via internal effect/fetch
+                                setIsUploadOpen(false);
+                            }} 
+                        />
+                    </div>
                 )}
 
                 {/* REVIEWS TAB */}

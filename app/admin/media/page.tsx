@@ -8,9 +8,9 @@ import {
     Activity,
     ShieldCheck
 } from "lucide-react";
-import MediaLibrary from "./_components/MediaLibrary";
-import AssetWarehouse from "./_components/AssetWarehouse";
-import { UploadModal } from "./_components/upload-modal";
+import MediaLibrary from "@/components/admin/media/MediaLibrary";
+import AssetWarehouse from "@/components/admin/media/AssetWarehouse";
+import { UploadModal } from "@/components/admin/media/UploadModal";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 

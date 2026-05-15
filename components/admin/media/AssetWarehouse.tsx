@@ -124,8 +124,8 @@ export default function AssetWarehouse() {
                 </div>
             </div>
 
-            {/* Assets Table */}
-            <div className="bg-[#111622] border border-slate-800 rounded-[32px] overflow-hidden shadow-2xl">
+            {/* Assets Table (Desktop) */}
+            <div className="hidden lg:block bg-[#111622] border border-slate-800 rounded-[32px] overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
@@ -238,6 +238,73 @@ export default function AssetWarehouse() {
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            {/* Assets Mobile View (Cards) */}
+            <div className="lg:hidden space-y-4">
+                {loading ? (
+                    Array(3).fill(0).map((_, i) => (
+                        <div key={i} className="bg-[#111622] border border-slate-800 rounded-[24px] p-6 animate-pulse space-y-4">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 bg-slate-800 rounded-xl"></div>
+                                <div className="h-4 bg-slate-800 rounded w-1/2"></div>
+                            </div>
+                            <div className="h-20 bg-slate-800/50 rounded-xl"></div>
+                        </div>
+                    ))
+                ) : assets.length === 0 ? (
+                    <div className="bg-[#111622] border border-slate-800 rounded-[24px] p-12 text-center">
+                        <Package className="h-12 w-12 text-slate-800 mx-auto mb-4" />
+                        <p className="text-slate-500 font-bold">Warehouse Empty</p>
+                    </div>
+                ) : (
+                    assets.map((asset) => (
+                        <div key={asset._id} className="bg-[#111622] border border-slate-800 rounded-[24px] p-6 space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-[#0A0D14] rounded-xl border border-slate-800">
+                                    {getFileIcon(asset.mimeType)}
+                                </div>
+                                <div className="overflow-hidden">
+                                    <h4 className="font-bold text-white text-sm truncate">{asset.title}</h4>
+                                    <p className="text-[10px] text-slate-500 font-mono truncate">{asset.storedFilename}</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-[#0A0D14] p-3 rounded-xl border border-slate-800">
+                                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-500 mb-1">Size</p>
+                                    <p className="text-xs font-bold text-white">{formatSize(asset.fileSizeBytes)}</p>
+                                </div>
+                                <div className="bg-[#0A0D14] p-3 rounded-xl border border-slate-800">
+                                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-500 mb-1">Downloads</p>
+                                    <p className="text-xs font-bold text-[#6366F1]">{asset.downloadCount || 0}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={() => handleCopy(asset.url, asset._id)}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all text-[10px] font-black uppercase tracking-widest ${copiedId === asset._id ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-[#0A0D14] border-slate-800 text-slate-400'}`}
+                                >
+                                    {copiedId === asset._id ? <Check size={14} /> : <Copy size={14} />}
+                                    {copiedId === asset._id ? 'Copied' : 'Link'}
+                                </button>
+                                <button 
+                                    onClick={() => handleDownload(asset._id, asset.url)}
+                                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#6366F1] text-white rounded-xl text-[10px] font-black uppercase tracking-widest"
+                                >
+                                    <Download size={14} /> Download
+                                </button>
+                                <button 
+                                    onClick={() => handleDelete(asset._id)}
+                                    className="p-3 bg-white/5 text-slate-500 rounded-xl border border-slate-800"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
 
             {/* Security Notice */}
