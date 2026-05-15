@@ -186,6 +186,7 @@ export default function MediaLibrary({ onSelect }: MediaLibraryProps) {
                                         src={asset.url} 
                                         alt={asset.altText || asset.title}
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        loading="lazy"
                                     />
                                     
                                     {/* Badges */}
@@ -272,7 +273,7 @@ export default function MediaLibrary({ onSelect }: MediaLibraryProps) {
                         {snippetAsset && (
                             <div className="space-y-6">
                                 <div className="flex items-center gap-4 p-4 bg-[#111622] rounded-2xl border border-slate-800">
-                                    <img src={snippetAsset.url} className="h-16 w-16 object-cover rounded-xl" />
+                                    <img src={snippetAsset.url} className="h-16 w-16 object-cover rounded-xl" loading="lazy" />
                                     <div>
                                         <p className="font-bold text-white">{snippetAsset.title}</p>
                                         <p className="text-xs text-slate-500">{snippetAsset.altText || "No alt text"}</p>
