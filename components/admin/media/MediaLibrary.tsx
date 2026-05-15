@@ -16,7 +16,8 @@ import {
     X,
     AlertCircle,
     Tag,
-    Clock
+    Clock,
+    RefreshCw
 } from "lucide-react";
 import { getResources, updateResource, removeResource } from "@/lib/actions/media.actions";
 import { toast } from "sonner";
@@ -58,8 +59,11 @@ export default function MediaLibrary({ onSelect }: MediaLibraryProps) {
             category: categoryFilter,
             type: "image" 
         });
+        console.log("[MediaLibrary] Fetch result:", result);
         if (result.success) {
             setAssets(result.data);
+        } else {
+            toast.error("Failed to pull images: " + (result.error || "Unknown error"));
         }
         setLoading(false);
     }, [search, statusFilter, categoryFilter]);
@@ -165,10 +169,23 @@ export default function MediaLibrary({ onSelect }: MediaLibraryProps) {
                     <p className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px]">Scanning Database</p>
                 </div>
             ) : assets.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-40 border-2 border-dashed border-slate-800 rounded-[40px] bg-[#111622]/50">
-                    <ImageIcon className="h-16 w-16 text-slate-800 mb-4" />
-                    <p className="text-xl font-bold text-slate-500">No images found</p>
-                    <p className="text-sm text-slate-600 mt-1">Try adjusting your filters or upload new assets.</p>
+                <div className="flex flex-col items-center justify-center py-40 border-2 border-dashed border-slate-800 rounded-[40px] bg-[#111622]/50 text-center px-4">
+                    <div className="p-6 bg-slate-900/50 rounded-full mb-6 border border-slate-800">
+                        <ImageIcon className="h-12 w-12 text-slate-700" />
+                    </div>
+                    <p className="text-2xl font-bold text-slate-400 tracking-tight">Your Media Vault is Empty</p>
+                    <p className="text-sm text-slate-500 mt-2 max-w-md mx-auto leading-relaxed">
+                        No images were found in the database. Start by uploading assets to build your cross-platform media center.
+                    </p>
+                    <div className="mt-8 flex gap-3">
+                        <Button 
+                            onClick={() => fetchAssets()}
+                            variant="outline"
+                            className="rounded-xl border-slate-800 text-slate-400 hover:text-white"
+                        >
+                            <RefreshCw className="h-4 w-4 mr-2" /> Retry Fetch
+                        </Button>
+                    </div>
                 </div>
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">

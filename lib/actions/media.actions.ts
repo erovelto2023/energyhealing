@@ -91,7 +91,9 @@ export async function getResources(options: {
             filter.status = options.status;
         }
 
+        console.log("[getResources] Filter:", filter);
         const resources = await Resource.find(filter).sort({ createdAt: -1 }).lean();
+        console.log("[getResources] Found:", resources.length);
         return { success: true, data: JSON.parse(JSON.stringify(resources)) };
     } catch (error: any) {
         console.error("[getResources] Error:", error);
