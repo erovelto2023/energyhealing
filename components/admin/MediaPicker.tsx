@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Image as ImageIcon, Library } from "lucide-react";
-import MediaLibrary from "@/app/admin/media/_components/MediaLibrary";
+import MediaLibrary from "./media/MediaLibrary";
 
 interface MediaPickerProps {
     onSelect: (url: string) => void;
