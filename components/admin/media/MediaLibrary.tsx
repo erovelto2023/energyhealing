@@ -356,64 +356,92 @@ export default function MediaLibrary({ onSelect }: MediaLibraryProps) {
 
             {/* Snippet Modal */}
             <Dialog open={!!snippetAsset} onOpenChange={() => setSnippetAsset(null)}>
-                <DialogContent className="bg-[#0A0D14] border-slate-800 text-white sm:max-w-[600px] p-0 overflow-hidden rounded-[32px]">
+                <DialogContent className="bg-[#0A0D14] border-slate-800 text-white sm:max-w-[800px] p-0 overflow-hidden rounded-[32px]">
                     <div className="p-4 sm:p-8 space-y-6">
                         <DialogHeader>
-                            <DialogTitle className="text-2xl font-bold uppercase tracking-tight flex items-center gap-3">
-                                <div className="p-2 bg-[#6366F1]/10 rounded-xl">
-                                    <ExternalLink className="h-5 w-5 text-[#6366F1]" />
+                            <DialogTitle className="text-3xl font-black italic uppercase tracking-tighter flex items-center gap-3">
+                                <div className="p-3 bg-[#6366F1]/10 rounded-[20px]">
+                                    <ExternalLink className="h-6 w-6 text-[#6366F1]" />
                                 </div>
-                                Embed Snippets
+                                Deployment <span className="text-[#6366F1]">Snippets</span>
                             </DialogTitle>
                         </DialogHeader>
 
                         {snippetAsset && (
-                            <div className="space-y-6">
-                                <div className="flex items-center gap-4 p-4 bg-[#111622] rounded-2xl border border-slate-800">
-                                    <img src={snippetAsset.url} className="h-16 w-16 object-cover rounded-xl" loading="lazy" />
-                                    <div>
-                                        <p className="font-bold text-white">{snippetAsset.title}</p>
-                                        <p className="text-xs text-slate-500">{snippetAsset.altText || "No alt text"}</p>
+                            <div className="space-y-8">
+                                <div className="flex items-center gap-6 p-6 bg-[#111622] rounded-3xl border border-slate-800 shadow-inner">
+                                    <div className="h-24 w-24 rounded-2xl overflow-hidden border border-slate-700 bg-black/40">
+                                        <img src={snippetAsset.url} className="w-full h-full object-cover" loading="lazy" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-xl font-bold text-white tracking-tight">{snippetAsset.title}</p>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{snippetAsset.mimeType} • {formatSize(snippetAsset.fileSizeBytes)}</p>
+                                        <div className="flex gap-2 mt-3">
+                                            {snippetAsset.tags?.map((t: string) => (
+                                                <span key={t} className="px-2 py-0.5 bg-[#6366F1]/10 text-[#6366F1] text-[8px] font-black uppercase rounded-md border border-[#6366F1]/20">#{t}</span>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">HTML Image Tag</label>
-                                        <div className="relative group">
-                                            <pre className="bg-[#0A0D14] p-4 rounded-2xl border border-slate-800 text-[10px] text-emerald-400 font-mono overflow-x-auto whitespace-pre-wrap leading-relaxed">
-                                                {`<img \n  src="${APP_URL}${snippetAsset.url}" \n  alt="${snippetAsset.altText || snippetAsset.title}" \n  loading="lazy" \n/>`}
-                                            </pre>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* HTML Tag */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between px-1">
+                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">HTML Image Tag</label>
                                             <button 
                                                 onClick={() => handleCopy(`<img src="${APP_URL}${snippetAsset.url}" alt="${snippetAsset.altText || snippetAsset.title}" loading="lazy" />`, 'html')}
-                                                className="absolute top-3 right-3 p-2 bg-[#6366F1] text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${copied === 'html' ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
                                             >
                                                 {copied === 'html' ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                                                {copied === 'html' ? 'Copied' : 'Copy HTML'}
                                             </button>
+                                        </div>
+                                        <pre className="bg-[#111622] p-5 rounded-2xl border border-slate-800 text-[11px] text-emerald-400 font-mono overflow-x-auto whitespace-pre-wrap leading-relaxed shadow-inner min-h-[100px]">
+                                            {`<img \n  src="${APP_URL}${snippetAsset.url}" \n  alt="${snippetAsset.altText || snippetAsset.title}" \n  loading="lazy" \n/>`}
+                                        </pre>
+                                    </div>
+
+                                    {/* Markdown */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between px-1">
+                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Markdown Snippet</label>
+                                            <button 
+                                                onClick={() => handleCopy(`![${snippetAsset.altText || snippetAsset.title}](${APP_URL}${snippetAsset.url})`, 'md')}
+                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${copied === 'md' ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
+                                            >
+                                                {copied === 'md' ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                                                {copied === 'md' ? 'Copied' : 'Copy Markdown'}
+                                            </button>
+                                        </div>
+                                        <div className="bg-[#111622] p-5 rounded-2xl border border-slate-800 text-[11px] text-indigo-400 font-mono flex items-center min-h-[100px] shadow-inner">
+                                            {`![${snippetAsset.altText || snippetAsset.title}](${APP_URL}${snippetAsset.url})`}
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Direct URL</label>
-                                        <div className="relative group">
-                                            <div className="bg-[#0A0D14] p-4 rounded-2xl border border-slate-800 text-[10px] text-[#6366F1] font-mono truncate pr-12">
-                                                {APP_URL}{snippetAsset.url}
-                                            </div>
+                                    {/* Direct URL */}
+                                    <div className="md:col-span-2 space-y-3">
+                                        <div className="flex items-center justify-between px-1">
+                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Direct Asset URL</label>
                                             <button 
                                                 onClick={() => handleCopy(`${APP_URL}${snippetAsset.url}`, 'url')}
-                                                className="absolute top-3 right-3 p-2 bg-[#6366F1] text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${copied === 'url' ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
                                             >
                                                 {copied === 'url' ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                                                {copied === 'url' ? 'Copied' : 'Copy Direct Link'}
                                             </button>
+                                        </div>
+                                        <div className="bg-[#111622] p-5 rounded-2xl border border-slate-800 text-[11px] text-sky-400 font-mono truncate shadow-inner">
+                                            {APP_URL}{snippetAsset.url}
                                         </div>
                                     </div>
                                 </div>
 
                                 <Button 
                                     onClick={() => setSnippetAsset(null)}
-                                    className="w-full bg-slate-800 hover:bg-slate-700 text-white rounded-2xl h-14 font-bold"
+                                    className="w-full bg-[#111622] hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white rounded-2xl h-14 font-black uppercase tracking-widest transition-all"
                                 >
-                                    Close Snippet Vault
+                                    Dismiss Snippet Vault
                                 </Button>
                             </div>
                         )}
