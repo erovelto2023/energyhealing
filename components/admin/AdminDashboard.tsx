@@ -14,6 +14,7 @@ import HerbForm from './HerbForm';
 import MediaLibrary from './media/MediaLibrary';
 import AssetWarehouse from './media/AssetWarehouse';
 import { UploadModal } from './media/UploadModal';
+import PantryPromptBuilder from './PantryPromptBuilder';
 
 import {
     createProduct, updateProduct, deleteProduct,
@@ -50,7 +51,7 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
     const [activeTab, setActiveTab] = useState<'reviews' | 'tools' | 'glossary' | 'niches' | 'subscribers' | 'writing' | 'offers' | 'pantry' | 'affirmations' | 'faqs' | 'media'>('reviews');
 
     // Healing Pantry State
-    const [pantryView, setPantryView] = useState<'list' | 'create' | 'edit' | 'import'>('list');
+    const [pantryView, setPantryView] = useState<'list' | 'create' | 'edit' | 'import' | 'prompt-builder'>('list');
     const [editingHerb, setEditingHerb] = useState<IHerb | undefined>(undefined);
     const [pantrySearch, setPantrySearch] = useState('');
     const [pantryPage, setPantryPage] = useState(1);
@@ -1615,7 +1616,9 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
 
                     return (
                         <div className="max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            {pantryView === 'import' ? (
+                            {pantryView === 'prompt-builder' ? (
+                                <PantryPromptBuilder onBack={() => setPantryView('list')} />
+                            ) : pantryView === 'import' ? (
                                 <div>
                                     <button
                                         onClick={() => setPantryView('list')}
@@ -1687,6 +1690,12 @@ export default function AdminDashboard({ reviews = [], products = [], glossaryTe
                                                         className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all flex items-center gap-2 shadow-lg shadow-slate-200 hover:scale-105"
                                                     >
                                                         <Plus size={18} /> Add Item
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setPantryView('prompt-builder')}
+                                                        className="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-700 transition-all flex items-center gap-2 shadow-lg shadow-emerald-100 hover:scale-105"
+                                                    >
+                                                        <Sparkles size={18} /> Forge Prompt
                                                     </button>
                                                     <button
                                                         onClick={() => setPantryView('import')}
