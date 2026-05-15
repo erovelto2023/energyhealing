@@ -1,7 +1,31 @@
+"use client";
+
 import Link from 'next/link';
-import { Leaf, YoutubeIcon as Youtube, FacebookIcon as Facebook } from 'lucide-react';
+import { Leaf, YoutubeIcon as Youtube, FacebookIcon as Facebook, Menu } from 'lucide-react';
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet";
+import { useState } from 'react';
+
+const NAV_LINKS = [
+    { name: 'Blog', href: '/blog' },
+    { name: 'Glossary', href: '/glossary' },
+    { name: 'Questions / FAQ', href: '/questions' },
+    { name: 'Daily Affirmations', href: '/affirmations' },
+    { name: 'Herbs and Plants', href: '/healing-pantry' },
+    { name: 'Resources', href: '/marketplace' },
+    { name: 'Testimonials', href: '/testimonials' },
+    { name: 'Your Story', href: '/stories' },
+];
 
 export default function Header() {
+    const [open, setOpen] = useState(false);
+
     return (
         <header className="sticky top-0 z-50">
             {/* Disclaimer Banner */}
@@ -22,14 +46,9 @@ export default function Header() {
                     </Link>
 
                     <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-600">
-                        <Link href="/blog" className="hover:text-emerald-600 transition-colors">Blog</Link>
-                        <Link href="/glossary" className="hover:text-emerald-600 transition-colors">Glossary</Link>
-                        <Link href="/questions" className="hover:text-emerald-600 transition-colors">Questions / FAQ</Link>
-                        <Link href="/affirmations" className="hover:text-emerald-600 transition-colors">Daily Affirmations</Link>
-                        <Link href="/healing-pantry" className="hover:text-emerald-600 transition-colors">Herbs and Plants</Link>
-                        <Link href="/marketplace" className="hover:text-emerald-600 transition-colors">Resources</Link>
-                        <Link href="/testimonials" className="hover:text-emerald-600 transition-colors">Testimonials</Link>
-                        <Link href="/stories" className="hover:text-emerald-600 transition-colors">Your Story</Link>
+                        {NAV_LINKS.map((link) => (
+                            <Link key={link.href} href={link.href} className="hover:text-emerald-600 transition-colors">{link.name}</Link>
+                        ))}
 
                         {/* Social Links */}
                         <div className="flex items-center gap-3 border-l border-slate-200 pl-5">
@@ -46,9 +65,53 @@ export default function Header() {
                         </Link>
                     </div>
 
-                    {/* Mobile Menu Icon Placeholder */}
-                    <div className="md:hidden text-slate-400">
-                        <Leaf size={24} />
+                    {/* Mobile Menu */}
+                    <div className="lg:hidden">
+                        <Sheet open={open} onOpenChange={setOpen}>
+                            <SheetTrigger asChild>
+                                <button className="p-2 text-slate-600 hover:text-emerald-600 transition-colors">
+                                    <Menu size={24} />
+                                </button>
+                            </SheetTrigger>
+                            <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white">
+                                <SheetHeader className="mb-8">
+                                    <SheetTitle className="text-left flex items-center gap-2">
+                                        <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white">
+                                            <Leaf size={16} />
+                                        </div>
+                                        <span className="text-xl font-bold tracking-tight text-slate-900">Kathleen<span className="text-emerald-600">Heals</span></span>
+                                    </SheetTitle>
+                                </SheetHeader>
+                                <div className="flex flex-col gap-6 text-lg font-medium text-slate-600">
+                                    {NAV_LINKS.map((link) => (
+                                        <Link 
+                                            key={link.href} 
+                                            href={link.href} 
+                                            className="hover:text-emerald-600 transition-colors"
+                                            onClick={() => setOpen(false)}
+                                        >
+                                            {link.name}
+                                        </Link>
+                                    ))}
+                                    <div className="h-px bg-slate-100 my-2" />
+                                    <div className="flex items-center gap-6">
+                                        <a href="https://www.youtube.com/@KathleenEnergyHealing" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-red-600 transition-colors">
+                                            <Youtube size={24} />
+                                        </a>
+                                        <a href="https://www.facebook.com/groups/908078861130495" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-blue-600 transition-colors">
+                                            <Facebook size={24} />
+                                        </a>
+                                    </div>
+                                    <Link 
+                                        href="/book-session" 
+                                        className="w-full bg-slate-900 text-white px-6 py-4 rounded-2xl hover:bg-emerald-700 transition-all text-center font-bold"
+                                        onClick={() => setOpen(false)}
+                                    >
+                                        Book a Session
+                                    </Link>
+                                </div>
+                            </SheetContent>
+                        </Sheet>
                     </div>
                 </div>
             </nav>

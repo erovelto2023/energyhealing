@@ -5,6 +5,7 @@ import { createGlossaryTerm, updateGlossaryTerm } from "@/lib/actions";
 import { Save, AlertCircle, CheckCircle, Loader2, Link as LinkIcon } from "lucide-react";
 import { IGlossaryTerm } from "@/lib/models/GlossaryTerm";
 import { IProduct } from "@/lib/models/Product";
+import MediaPicker from "./MediaPicker";
 
 interface GlossaryFormProps {
     initialData?: IGlossaryTerm;
@@ -129,6 +130,20 @@ export default function GlossaryForm({ initialData, onComplete, products = [] }:
                         className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
                         placeholder="e.g. Non-duality"
                     />
+                </div>
+
+                <div className="col-span-full">
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Featured Image URL</label>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={formData.imageUrl || ""}
+                            onChange={e => handleChange("imageUrl", e.target.value)}
+                            className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                            placeholder="https://..."
+                        />
+                        <MediaPicker onSelect={(url) => handleChange("imageUrl", url)} />
+                    </div>
                 </div>
 
                 <div className="col-span-full">

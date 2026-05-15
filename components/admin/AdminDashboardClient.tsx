@@ -77,6 +77,14 @@ export default function AdminDashboardClient() {
             color: 'from-orange-500 to-amber-500'
         },
         {
+            title: 'Media Center',
+            description: 'Centralized asset management and secure downloads.',
+            href: '/admin/media',
+            icon: <LayoutDashboard size={24} />,
+            color: 'from-indigo-600 to-blue-600',
+            tag: 'New'
+        },
+        {
             title: 'Internal Tools',
             description: 'Platform settings and system maintenance.',
             href: '#',

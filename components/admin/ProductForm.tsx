@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { createProduct, updateProduct } from "@/lib/actions";
 import { IProduct } from "@/lib/models/Product";
+import MediaPicker from "./MediaPicker";
 
 export default function ProductForm({ initialData }: { initialData?: IProduct }) {
     const [isPending, startTransition] = useTransition();
@@ -97,7 +98,13 @@ export default function ProductForm({ initialData }: { initialData?: IProduct })
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700">Logo URL</label>
-                        <input name="logoUrl" defaultValue={initialData?.logoUrl} className="input-field" placeholder="https://..." />
+                        <div className="flex gap-2">
+                            <input name="logoUrl" id="logoUrl" defaultValue={initialData?.logoUrl} className="input-field flex-1" placeholder="https://..." />
+                            <MediaPicker onSelect={(url) => {
+                                const input = document.getElementById('logoUrl') as HTMLInputElement;
+                                if (input) input.value = url;
+                            }} />
+                        </div>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700">Niche *</label>
