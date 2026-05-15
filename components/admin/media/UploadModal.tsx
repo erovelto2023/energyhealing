@@ -152,6 +152,18 @@ export const UploadModal = ({ isOpen, onClose, onSuccess }: UploadModalProps) =>
                         </DialogDescription>
                     </DialogHeader>
 
+                    <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-4 flex items-start gap-4">
+                        <div className="p-2 bg-amber-500/10 rounded-lg">
+                            <Zap className="h-5 w-5 text-amber-500" />
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-amber-200 uppercase tracking-widest">Universal Media Notice</p>
+                            <p className="text-[10px] text-amber-500/70 mt-1 leading-relaxed">
+                                To avoid duplicate files, please upload primary assets directly to <a href="https://kbusinessacademy.com/admin/media" target="_blank" className="underline font-bold hover:text-amber-400">kbusinessacademy.com</a>. Assets uploaded there will automatically sync here.
+                            </p>
+                        </div>
+                    </div>
+
                     {!isUploading ? (
                         <div className="space-y-6">
                             {/* Category Selector */}

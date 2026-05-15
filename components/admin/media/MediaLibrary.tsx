@@ -162,6 +162,13 @@ export default function MediaLibrary({ onSelect }: MediaLibraryProps) {
                 </div>
             </div>
 
+            <div className="flex items-center gap-2 px-2">
+                <div className="flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Linked to kbusinessacademy.com vault</span>
+                </div>
+            </div>
+
             {/* Grid */}
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-40 space-y-4">

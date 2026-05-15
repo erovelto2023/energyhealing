@@ -33,7 +33,7 @@ export default function AssetWarehouse() {
         setLoading(true);
         const result = await getResources({ 
             query: search, 
-            type: "file" // This includes 'file', 'pdf'
+            type: "warehouse" 
         });
         if (result.success) {
             setAssets(result.data);
@@ -121,6 +121,13 @@ export default function AssetWarehouse() {
                     >
                         <RefreshCw className={`h-5 w-5 text-slate-500 ${loading ? 'animate-spin' : ''}`} />
                     </Button>
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2 px-2">
+                <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Pulling from kbusinessacademy.com Warehouse</span>
                 </div>
             </div>
 

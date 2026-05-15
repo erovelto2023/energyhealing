@@ -71,30 +71,58 @@ export async function getResources(options: {
         const { userId } = await auth();
         if (!userId) throw new Error("Unauthorized");
 
-        await connectToDatabase();
+        const MAIN_SITE = "https://kbusinessacademy.com";
+        const url = new URL(`${MAIN_SITE}/api/gallery`);
         
-        let filter: any = {};
-        if (options.query) {
-            const safeQuery = escapeRegExp(options.query);
-            filter.$or = [
-                { title: { $regex: safeQuery, $options: "i" } },
-                { tags: { $regex: safeQuery, $options: "i" } }
-            ];
-        }
-        if (options.category && options.category !== 'all') {
-            filter.category = options.category;
-        }
+        if (options.query) url.searchParams.set("query", options.query);
+        if (options.category) url.searchParams.set("category", options.category);
+        if (options.status) url.searchParams.set("status", options.status);
+        // The external API uses 'limit' but we can just fetch default for now
+        url.searchParams.set("limit", "100");
+
+        console.log("[getResources] Fetching from external vault:", url.toString());
+        const response = await fetch(url.toString(), {
+            next: { revalidate: 60 } // Cache for 1 minute
+        });
+        
+        if (!response.ok) throw new Error("Failed to fetch from main media site");
+        
+        const result = await response.json();
+        
+        if (!result.success) throw new Error(result.error || "External API error");
+
+        // Map external structure to local structure if necessary
+        // Local expects: _id, title, url, type, category, mimeType, fileSizeBytes, status, altText, thumbnailUrl, tags
+        // External provides: _id, title, altText, description, tags, fileUrl, thumbnailUrl, mimeType, fileSizeBytes, status, createdAt, category
+        const mappedData = result.images.map((img: any) => ({
+            _id: img._id,
+            title: img.title,
+            url: img.fileUrl, // Map fileUrl to url
+            thumbnailUrl: img.thumbnailUrl,
+            type: img.mimeType?.startsWith("image/") ? "image" : (img.mimeType === "application/pdf" ? "pdf" : "file"),
+            category: img.category,
+            mimeType: img.mimeType,
+            fileSizeBytes: img.fileSizeBytes,
+            status: img.status,
+            altText: img.altText,
+            tags: img.tags,
+            createdAt: img.createdAt
+        }));
+
+        // Client side filtering for 'warehouse' if needed, though the API might handle it
+        let finalData = mappedData;
         if (options.type && options.type !== 'all') {
-            filter.type = options.type;
-        }
-        if (options.status && options.status !== 'all') {
-            filter.status = options.status;
+            if (options.type === 'warehouse') {
+                finalData = mappedData.filter((a: any) => a.type !== 'image');
+            } else if (options.type === 'image') {
+                finalData = mappedData.filter((a: any) => a.type === 'image');
+            } else {
+                finalData = mappedData.filter((a: any) => a.type === options.type);
+            }
         }
 
-        console.log("[getResources] Filter:", filter);
-        const resources = await Resource.find(filter).sort({ createdAt: -1 }).lean();
-        console.log("[getResources] Found:", resources.length);
-        return { success: true, data: JSON.parse(JSON.stringify(resources)) };
+        console.log("[getResources] Successfully pulled from external vault. Count:", finalData.length);
+        return { success: true, data: finalData };
     } catch (error: any) {
         console.error("[getResources] Error:", error);
         return { success: false, error: error.message };
@@ -109,19 +137,11 @@ export async function updateResource(id: string, data: any) {
         const user = await validateAdmin();
         if (!user) throw new Error("Unauthorized");
 
-        await connectToDatabase();
-        
-        // Handle tags if they come as a string
-        if (data.tags && typeof data.tags === 'string') {
-            data.tags = data.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
-        }
-
-        const resource = await Resource.findByIdAndUpdate(id, data, { new: true });
-
-        revalidatePath("/admin/media");
-        return { success: true, data: JSON.parse(JSON.stringify(resource)) };
+        return { 
+            success: false, 
+            error: "This asset is managed by kbusinessacademy.com. Please perform updates on the main site to ensure consistency across the network." 
+        };
     } catch (error: any) {
-        console.error("[updateResource] Error:", error);
         return { success: false, error: error.message };
     }
 }
@@ -134,24 +154,11 @@ export async function removeResource(id: string) {
         const user = await validateAdmin();
         if (!user) throw new Error("Unauthorized");
 
-        await connectToDatabase();
-        const resource = await Resource.findById(id);
-        if (!resource) throw new Error("Resource not found");
-
-        // Delete from disk
-        try {
-            await deleteFile(resource.url);
-        } catch (err) {
-            console.warn(`File already deleted from disk or not found: ${resource.url}`);
-        }
-
-        // Delete from DB
-        await Resource.findByIdAndDelete(id);
-
-        revalidatePath("/admin/media");
-        return { success: true };
+        return { 
+            success: false, 
+            error: "Deletion is restricted in the Universal Media Center. Please purge this asset from the main site (kbusinessacademy.com) to remove it from the network." 
+        };
     } catch (error: any) {
-        console.error("[removeResource] Error:", error);
         return { success: false, error: error.message };
     }
 }
