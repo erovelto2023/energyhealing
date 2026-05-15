@@ -226,7 +226,7 @@ export default function MediaLibrary({ onSelect }: MediaLibraryProps) {
                                     </div>
 
                                     {/* Hover Actions */}
-                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2 backdrop-blur-[2px]">
+                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 lg:group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2 backdrop-blur-[2px] touch-none">
                                         <button 
                                             onClick={() => setSnippetAsset(asset)}
                                             className="p-3 bg-white/10 hover:bg-[#6366F1] rounded-2xl text-white transition-all hover:scale-110"
@@ -268,12 +268,14 @@ export default function MediaLibrary({ onSelect }: MediaLibraryProps) {
 
                                 {/* Select Button for Overlays */}
                                 {onSelect && (
-                                    <button 
-                                        onClick={() => onSelect(asset.url)}
-                                        className="absolute bottom-4 left-4 right-4 py-2 bg-[#6366F1] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                        Select Asset
-                                    </button>
+                                    <div className="px-4 pb-4">
+                                        <Button 
+                                            onClick={() => onSelect(asset.url)}
+                                            className="w-full py-2 bg-[#6366F1] hover:bg-[#5850EC] text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 transition-all lg:opacity-0 lg:group-hover:opacity-100"
+                                        >
+                                            Select Asset
+                                        </Button>
+                                    </div>
                                 )}
                             </motion.div>
                         ))}
