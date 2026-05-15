@@ -51,21 +51,37 @@ export default function MediaLibrary({ onSelect }: MediaLibraryProps) {
     const [editStatus, setEditStatus] = useState("published");
     const [saving, setSaving] = useState(false);
 
+    // Pagination State
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+
     const fetchAssets = useCallback(async () => {
         setLoading(true);
         const result = await getResources({ 
             query: search, 
             status: statusFilter, 
             category: categoryFilter,
-            type: "image" 
+            type: "image",
+            page: page,
+            limit: 20
         });
         console.log("[MediaLibrary] Fetch result:", result);
         if (result.success) {
             setAssets(result.data);
+            if (result.pagination) {
+                setTotalPages(result.pagination.totalPages);
+                setTotalItems(result.pagination.total);
+            }
         } else {
             toast.error("Failed to pull images: " + (result.error || "Unknown error"));
         }
         setLoading(false);
+    }, [search, statusFilter, categoryFilter, page]);
+
+    // Reset page when filters change
+    useEffect(() => {
+        setPage(1);
     }, [search, statusFilter, categoryFilter]);
 
     useEffect(() => {
@@ -195,92 +211,147 @@ export default function MediaLibrary({ onSelect }: MediaLibraryProps) {
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                    <AnimatePresence>
-                        {assets.map((asset) => (
-                            <motion.div 
-                                key={asset._id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="group relative bg-[#111622] border border-slate-800 rounded-[28px] overflow-hidden hover:border-[#6366F1]/50 transition-all shadow-lg hover:shadow-[#6366F1]/5"
-                            >
-                                {/* Thumbnail */}
-                                <div className="aspect-square relative overflow-hidden bg-slate-900/50">
-                                    <img 
-                                        src={asset.url} 
-                                        alt={asset.altText || asset.title}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                        loading="lazy"
-                                    />
-                                    
-                                    {/* Badges */}
-                                    <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                                        <span className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest ${asset.status === 'published' ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'}`}>
-                                            {asset.status}
-                                        </span>
-                                        {asset.category !== 'General' && (
-                                            <span className="px-2 py-0.5 bg-[#6366F1] text-white rounded-lg text-[8px] font-black uppercase tracking-widest">
-                                                {asset.category}
+                <>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                        <AnimatePresence>
+                            {assets.map((asset) => (
+                                <motion.div 
+                                    key={asset._id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="group relative bg-[#111622] border border-slate-800 rounded-[28px] overflow-hidden hover:border-[#6366F1]/50 transition-all shadow-lg hover:shadow-[#6366F1]/5"
+                                >
+                                    {/* Thumbnail */}
+                                    <div className="aspect-square relative overflow-hidden bg-slate-900/50">
+                                        <img 
+                                            src={asset.url} 
+                                            alt={asset.altText || asset.title}
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            loading="lazy"
+                                        />
+                                        
+                                        {/* Badges */}
+                                        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                                            <span className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest ${asset.status === 'published' ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'}`}>
+                                                {asset.status}
                                             </span>
-                                        )}
-                                    </div>
+                                            {asset.category !== 'General' && (
+                                                <span className="px-2 py-0.5 bg-[#6366F1] text-white rounded-lg text-[8px] font-black uppercase tracking-widest">
+                                                    {asset.category}
+                                                </span>
+                                            )}
+                                        </div>
 
-                                    {/* Hover Actions */}
-                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 lg:group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2 backdrop-blur-[2px] touch-none">
-                                        <button 
-                                            onClick={() => setSnippetAsset(asset)}
-                                            className="p-3 bg-white/10 hover:bg-[#6366F1] rounded-2xl text-white transition-all hover:scale-110"
-                                            title="Embed Code"
-                                        >
-                                            <Copy className="h-4 w-4" />
-                                        </button>
-                                        <button 
-                                            onClick={() => openEdit(asset)}
-                                            className="p-3 bg-white/10 hover:bg-white text-slate-900 rounded-2xl transition-all hover:scale-110"
-                                            title="Edit Metadata"
-                                        >
-                                            <Pencil className="h-4 w-4" />
-                                        </button>
-                                        <button 
-                                            onClick={() => handleDelete(asset._id)}
-                                            className="p-3 bg-white/10 hover:bg-rose-500 rounded-2xl text-white transition-all hover:scale-110"
-                                            title="Delete"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Info */}
-                                <div className="p-4 space-y-1">
-                                    <h4 className="text-sm font-bold text-white truncate">{asset.title}</h4>
-                                    <div className="flex items-center justify-between">
-                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
-                                            {formatSize(asset.fileSizeBytes)}
-                                        </p>
-                                        <div className="flex gap-1">
-                                            {asset.tags?.slice(0, 2).map((tag: string) => (
-                                                <span key={tag} className="text-[8px] text-[#6366F1] font-bold">#{tag}</span>
-                                            ))}
+                                        {/* Hover Actions */}
+                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 lg:group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2 backdrop-blur-[2px] touch-none">
+                                            <button 
+                                                onClick={() => setSnippetAsset(asset)}
+                                                className="p-3 bg-white/10 hover:bg-[#6366F1] rounded-2xl text-white transition-all hover:scale-110"
+                                                title="Embed Code"
+                                            >
+                                                <Copy className="h-4 w-4" />
+                                            </button>
+                                            <button 
+                                                onClick={() => openEdit(asset)}
+                                                className="p-3 bg-white/10 hover:bg-white text-slate-900 rounded-2xl transition-all hover:scale-110"
+                                                title="Edit Metadata"
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDelete(asset._id)}
+                                                className="p-3 bg-white/10 hover:bg-rose-500 rounded-2xl text-white transition-all hover:scale-110"
+                                                title="Delete"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
                                         </div>
                                     </div>
+
+                                    {/* Info */}
+                                    <div className="p-4 space-y-1">
+                                        <h4 className="text-sm font-bold text-white truncate">{asset.title}</h4>
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                                                {formatSize(asset.fileSizeBytes)}
+                                            </p>
+                                            <div className="flex gap-1">
+                                                {asset.tags?.slice(0, 2).map((tag: string) => (
+                                                    <span key={tag} className="text-[8px] text-[#6366F1] font-bold">#{tag}</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Select Button for Overlays */}
+                                    {onSelect && (
+                                        <div className="px-4 pb-4">
+                                            <Button 
+                                                onClick={() => onSelect(asset.url)}
+                                                className="w-full py-2 bg-[#6366F1] hover:bg-[#5850EC] text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 transition-all lg:opacity-0 lg:group-hover:opacity-100"
+                                            >
+                                                Select Asset
+                                            </Button>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#111622] p-6 rounded-[32px] border border-slate-800 shadow-xl mt-8">
+                            <div className="flex items-center gap-4">
+                                <div className="p-2 bg-slate-900 rounded-xl border border-slate-800">
+                                    <ImageIcon className="h-4 w-4 text-slate-500" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Inventory Status</p>
+                                    <p className="text-xs font-bold text-white">Showing {assets.length} of {totalItems} assets</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    disabled={page === 1}
+                                    variant="outline"
+                                    className="rounded-xl border-slate-800 bg-[#0A0D14] text-slate-400 hover:text-white disabled:opacity-30 h-10 px-4"
+                                >
+                                    Previous
+                                </Button>
+                                
+                                <div className="flex items-center gap-1 mx-2">
+                                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                        let pageNum = i + 1;
+                                        if (totalPages > 5 && page > 3) {
+                                            pageNum = Math.min(page - 2 + i, totalPages - 4 + i);
+                                        }
+                                        return (
+                                            <button
+                                                key={pageNum}
+                                                onClick={() => setPage(pageNum)}
+                                                className={`w-8 h-8 rounded-lg text-[10px] font-bold transition-all ${page === pageNum ? 'bg-[#6366F1] text-white shadow-lg shadow-indigo-500/20' : 'text-slate-500 hover:bg-slate-800'}`}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
 
-                                {/* Select Button for Overlays */}
-                                {onSelect && (
-                                    <div className="px-4 pb-4">
-                                        <Button 
-                                            onClick={() => onSelect(asset.url)}
-                                            className="w-full py-2 bg-[#6366F1] hover:bg-[#5850EC] text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 transition-all lg:opacity-0 lg:group-hover:opacity-100"
-                                        >
-                                            Select Asset
-                                        </Button>
-                                    </div>
-                                )}
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-                </div>
+                                <Button
+                                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={page === totalPages}
+                                    variant="outline"
+                                    className="rounded-xl border-slate-800 bg-[#0A0D14] text-slate-400 hover:text-white disabled:opacity-30 h-10 px-4"
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </>
             )}
 
             {/* Snippet Modal */}

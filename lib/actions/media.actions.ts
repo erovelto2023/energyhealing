@@ -66,6 +66,8 @@ export async function getResources(options: {
     category?: string; 
     type?: string; 
     status?: string;
+    page?: number;
+    limit?: number;
 } = {}) {
     try {
         const { userId } = await auth();
@@ -74,30 +76,31 @@ export async function getResources(options: {
         const MAIN_SITE = "https://kbusinessacademy.com";
         const url = new URL(`${MAIN_SITE}/api/gallery`);
         
+        const page = options.page || 1;
+        const limit = options.limit || 20;
+
         if (options.query) url.searchParams.set("query", options.query);
         if (options.category) url.searchParams.set("category", options.category);
         if (options.status) url.searchParams.set("status", options.status);
-        // The external API uses 'limit' but we can just fetch default for now
-        url.searchParams.set("limit", "100");
+        
+        // Fetch a larger batch and paginate here if the remote API doesn't support page
+        // But we'll pass limit to the API to reduce load
+        url.searchParams.set("limit", "1000"); 
 
         console.log("[getResources] Fetching from external vault:", url.toString());
         const response = await fetch(url.toString(), {
-            next: { revalidate: 60 } // Cache for 1 minute
+            next: { revalidate: 60 }
         });
         
         if (!response.ok) throw new Error("Failed to fetch from main media site");
         
         const result = await response.json();
-        
         if (!result.success) throw new Error(result.error || "External API error");
 
-        // Map external structure to local structure if necessary
-        // Local expects: _id, title, url, type, category, mimeType, fileSizeBytes, status, altText, thumbnailUrl, tags
-        // External provides: _id, title, altText, description, tags, fileUrl, thumbnailUrl, mimeType, fileSizeBytes, status, createdAt, category
-        const mappedData = result.images.map((img: any) => ({
+        let mappedData = result.images.map((img: any) => ({
             _id: img._id,
             title: img.title,
-            url: img.fileUrl, // Map fileUrl to url
+            url: img.fileUrl,
             thumbnailUrl: img.thumbnailUrl,
             type: img.mimeType?.startsWith("image/") ? "image" : (img.mimeType === "application/pdf" ? "pdf" : "file"),
             category: img.category,
@@ -109,20 +112,35 @@ export async function getResources(options: {
             createdAt: img.createdAt
         }));
 
-        // Client side filtering for 'warehouse' if needed, though the API might handle it
-        let finalData = mappedData;
+        // Client side filtering for 'warehouse' or 'image'
         if (options.type && options.type !== 'all') {
             if (options.type === 'warehouse') {
-                finalData = mappedData.filter((a: any) => a.type !== 'image');
+                mappedData = mappedData.filter((a: any) => a.type !== 'image');
             } else if (options.type === 'image') {
-                finalData = mappedData.filter((a: any) => a.type === 'image');
+                mappedData = mappedData.filter((a: any) => a.type === 'image');
             } else {
-                finalData = mappedData.filter((a: any) => a.type === options.type);
+                mappedData = mappedData.filter((a: any) => a.type === options.type);
             }
         }
 
-        console.log("[getResources] Successfully pulled from external vault. Count:", finalData.length);
-        return { success: true, data: finalData };
+        // Apply Pagination
+        const total = mappedData.length;
+        const totalPages = Math.ceil(total / limit);
+        const startIndex = (page - 1) * limit;
+        const paginatedData = mappedData.slice(startIndex, startIndex + limit);
+
+        console.log(`[getResources] Pulled ${total} total. Returning page ${page} (${paginatedData.length} items).`);
+        
+        return { 
+            success: true, 
+            data: paginatedData,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages
+            }
+        };
     } catch (error: any) {
         console.error("[getResources] Error:", error);
         return { success: false, error: error.message };

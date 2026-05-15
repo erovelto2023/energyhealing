@@ -29,16 +29,32 @@ export default function AssetWarehouse() {
     const [search, setSearch] = useState("");
     const [copiedId, setCopiedId] = useState<string | null>(null);
 
+    // Pagination
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+
     const fetchAssets = useCallback(async () => {
         setLoading(true);
         const result = await getResources({ 
             query: search, 
-            type: "warehouse" 
+            type: "warehouse",
+            page: page,
+            limit: 20
         });
         if (result.success) {
             setAssets(result.data);
+            if (result.pagination) {
+                setTotalPages(result.pagination.totalPages);
+                setTotalItems(result.pagination.total);
+            }
         }
         setLoading(false);
+    }, [search, page]);
+
+    // Reset page when search changes
+    useEffect(() => {
+        setPage(1);
     }, [search]);
 
     useEffect(() => {
@@ -313,6 +329,59 @@ export default function AssetWarehouse() {
                     ))
                 )}
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#111622] p-6 rounded-[32px] border border-slate-800 shadow-xl">
+                    <div className="flex items-center gap-4">
+                        <div className="p-2 bg-emerald-500/10 rounded-xl">
+                            <Package className="h-4 w-4 text-emerald-500" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Warehouse Inventory</p>
+                            <p className="text-xs font-bold text-white">Showing {assets.length} of {totalItems} items</p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Button
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            disabled={page === 1}
+                            variant="outline"
+                            className="rounded-xl border-slate-800 bg-[#0A0D14] text-slate-400 hover:text-white disabled:opacity-30 h-10 px-4"
+                        >
+                            Previous
+                        </Button>
+                        
+                        <div className="flex items-center gap-1 mx-2">
+                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                let pageNum = i + 1;
+                                if (totalPages > 5 && page > 3) {
+                                    pageNum = Math.min(page - 2 + i, totalPages - 4 + i);
+                                }
+                                return (
+                                    <button
+                                        key={pageNum}
+                                        onClick={() => setPage(pageNum)}
+                                        className={`w-8 h-8 rounded-lg text-[10px] font-bold transition-all ${page === pageNum ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-500 hover:bg-slate-800'}`}
+                                    >
+                                        {pageNum}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <Button
+                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                            disabled={page === totalPages}
+                            variant="outline"
+                            className="rounded-xl border-slate-800 bg-[#0A0D14] text-slate-400 hover:text-white disabled:opacity-30 h-10 px-4"
+                        >
+                            Next
+                        </Button>
+                    </div>
+                </div>
+            )}
 
             {/* Security Notice */}
             <div className="flex items-start gap-4 p-6 bg-indigo-500/5 border border-indigo-500/10 rounded-[32px]">
